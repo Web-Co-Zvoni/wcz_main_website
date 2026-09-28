@@ -7,7 +7,7 @@ import { EASE } from "./ui";
 const LINKS = [
   { label: "Služby", href: "#sluzby" },
   { label: "Postup", href: "#postup" },
-  { label: "Reference", href: "#reference" },
+  { label: "Koncepty", href: "#reference" },
   { label: "Ceník", href: "#cenik" },
   { label: "Otázky", href: "#faq" },
   { label: "Kontakt", href: "#kontakt" },

@@ -4,7 +4,7 @@ import { Logo } from "./Header";
 const NAV = [
   { label: "Služby", href: "#sluzby" },
   { label: "Postup", href: "#postup" },
-  { label: "Reference", href: "#reference" },
+  { label: "Koncepty", href: "#reference" },
   { label: "Ceník", href: "#cenik" },
   { label: "Otázky", href: "#faq" },
   { label: "Kontakt", href: "#kontakt" },

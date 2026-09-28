@@ -4,22 +4,21 @@ import {
   ArrowRight,
   BatteryFull,
   CheckCircle2,
+  ClipboardList,
   MapPin,
   Phone,
   PhoneOff,
   Signal,
-  Star,
-  TrendingUp,
   Wifi,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { EASE, Eyebrow, Reveal } from "./ui";
 
 const CALLERS = [
-  { tag: "Instalatérství · web", name: "Rekonstrukce koupelny", place: "Plzeň–Doubravka", initials: "RK" },
-  { tag: "Kadeřnictví · kalendář", name: "Rezervace — pánský střih", place: "Plzeň–Bory", initials: "PS" },
-  { tag: "Truhlářství · poptávka", name: "Kuchyň na míru 3,6 m", place: "Rokycany", initials: "KM" },
-  { tag: "Autoservis · telefon", name: "STK + výměna oleje", place: "Nýřany", initials: "SV" },
+  { tag: "Ukázkový scénář", name: "Poptávka na instalatérské práce", place: "Ilustrační obsah", initials: "UP" },
+  { tag: "Ukázkový scénář", name: "Rezervace termínu v salonu", place: "Ilustrační obsah", initials: "RS" },
+  { tag: "Ukázkový scénář", name: "Poptávka na nábytek na míru", place: "Ilustrační obsah", initials: "NM" },
+  { tag: "Ukázkový scénář", name: "Objednání do autoservisu", place: "Ilustrační obsah", initials: "OA" },
 ];
 
 const STATS = [
@@ -195,10 +194,10 @@ function PhoneMockup() {
         className="animate-floaty absolute -left-24 bottom-24 hidden rounded-2xl border border-paper/10 bg-card/95 px-4 py-3 shadow-2xl backdrop-blur lg:block"
       >
         <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-mute">
-          <TrendingUp className="size-3.5 text-accent" />
-          Za 3 měsíce
+          <ClipboardList className="size-3.5 text-accent" />
+          Ukázková funkce
         </p>
-        <p className="stretch mt-1 text-lg font-extrabold text-paper">+64 % poptávek</p>
+        <p className="stretch mt-1 text-lg font-extrabold text-paper">Poptávkový formulář</p>
       </motion.div>
 
       <motion.div
@@ -209,9 +208,9 @@ function PhoneMockup() {
       >
         <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-mute">
           <CheckCircle2 className="size-3.5 text-leaf" />
-          Rezervace potvrzena
+          Ukázková funkce
         </p>
-        <p className="mt-1 text-[13px] font-semibold text-paper">Čtvrtek 14:30 — bez jediného hovoru</p>
+        <p className="mt-1 text-[13px] font-semibold text-paper">Online rezervace termínu</p>
       </motion.div>
     </div>
   );
@@ -254,7 +253,7 @@ export default function Hero() {
               <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-mute">
                 Stavíme poctivé weby pro <span className="text-paper">živnostníky a malé firmy</span> z Plzně
                 a okolí. Bez korporátních keců a paušálů za nic — jen web, díky kterému{" "}
-                <span className="text-paper">vám zákazníci volají, ne konkurenci.</span>
+                <span className="text-paper">vás zákazníci snadno najdou a kontaktují.</span>
               </p>
             </Reveal>
 
@@ -271,7 +270,7 @@ export default function Hero() {
                   href="#reference"
                   className="group flex items-center gap-2.5 rounded-full border border-paper/15 px-7 py-4 text-[15px] font-bold tracking-tight text-paper transition-all duration-300 hover:border-accent/60 hover:text-accent"
                 >
-                  Podívat se na práce
+                  Podívat se na koncepty
                   <ArrowDownRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:translate-y-0.5" strokeWidth={2.5} />
                 </a>
               </div>
@@ -279,12 +278,7 @@ export default function Hero() {
 
             <Reveal delay={0.75}>
               <p className="mt-6 flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] text-mute">
-                <span className="flex text-flame">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="size-3.5" fill="currentColor" strokeWidth={0} />
-                  ))}
-                </span>
-                <span className="uppercase">5,0 z 27 recenzí · Odpovídáme do 24 hodin</span>
+                <span className="uppercase">Ukázkové scénáře nejsou klientské výsledky</span>
               </p>
             </Reveal>
           </div>
