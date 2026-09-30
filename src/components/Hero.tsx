@@ -12,21 +12,8 @@ import {
   Wifi,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { HERO, SETTINGS, SITE } from "../content";
 import { EASE, Eyebrow, Reveal } from "./ui";
-
-const CALLERS = [
-  { tag: "Ukázkový scénář", name: "Poptávka na instalatérské práce", place: "Ilustrační obsah", initials: "UP" },
-  { tag: "Ukázkový scénář", name: "Rezervace termínu v salonu", place: "Ilustrační obsah", initials: "RS" },
-  { tag: "Ukázkový scénář", name: "Poptávka na nábytek na míru", place: "Ilustrační obsah", initials: "NM" },
-  { tag: "Ukázkový scénář", name: "Objednání do autoservisu", place: "Ilustrační obsah", initials: "OA" },
-];
-
-const STATS = [
-  { v: "72 h", l: "první návrh — zdarma" },
-  { v: "14 dní", l: "od zadání po spuštění" },
-  { v: "0 Kč", l: "měsíční paušály za nic" },
-  { v: "24 h", l: "do odpovědi na poptávku" },
-];
 
 function PhoneMockup() {
   const [idx, setIdx] = useState(0);
@@ -35,7 +22,7 @@ function PhoneMockup() {
 
   useEffect(() => {
     if (accepted) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % CALLERS.length), 4200);
+    const t = setInterval(() => setIdx((i) => (i + 1) % HERO.callers.length), SETTINGS.callerRotationMs);
     return () => clearInterval(t);
   }, [accepted]);
 
@@ -45,14 +32,14 @@ function PhoneMockup() {
     return () => clearInterval(t);
   }, [accepted]);
 
-  const c = CALLERS[idx];
+  const c = HERO.callers[idx];
   const mm = String(Math.floor(sec / 60)).padStart(2, "0");
   const ss = String(sec % 60).padStart(2, "0");
 
   const hangUp = () => {
     setAccepted(false);
     setSec(0);
-    setIdx((i) => (i + 1) % CALLERS.length);
+    setIdx((i) => (i + 1) % HERO.callers.length);
   };
 
   return (
@@ -81,7 +68,7 @@ function PhoneMockup() {
             <div className="flex items-center gap-2 rounded-full border border-leaf/25 bg-leaf/10 px-3.5 py-1.5">
               <span className="size-1.5 animate-blink rounded-full bg-leaf" />
               <span className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-leaf">
-                {accepted ? "Hovor probíhá" : "Příchozí poptávka"}
+                {accepted ? HERO.callLabels.inProgress : HERO.callLabels.incoming}
               </span>
             </div>
 
@@ -148,7 +135,7 @@ function PhoneMockup() {
                 </p>
                 <button
                   onClick={hangUp}
-                  aria-label="Ukončit hovor"
+                    aria-label={HERO.callLabels.hangUp}
                   className="grid size-16 place-items-center rounded-full bg-blood text-paper shadow-[0_0_36px_-8px_var(--color-blood)] transition-transform hover:scale-105 active:scale-95"
                 >
                   <PhoneOff className="size-6" />
@@ -158,24 +145,24 @@ function PhoneMockup() {
               <div className="mt-auto flex w-full items-center justify-between px-5">
                 <div className="flex flex-col items-center gap-2">
                   <button
-                    onClick={() => setIdx((i) => (i + 1) % CALLERS.length)}
-                    aria-label="Odmítnout"
+                    onClick={() => setIdx((i) => (i + 1) % HERO.callers.length)}
+                    aria-label={HERO.callLabels.reject}
                     className="grid size-15 place-items-center rounded-full bg-blood/90 p-4 text-paper transition-transform hover:scale-105 active:scale-95"
                   >
                     <PhoneOff className="size-6" />
                   </button>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-mute">Příští</span>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-mute">{HERO.callLabels.next}</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <button
                     onClick={() => setAccepted(true)}
-                    aria-label="Přijmout poptávku"
+                    aria-label={HERO.callLabels.acceptRequest}
                     className="relative grid size-15 place-items-center rounded-full bg-leaf p-4 text-ink shadow-[0_0_40px_-6px_var(--color-leaf)] transition-transform hover:scale-110 active:scale-95"
-                    data-cursor="Přijmout"
+                    data-cursor={HERO.callLabels.accept}
                   >
                     <Phone className="size-6" />
                   </button>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-mute">Přijmout</span>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-mute">{HERO.callLabels.accept}</span>
                 </div>
               </div>
             )}
@@ -195,9 +182,9 @@ function PhoneMockup() {
       >
         <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-mute">
           <ClipboardList className="size-3.5 text-accent" />
-          Ukázková funkce
+          {HERO.callLabels.sampleFeature}
         </p>
-        <p className="stretch mt-1 text-lg font-extrabold text-paper">Poptávkový formulář</p>
+        <p className="stretch mt-1 text-lg font-extrabold text-paper">{HERO.callLabels.requestForm}</p>
       </motion.div>
 
       <motion.div
@@ -208,9 +195,9 @@ function PhoneMockup() {
       >
         <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-mute">
           <CheckCircle2 className="size-3.5 text-leaf" />
-          Ukázková funkce
+          {HERO.callLabels.sampleFeature}
         </p>
-        <p className="mt-1 text-[13px] font-semibold text-paper">Online rezervace termínu</p>
+        <p className="mt-1 text-[13px] font-semibold text-paper">{HERO.callLabels.booking}</p>
       </motion.div>
     </div>
   );
@@ -228,22 +215,19 @@ export default function Hero() {
           {/* left */}
           <div className="lg:col-span-7">
             <Reveal delay={0.15}>
-              <Eyebrow>Webová agentura — Plzeň &amp; okolí</Eyebrow>
+              <Eyebrow>{HERO.eyebrowPrefix}{SITE.serviceArea}</Eyebrow>
             </Reveal>
 
             <h1 className="mt-7 stretch-max font-black uppercase leading-[0.92] tracking-tight">
-              {[
-                { text: "Weby,", cls: "text-paper" },
-                { text: "co zvoní.", cls: "text-accent" },
-              ].map((line, i) => (
+              {HERO.titleLines.map((line, i) => (
                 <span key={i} className="block overflow-hidden">
                   <motion.span
                     initial={{ y: "110%" }}
                     animate={{ y: 0 }}
                     transition={{ duration: 1, delay: 0.25 + i * 0.12, ease: EASE }}
-                    className={`block text-[clamp(3.4rem,9vw,7.5rem)] ${line.cls}`}
+                    className={`block text-[clamp(3.4rem,9vw,7.5rem)] ${i === 0 ? "text-paper" : "text-accent"}`}
                   >
-                    {line.text}
+                    {line}
                   </motion.span>
                 </span>
               ))}
@@ -251,9 +235,8 @@ export default function Hero() {
 
             <Reveal delay={0.55}>
               <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-mute">
-                Stavíme poctivé weby pro <span className="text-paper">živnostníky a malé firmy</span> z Plzně
-                a okolí. Bez korporátních keců a paušálů za nic — jen web, díky kterému{" "}
-                <span className="text-paper">vás zákazníci snadno najdou a kontaktují.</span>
+                {HERO.descriptionStart}<span className="text-paper">{HERO.audience}</span>{HERO.descriptionMiddle}
+                <span className="text-paper">{HERO.descriptionEnd}</span>
               </p>
             </Reveal>
 
@@ -263,14 +246,14 @@ export default function Hero() {
                   href="#kontakt"
                   className="group flex items-center gap-2.5 rounded-full bg-accent px-7 py-4 text-[15px] font-bold tracking-tight text-ink transition-all duration-300 hover:bg-flame hover:shadow-[0_0_44px_-8px_var(--color-accent)]"
                 >
-                  Nezávazná konzultace zdarma
+                  {HERO.primaryCta}
                   <ArrowRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
                 </a>
                 <a
                   href="#reference"
                   className="group flex items-center gap-2.5 rounded-full border border-paper/15 px-7 py-4 text-[15px] font-bold tracking-tight text-paper transition-all duration-300 hover:border-accent/60 hover:text-accent"
                 >
-                  Podívat se na koncepty
+                  {HERO.secondaryCta}
                   <ArrowDownRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:translate-y-0.5" strokeWidth={2.5} />
                 </a>
               </div>
@@ -278,7 +261,7 @@ export default function Hero() {
 
             <Reveal delay={0.75}>
               <p className="mt-6 flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] text-mute">
-                <span className="uppercase">Ukázkové scénáře nejsou klientské výsledky</span>
+                <span className="uppercase">{HERO.disclaimer}</span>
               </p>
             </Reveal>
           </div>
@@ -298,12 +281,12 @@ export default function Hero() {
         {/* stats */}
         <Reveal delay={0.2}>
           <div className="mt-20 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-paper/10 bg-paper/10 md:grid-cols-4">
-            {STATS.map((s, i) => (
+            {HERO.stats.map((s, i) => (
               <div key={i} className="group bg-ink px-6 py-7 transition-colors duration-500 hover:bg-card">
                 <p className="stretch text-3xl font-extrabold tracking-tight text-paper transition-colors duration-500 group-hover:text-accent md:text-4xl">
-                  {s.v}
+                  {s.value}
                 </p>
-                <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.16em] text-mute">{s.l}</p>
+                <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.16em] text-mute">{s.label}</p>
               </div>
             ))}
           </div>

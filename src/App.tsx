@@ -2,6 +2,7 @@ import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motio
 import Lenis from "lenis";
 import { Phone } from "lucide-react";
 import { useEffect, useState } from "react";
+import { SETTINGS, SITE } from "./content";
 import Contact from "./components/Contact";
 import Faq from "./components/Faq";
 import Footer from "./components/Footer";
@@ -18,7 +19,7 @@ import Testimonials from "./components/Testimonials";
 /** Butter-smooth scrolling + anchored navigation */
 function useSmoothScroll() {
   useEffect(() => {
-    const lenis = new Lenis({ lerp: 0.11, smoothWheel: true });
+    const lenis = new Lenis({ lerp: SETTINGS.smoothScrollLerp, smoothWheel: true });
     let raf = 0;
     const loop = (t: number) => {
       lenis.raf(t);
@@ -35,7 +36,10 @@ function useSmoothScroll() {
       const el = document.querySelector(id);
       if (el) {
         e.preventDefault();
-        lenis.scrollTo(el as HTMLElement, { offset: -70, duration: 1.4 });
+        lenis.scrollTo(el as HTMLElement, {
+          offset: SETTINGS.smoothScrollOffset,
+          duration: SETTINGS.smoothScrollDuration,
+        });
       }
     };
     document.addEventListener("click", onClick);
@@ -99,7 +103,7 @@ function FloatingCall() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > 640);
+    const onScroll = () => setShow(window.scrollY > SETTINGS.floatingCallScrollThreshold);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -109,19 +113,19 @@ function FloatingCall() {
     <AnimatePresence>
       {show && (
         <motion.a
-          href="tel:+420777284596"
+          href={`tel:${SITE.phoneLink}`}
           initial={{ opacity: 0, scale: 0.5, y: 24 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 24 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           className="group fixed bottom-6 right-6 z-40 flex items-center gap-3 rounded-full bg-accent py-3 pl-4 pr-5 text-ink shadow-[0_16px_40px_-10px_rgba(255,92,31,0.55)] transition-colors hover:bg-flame"
-          aria-label="Zavolat webcozvoni.cz"
+          aria-label={`Zavolat ${SITE.domain}`}
         >
           <span className="relative grid size-9 place-items-center rounded-full bg-ink text-accent">
             <span className="pulse-ring" />
             <Phone className="animate-ringshake size-4" fill="currentColor" />
           </span>
-          <span className="stretch text-[15px] font-black tracking-tight">777 284 596</span>
+          <span className="stretch text-[15px] font-black tracking-tight">{SITE.phone}</span>
         </motion.a>
       )}
     </AnimatePresence>

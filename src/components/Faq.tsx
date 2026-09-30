@@ -1,35 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { FAQ, SITE } from "../content";
 import { cn } from "../utils/cn";
 import { EASE, Reveal, SectionHead } from "./ui";
-
-const FAQS = [
-  {
-    q: "Kolik trvá výroba webu?",
-    a: "Menší weby stíháme za 7–10 dní, ty větší za 2–3 týdny. Termín dostanete předem na papír — a když se zpozdíme z naší viny, máte slevu 10 %. Zpozdit se kvůli nám zkrátka nemůže stát vašeho času.",
-  },
-  {
-    q: "Musím si něco připravit nebo vymyslet texty?",
-    a: "Ne. Stačí telefon a půl hodina času na úvodní hovor. Texty napíšeme my, fotky použijeme vaše — nebo k vám přijedeme a dílnu, tým i hotové zakázky vyfotíme. Vy pak jen schválíte výsledek.",
-  },
-  {
-    q: "Kolik mě web bude stát dohromady a do roka?",
-    a: "Cenu návrhu a výroby víte předem a pevně. K tomu hosting a doména od 1 800 Kč ročně (první rok je od nás). Žádné skryté poplatky, žádné „měsíční paušály na nic“, o kterých se dozvíte až za půl roku.",
-  },
-  {
-    q: "Co když se mi první návrh nebude líbit?",
-    a: "První návrh děláme do 72 hodin zdarma a bez závazků. Upravujeme ho, dokud nesedne — a zaplatíte až po jeho schválení. Kdyby nesedl ani poté, rozejdeme se bez faktury a bez křiku.",
-  },
-  {
-    q: "Zvládnu si web upravovat sám?",
-    a: "Ano. Během 45 minut vás naučíme měnit texty, ceny i fotky — víc většinou není potřeba. A kdybyste si přesto nevěděli rady, stačí napsat; drobné úpravy pro klienty se správou děláme zdarma.",
-  },
-  {
-    q: "Pomůžete i s Googlem, mapami a e-mailem?",
-    a: "Jasně. Zřídíme a doladíme firemní profil na Google (mapy, recenze, fotky), e-maily na vaší doméně i propojení se sociálními sítěmi. Všechno okolo webu pod jednou střechou.",
-  },
-];
 
 export default function Faq() {
   const [open, setOpen] = useState<number | null>(0);
@@ -41,35 +15,34 @@ export default function Faq() {
           <div className="lg:col-span-5">
             <SectionHead
               index="07"
-              eyebrow="Časté otázky"
+              eyebrow={FAQ.eyebrow}
               title={
                 <>
-                  Na rovinu
+                  {FAQ.titleLead}
                   <br />
-                  <span className="text-accent">odpovězeno.</span>
+                  <span className="text-accent">{FAQ.titleAccent}</span>
                 </>
               }
             />
             <Reveal delay={0.2}>
               <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-mute">
-                Nenašli jste, co jste hledali? Zavolejte — raději odpovíme na hloupou otázku než na tu
-                nezodpovězenou.
+                {FAQ.intro}
               </p>
               <a
-                href="tel:+420777284596"
+                href={`tel:${SITE.phoneLink}`}
                 className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-paper/15 px-6 py-3.5 text-[14px] font-bold transition-all duration-300 hover:border-accent/60 hover:text-accent"
               >
-                777 284 596
+                {SITE.phone}
               </a>
             </Reveal>
           </div>
 
           <div className="lg:col-span-7">
             <div className="flex flex-col divide-y divide-paper/10 border-y border-paper/10">
-              {FAQS.map((f, i) => {
+              {FAQ.items.map((f, i) => {
                 const isOpen = open === i;
                 return (
-                  <Reveal key={f.q} delay={i * 0.05}>
+                  <Reveal key={f.question} delay={i * 0.05}>
                     <div>
                       <button
                         onClick={() => setOpen(isOpen ? null : i)}
@@ -83,7 +56,7 @@ export default function Faq() {
                               isOpen ? "text-accent" : "text-paper group-hover:text-accent"
                             )}
                           >
-                            {f.q}
+                            {f.question}
                           </span>
                         </span>
                         <span
@@ -107,7 +80,7 @@ export default function Faq() {
                             className="overflow-hidden"
                           >
                             <p className="max-w-2xl pb-7 pl-8 text-[15px] leading-relaxed text-mute">
-                              {f.a}
+                              {f.answer}
                             </p>
                           </motion.div>
                         )}

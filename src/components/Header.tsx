@@ -1,17 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Menu, Phone, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { HEADER, NAV_LINKS, SITE } from "../content";
 import { cn } from "../utils/cn";
 import { EASE } from "./ui";
-
-const LINKS = [
-  { label: "Služby", href: "#sluzby" },
-  { label: "Postup", href: "#postup" },
-  { label: "Koncepty", href: "#reference" },
-  { label: "Ceník", href: "#cenik" },
-  { label: "Otázky", href: "#faq" },
-  { label: "Kontakt", href: "#kontakt" },
-];
 
 export function Logo({ className }: { className?: string }) {
   return (
@@ -20,8 +12,8 @@ export function Logo({ className }: { className?: string }) {
         <Phone className="size-4.5 -rotate-12" strokeWidth={2.5} fill="currentColor" />
       </span>
       <span className="stretch text-[17px] font-extrabold tracking-tight">
-        webcozvoni
-        <span className="text-accent">.cz</span>
+        {SITE.name}
+        <span className="text-accent">{SITE.brandSuffix}</span>
       </span>
     </a>
   );
@@ -62,7 +54,7 @@ export default function Header() {
           <Logo />
 
           <nav className="hidden items-center gap-7 lg:flex">
-            {LINKS.map((l) => (
+            {NAV_LINKS.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
@@ -76,25 +68,25 @@ export default function Header() {
 
           <div className="flex items-center gap-3">
             <a
-              href="tel:+420777284596"
+              href={`tel:${SITE.phoneLink}`}
               className="hidden items-center gap-2 font-mono text-[12px] tracking-wider text-mute transition-colors hover:text-paper md:flex"
             >
               <span className="relative flex size-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-leaf opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-leaf" />
               </span>
-              777 284 596
+              {SITE.phone}
             </a>
             <a
               href="#kontakt"
               className="hidden items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 text-[13px] font-bold tracking-tight text-ink transition-all duration-300 hover:bg-flame hover:shadow-[0_0_32px_-6px_var(--color-accent)] sm:flex"
             >
-              Chci nabídku zdarma
+              {HEADER.offerCta}
               <ArrowUpRight className="size-4" strokeWidth={2.5} />
             </a>
             <button
               onClick={() => setOpen(true)}
-              aria-label="Otevřít menu"
+              aria-label={HEADER.openMenu}
               className="grid size-10 place-items-center rounded-full border border-paper/15 text-paper lg:hidden"
             >
               <Menu className="size-5" />
@@ -116,14 +108,14 @@ export default function Header() {
               <Logo />
               <button
                 onClick={() => setOpen(false)}
-                aria-label="Zavřít menu"
+                aria-label={HEADER.closeMenu}
                 className="grid size-10 place-items-center rounded-full border border-paper/15 text-paper"
               >
                 <X className="size-5" />
               </button>
             </div>
             <nav className="flex flex-1 flex-col justify-center gap-1 px-6">
-              {LINKS.map((l, i) => (
+              {NAV_LINKS.map((l, i) => (
                 <motion.a
                   key={l.href}
                   href={l.href}
@@ -147,11 +139,11 @@ export default function Header() {
               className="px-6 pb-10"
             >
               <a
-                href="tel:+420777284596"
+                href={`tel:${SITE.phoneLink}`}
                 className="flex items-center justify-between rounded-2xl bg-accent px-6 py-5 text-ink"
               >
-                <span className="text-sm font-bold uppercase tracking-widest">Zavolejte nám</span>
-                <span className="stretch text-2xl font-extrabold">777 284 596</span>
+                <span className="text-sm font-bold uppercase tracking-widest">{HEADER.callUs}</span>
+                <span className="stretch text-2xl font-extrabold">{SITE.phone}</span>
               </a>
             </motion.div>
           </motion.div>

@@ -1,24 +1,10 @@
 import { Asterisk } from "lucide-react";
-
-const TRADES = [
-  "Instalatéři",
-  "Elektrikáři",
-  "Truhláři",
-  "Malíři",
-  "Autoservisy",
-  "Kadeřnictví",
-  "Obkladači",
-  "Zámečníci",
-  "Pekařství",
-  "Klempíři",
-  "Podlaháři",
-  "Hodináři",
-];
+import { MARQUEE_TRADES } from "../content";
 
 export default function Marquee() {
   const row = (key: string) => (
     <div key={key} className="flex shrink-0 items-center">
-      {TRADES.map((t, i) => (
+      {MARQUEE_TRADES.map((t, i) => (
         <span key={i} className="flex items-center">
           <span className="stretch px-6 text-2xl font-extrabold uppercase tracking-tight text-paper/80 md:px-8 md:text-3xl">
             {t}
@@ -30,7 +16,7 @@ export default function Marquee() {
   );
 
   return (
-    <section aria-hidden className="relative border-y border-paper/10 bg-coal py-6">
+    <section aria-hidden className="relative overflow-hidden border-y border-paper/10 bg-coal py-6">
       <div className="animate-marquee flex w-max">
         {row("a")}
         {row("b")}

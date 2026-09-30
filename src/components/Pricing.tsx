@@ -1,54 +1,7 @@
 import { ArrowRight, Check, Flame } from "lucide-react";
+import { PRICING } from "../content";
 import { cn } from "../utils/cn";
 import { Eyebrow, Reveal, SectionHead } from "./ui";
-
-const PLANS = [
-  {
-    name: "Start",
-    price: "9 900 Kč",
-    per: "jednorázově",
-    desc: "Pro živnostníka, co potřebuje být konečně pořádně vidět.",
-    features: [
-      "Jednostránkový web na míru",
-      "Poptávkový formulář + mapa",
-      "Mobilní verze, co nezlobí",
-      "Základy SEO + profil na Google",
-      "Spuštění do 10 dnů",
-    ],
-    cta: "Chci Start",
-    featured: false,
-  },
-  {
-    name: "Poctivý web",
-    price: "19 900 Kč",
-    per: "jednorázově",
-    desc: "Nejčastější volba pro malé firmy, dílny a salony.",
-    features: [
-      "Vše z balíčku Start",
-      "Do 8 podstránek + sekce referencí",
-      "Rezervace nebo objednávkový modul",
-      "Rozšířené lokální SEO pro Plzeň i okolí",
-      "45min školení — úpravy zvládnete sami",
-      "Spuštění do 14 dnů",
-    ],
-    cta: "Chci Poctivý web",
-    featured: true,
-  },
-  {
-    name: "Na míru",
-    price: "Cena dohodou",
-    per: "vždy pevná a předem",
-    desc: "E-shop, katalog nebo cokoliv, co se do krabičky nevejde.",
-    features: [
-      "E-shop nebo katalog produktů",
-      "Atypické funkce a napojení na systémy",
-      "Vícejazyčná verze i velké weby",
-      "Konzultace zdarma, nabídka do 48 h",
-    ],
-    cta: "Popište nám zadání",
-    featured: false,
-  },
-];
 
 export default function Pricing() {
   return (
@@ -56,19 +9,19 @@ export default function Pricing() {
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHead
           index="05"
-          eyebrow="Ceník"
+          eyebrow={PRICING.eyebrow}
           title={
             <>
-              Cena na stole.
+              {PRICING.titleLead}
               <br />
-              <span className="text-stroke">Hned a celá.</span>
+              <span className="text-stroke">{PRICING.titleAccent}</span>
             </>
           }
-          desc="Žádné „napište nám a uvidíme“. Víte předem, kolik co stojí — a dohodnutá cena se nehne ani o korunu."
+          desc={PRICING.description}
         />
 
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
-          {PLANS.map((p, i) => (
+          {PRICING.plans.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.1} className="h-full">
               <div
                 className={cn(
@@ -81,7 +34,7 @@ export default function Pricing() {
                 {p.featured && (
                   <span className="absolute -top-3.5 left-8 inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink">
                     <Flame className="size-3.5" />
-                    Nejčastější volba
+                    {PRICING.featuredLabel}
                   </span>
                 )}
                 <Eyebrow dot={false} className={cn(p.featured && "text-accent")}>
@@ -126,10 +79,9 @@ export default function Pricing() {
 
         <Reveal delay={0.15}>
           <div className="mt-8 flex flex-col items-start gap-3 rounded-2xl border border-paper/10 bg-card/60 p-6 font-mono text-[12px] leading-relaxed tracking-wide text-mute md:flex-row md:items-center md:gap-6">
-            <span className="text-accent">// poznámka pod čarou</span>
+            <span className="text-accent">{PRICING.noteLabel}</span>
             <p>
-              Všechny weby platíte jednorázově — web je váš, žádný pronájem. Hosting + doména od 1 800 Kč/rok,
-              první rok máte od nás k webu. Návrh zdarma, platba až po jeho schválení.
+              {PRICING.note}
             </p>
           </div>
         </Reveal>
