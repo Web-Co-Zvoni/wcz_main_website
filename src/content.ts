@@ -3,14 +3,15 @@ export const SITE = {
   brandSuffix: ".cz",
   domain: "webcozvoni.cz",
   wordmark: "WEBCOZVONÍ",
-  phone: "777 284 596",
-  phoneLink: "+420777284596",
+  phone: "608 228 124",
+  phoneLink: "+420608228124",
   email: "info@webcozvoni.cz",
+  ico: "29860873",
   location: "Plzeň · Rokycany · Nýřany · kamkoliv autem",
   serviceArea: "Plzeň & okolí",
   contactLocation: "Plzeň — a za vámi přijedeme",
   openingHours: "Zvedáme po–pá 8:00–17:00",
-  footerSignoff: "Vyrob poctivě v Plzni",
+  footerSignoff: "Vyrobeno poctivě v Plzni",
   footerDescription:
     "Poctivé weby pro živnostníky a malé firmy z Plzně a okolí. Bez keců, za férovou cenu — a tak, aby vám díky nim zvonil telefon.",
 };
