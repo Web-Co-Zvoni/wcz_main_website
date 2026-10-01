@@ -20,6 +20,15 @@
     />
   </head>
   <body>
+    <form name="poptavka" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+      <input type="text" name="jmeno" />
+      <input type="tel" name="telefon" />
+      <input type="email" name="email" />
+      <input type="text" name="obor" />
+      <textarea name="zprava"></textarea>
+      <input type="checkbox" name="souhlas" />
+      <input type="text" name="bot-field" />
+    </form>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

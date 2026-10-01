@@ -2,25 +2,41 @@ import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, Clock, Loader2, Mail, MapPin, Phone, Send } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { CONTACT, SETTINGS, SITE } from "../content";
+import { CONTACT, SITE } from "../content";
 import { Chip, Eyebrow, Reveal } from "./ui";
 
 const inputCls =
   "w-full rounded-xl border border-paper/12 bg-ink px-4.5 py-3.5 text-[15px] text-paper placeholder:text-mute/60 outline-none transition-all duration-300 focus:border-accent/70 focus:shadow-[0_0_0_3px_rgba(255,92,31,0.15)]";
 
 export default function Contact() {
-  const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const nextMonth = CONTACT.monthsGenitive[(new Date().getMonth() + 1) % 12];
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
+
+    const body = new URLSearchParams();
+    new FormData(form).forEach((value, name) => {
+      if (typeof value === "string") body.append(name, value);
+    });
+
     setState("sending");
-    window.setTimeout(() => setState("sent"), SETTINGS.formSubmitDelayMs);
+    try {
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+      });
+      if (!response.ok) throw new Error("Netlify form submission failed");
+      setState("sent");
+    } catch {
+      setState("error");
+    }
   };
 
   return (
@@ -135,7 +151,20 @@ export default function Contact() {
                     </p>
                   </motion.div>
                 ) : (
-                  <form onSubmit={onSubmit} noValidate={false} className="flex flex-col gap-5">
+                  <form
+                    name="poptavka"
+                    method="POST"
+                    data-netlify="true"
+                    data-netlify-honeypot="bot-field"
+                    onSubmit={onSubmit}
+                    className="flex flex-col gap-5"
+                  >
+                    <input type="hidden" name="form-name" value="poptavka" />
+                    <div className="hidden" aria-hidden="true">
+                      <label>
+                        Nevyplňujte toto pole: <input name="bot-field" tabIndex={-1} autoComplete="off" />
+                      </label>
+                    </div>
                     <div className="flex items-center justify-between">
                       <h3 className="stretch text-2xl font-extrabold tracking-tight">{CONTACT.formTitle}</h3>
                       <Chip className="hidden sm:inline-flex">{CONTACT.formDuration}</Chip>
@@ -203,6 +232,8 @@ export default function Contact() {
                       <input
                         required
                         type="checkbox"
+                        name="souhlas"
+                        value="ano"
                         className="mt-0.5 size-4.5 shrink-0 cursor-pointer appearance-none rounded-md border border-paper/25 bg-ink transition-colors checked:border-accent checked:bg-accent"
                       />
                       {CONTACT.fields.consent}
@@ -225,6 +256,11 @@ export default function Contact() {
                         </>
                       )}
                     </button>
+                    {state === "error" && (
+                      <p role="alert" className="text-center text-sm text-blood">
+                        Odeslání se nepodařilo. Zkuste to znovu, nebo nám zavolejte.
+                      </p>
+                    )}
                     <p className="flex items-center justify-center gap-2 text-center font-mono text-[10.5px] uppercase tracking-[0.18em] text-mute">
                       <ArrowRight className="size-3.5 text-accent" />
                       {CONTACT.fields.response}
