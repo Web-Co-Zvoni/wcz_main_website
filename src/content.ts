@@ -147,7 +147,7 @@ export const SERVICES = {
 export const PROCESS = {
   eyebrow: "Jak to funguje",
   titleLead: "Od telefonátu",
-  titleAccent: "k telefonátům.",
+  titleAccent: "hotovému.",
   description: "Čtyři kroky, žádné překvapení. Termíny a cenu dostanete předem — a platí to, co bylo dohodnuto.",
   steps: [
     {

@@ -16,6 +16,7 @@ export default function Faq() {
             <SectionHead
               index="07"
               eyebrow={FAQ.eyebrow}
+              titleClassName="lg:text-[clamp(2rem,3.35vw,3.2rem)]"
               title={
                 <>
                   {FAQ.titleLead}

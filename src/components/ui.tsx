@@ -57,6 +57,7 @@ export function SectionHead({
   desc,
   align = "left",
   className,
+  titleClassName,
 }: {
   index: string;
   eyebrow: string;
@@ -64,6 +65,7 @@ export function SectionHead({
   desc?: string;
   align?: "left" | "center";
   className?: string;
+  titleClassName?: string;
 }) {
   return (
     <div
@@ -80,7 +82,7 @@ export function SectionHead({
           </Eyebrow>
         </Reveal>
         <Reveal delay={0.08}>
-          <h2 className="mt-5 stretch font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2.2rem,5vw,4.2rem)]">
+          <h2 className={cn("mt-5 stretch font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2.2rem,5vw,4.2rem)]", titleClassName)}>
             {title}
           </h2>
         </Reveal>
