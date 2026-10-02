@@ -7,6 +7,12 @@ export const SITE = {
   phoneLink: "+420608228124",
   email: "info@webcozvoni.cz",
   ico: "29860873",
+  // Právní údaje dle § 435 obč. zák. — ověřeno proti ARES, needitovat bez
+  // kontroly v rejstříku. Zdroj pravdy i pro JSON-LD v index.html.
+  legalName: "Matěj Kronus",
+  legalAddress: "Klatovská třída 1562/106, 301 00 Plzeň",
+  legalNote: "Neplátce DPH",
+  legalRegistry: "Zapsán v živnostenském rejstříku",
   location: "Plzeň · Rokycany · Nýřany · kamkoliv autem",
   serviceArea: "Plzeň & okolí",
   contactLocation: "Plzeň — a za vámi přijedeme",
@@ -329,7 +335,7 @@ export const CONTACT = {
     trade: "Čím se živíte? *",
     tradePlaceholder: "Vyberte obor…",
     message: "Co potřebujete? *",
-    consent: "Souhlasím se zpracováním údajů za účelem vyřízení poptávky. Žádný spam — fakt.",
+    privacyNote: "Odesláním berete na vědomí, jak nakládáme s vašimi údaji. Nikomu je nepředáváme a newslettery neposíláme.",
     submit: "Odeslat poptávku",
     sending: "Odesíláme…",
     response: "Odpovídáme do 24 hodin · první návrh zdarma",

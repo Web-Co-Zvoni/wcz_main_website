@@ -3,6 +3,14 @@ import { FOOTER, NAV_LINKS, SITE } from "../content";
 import { Logo } from "./Header";
 
 export default function Footer() {
+  const legalDetails = [
+    SITE.legalName,
+    `IČO ${SITE.ico}`,
+    SITE.legalAddress,
+    SITE.legalNote,
+    SITE.legalRegistry,
+  ];
+
   return (
     <footer className="relative overflow-hidden border-t border-paper/10 pt-16 md:pt-20">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
@@ -74,6 +82,19 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-paper/10">
+        <div className="mx-auto flex max-w-7xl flex-wrap justify-center gap-y-1 px-5 pt-5 font-mono text-[11px] uppercase tracking-[0.18em] text-mute/60 md:justify-start md:px-8">
+          {legalDetails.map((detail, index) => (
+            <span key={detail}>
+              {index > 0 && <span aria-hidden="true">{" · "}</span>}
+              {detail}
+            </span>
+          ))}
+          <p className="basis-full text-center md:text-left">
+            <a href="/ochrana-osobnich-udaju.html" className="transition-colors hover:text-accent">
+              Zásady zpracování osobních údajů
+            </a>
+          </p>
+        </div>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-6 font-mono text-[11px] uppercase tracking-[0.18em] text-mute md:flex-row md:px-8">
           <p>© {new Date().getFullYear()} {SITE.domain}</p>
           <p className="flex items-center gap-2">

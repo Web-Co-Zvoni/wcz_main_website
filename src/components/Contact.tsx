@@ -11,6 +11,8 @@ const inputCls =
 export default function Contact() {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const nextMonth = CONTACT.monthsGenitive[(new Date().getMonth() + 1) % 12];
+  const privacyLinkText = "jak nakládáme s vašimi údaji";
+  const privacyNoteParts = CONTACT.fields.privacyNote.split(privacyLinkText);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -228,17 +230,6 @@ export default function Contact() {
                       />
                     </label>
 
-                    <label className="flex cursor-pointer items-start gap-3 text-[13px] leading-relaxed text-mute">
-                      <input
-                        required
-                        type="checkbox"
-                        name="souhlas"
-                        value="ano"
-                        className="mt-0.5 size-4.5 shrink-0 cursor-pointer appearance-none rounded-md border border-paper/25 bg-ink transition-colors checked:border-accent checked:bg-accent"
-                      />
-                      {CONTACT.fields.consent}
-                    </label>
-
                     <button
                       type="submit"
                       disabled={state === "sending"}
@@ -256,6 +247,18 @@ export default function Contact() {
                         </>
                       )}
                     </button>
+                    <p className="text-center text-xs leading-relaxed text-mute">
+                      {privacyNoteParts[0]}
+                      <a
+                        href="/ochrana-osobnich-udaju.html"
+                        target="_blank"
+                        rel="noopener"
+                        className="underline underline-offset-4 transition-colors hover:text-accent"
+                      >
+                        {privacyLinkText}
+                      </a>
+                      {privacyNoteParts[1]}
+                    </p>
                     {state === "error" && (
                       <p role="alert" className="text-center text-sm text-blood">
                         Odeslání se nepodařilo. Zkuste to znovu, nebo nám zavolejte.

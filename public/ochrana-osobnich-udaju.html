@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zásady zpracování osobních údajů — webcozvoni.cz</title>
+    <meta
+      name="description"
+      content="Jak nakládáme s osobními údaji z poptávkového formuláře na webcozvoni.cz. Stručně, srozumitelně a bez právničiny."
+    />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="theme-color" content="#0B0A08" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF5C1F'/%3E%3Cpath d='M9 17a7 7 0 0 1 14 0' stroke='%230B0A08' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='20' r='3' fill='%230B0A08'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --ink: #0b0a08;
+        --paper: #f5f2ed;
+        --accent: #ff5c1f;
+        --mute: #8d8780;
+        --line: rgba(245, 242, 237, 0.12);
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--ink);
+        color: var(--paper);
+        font-family: Archivo, "Archivo Variable", -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 96px; }
+      header.top {
+        border-bottom: 1px solid var(--line);
+        padding: 20px 0;
+        margin-bottom: 56px;
+      }
+      header.top .inner {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .mono {
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .back { color: var(--mute); text-decoration: none; transition: color 0.2s; }
+      .back:hover, .back:focus-visible { color: var(--accent); }
+      .brand { color: var(--paper); text-decoration: none; font-weight: 700; letter-spacing: -0.01em; }
+      .brand span { color: var(--accent); }
+      .eyebrow { color: var(--accent); margin-bottom: 18px; }
+      h1 {
+        font-size: clamp(32px, 6vw, 52px);
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        margin: 0 0 20px;
+        font-weight: 800;
+      }
+      .lede { font-size: 18px; color: var(--mute); margin: 0 0 12px; max-width: 58ch; }
+      .updated { color: var(--mute); margin-bottom: 56px; }
+      h2 {
+        font-size: clamp(20px, 3vw, 26px);
+        letter-spacing: -0.02em;
+        margin: 52px 0 14px;
+        font-weight: 700;
+        scroll-margin-top: 24px;
+      }
+      h2 .num {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 13px;
+        color: var(--accent);
+        margin-right: 12px;
+        letter-spacing: 0.08em;
+      }
+      p { margin: 0 0 16px; }
+      ul { margin: 0 0 16px; padding-left: 22px; }
+      li { margin-bottom: 8px; }
+      a { color: var(--accent); }
+      a:focus-visible, .back:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+      strong { color: var(--paper); font-weight: 700; }
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 24px;
+        margin: 0 0 16px;
+        background: rgba(245, 242, 237, 0.025);
+      }
+      .card p:last-child { margin-bottom: 0; }
+      table { width: 100%; border-collapse: collapse; margin: 0 0 16px; font-size: 15px; }
+      th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { color: var(--mute); font-weight: 600; font-size: 13px; }
+      td:first-child { width: 38%; }
+      .foot {
+        margin-top: 72px;
+        padding-top: 24px;
+        border-top: 1px solid var(--line);
+        color: var(--mute);
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .foot a { color: var(--mute); text-decoration: none; }
+      .foot a:hover { color: var(--accent); }
+      @media (max-width: 560px) {
+        td:first-child { width: 42%; }
+        th, td { padding: 10px 6px; font-size: 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <div class="inner">
+        <a class="brand" href="/">webcozvoni<span>.cz</span></a>
+        <a class="back mono" href="/">← Zpět na hlavní stránku</a>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <p class="eyebrow mono">Právní informace</p>
+      <h1>Zásady zpracování osobních údajů</h1>
+      <p class="lede">
+        Shrnuto na rovinu: sbíráme jen to, co potřebujeme k vyřízení vaší poptávky.
+        Nikomu vaše údaje neprodáváme, nerozesíláme newslettery a nepoužíváme
+        sledovací cookies.
+      </p>
+      <p class="updated mono">Poslední aktualizace: 2. 10. 2026</p>
+
+      <h2><span class="num">01</span>Kdo je správce údajů</h2>
+      <div class="card">
+        <p>
+          <strong>Matěj Kronus</strong><br />
+          IČO: 29860873<br />
+          Klatovská třída 1562/106, 301 00 Plzeň<br />
+          Zapsán v živnostenském rejstříku
+        </p>
+        <p>
+          E-mail: <a href="mailto:info@webcozvoni.cz">info@webcozvoni.cz</a><br />
+          Telefon: <a href="tel:+420608228124">608 228 124</a>
+        </p>
+        <p>
+          Nemáme ani nepotřebujeme pověřence pro ochranu osobních údajů. Se vším se
+          obracejte přímo na kontakty výše — odpovídáme do 24 hodin.
+        </p>
+      </div>
+
+      <h2><span class="num">02</span>Jaké údaje zpracováváme</h2>
+      <p>Pouze to, co sami vyplníte v poptávkovém formuláři nebo nám sdělíte:</p>
+      <table>
+        <thead>
+          <tr><th>Údaj</th><th>Povinný?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Jméno a příjmení</td><td>ano</td></tr>
+          <tr><td>Telefonní číslo</td><td>ano</td></tr>
+          <tr><td>E-mailová adresa</td><td>ne</td></tr>
+          <tr><td>Obor podnikání</td><td>ano</td></tr>
+          <tr><td>Text zprávy</td><td>ano</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Nesbíráme rodná čísla, čísla dokladů ani žádné zvláštní kategorie údajů.
+        Do textu zprávy prosím neuvádějte citlivé informace — není k tomu důvod.
+      </p>
+
+      <h2><span class="num">03</span>Proč je zpracováváme a na jakém základě</h2>
+      <p>
+        Jediný účel je <strong>vyřízení vaší poptávky</strong> — ozvat se vám,
+        probrat zadání a případně připravit nabídku.
+      </p>
+      <p>
+        Právním základem je <strong>jednání o smlouvě na vaši žádost</strong>
+        podle čl. 6 odst. 1 písm. b) GDPR. Nepotřebujeme k tomu váš souhlas —
+        údaje nám posíláte právě proto, abychom vás kontaktovali. Proto také u
+        formuláře nenajdete zaškrtávátko se souhlasem, jen potvrzení, že jste
+        tyto zásady vzali na vědomí.
+      </p>
+      <p>
+        Pokud se z poptávky stane zakázka, zpracováváme nutné fakturační údaje
+        také na základě plnění smlouvy a našich zákonných povinností
+        (čl. 6 odst. 1 písm. b) a c) GDPR).
+      </p>
+
+      <h2><span class="num">04</span>Jak dlouho údaje uchováváme</h2>
+      <ul>
+        <li>
+          <strong>Poptávka, ze které nevznikla zakázka:</strong> 12 měsíců od
+          poslední komunikace. Pak ji mažeme.
+        </li>
+        <li>
+          <strong>Realizovaná zakázka:</strong> po dobu trvání spolupráce a dále
+          po dobu zákonných lhůt — zejména 10 let u daňových dokladů podle zákona
+          o DPH a zákona o účetnictví.
+        </li>
+        <li>
+          <strong>Spam a zjevně nesmyslné zprávy:</strong> mažeme průběžně.
+        </li>
+      </ul>
+
+      <h2><span class="num">05</span>Komu se údaje dostanou</h2>
+      <p>
+        Vaše údaje <strong>neprodáváme ani nepředáváme nikomu pro marketingové
+        účely</strong>. Dostanou se pouze k poskytovatelům služeb, bez kterých
+        web a e-mail nemůžou fungovat:
+      </p>
+      <table>
+        <thead>
+          <tr><th>Zpracovatel</th><th>K čemu</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Netlify, Inc. (USA)</td>
+            <td>
+              Hosting webu a příjem odeslaných formulářů. Předání do USA je kryto
+              standardními smluvními doložkami schválenými Evropskou komisí.
+            </td>
+          </tr>
+          <tr>
+            <td>WEDOS Internet, a.s. (ČR)</td>
+            <td>Doména a e-mailová schránka, kam poptávka dorazí.</td>
+          </tr>
+          <tr>
+            <td>Účetní / daňový poradce</td>
+            <td>Pouze fakturační údaje u realizovaných zakázek.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Dále můžeme údaje předat orgánům veřejné moci, pokud nám to ukládá zákon.
+      </p>
+
+      <h2><span class="num">06</span>Cookies a měření návštěvnosti</h2>
+      <div class="card">
+        <p>
+          Tento web <strong>nepoužívá žádné cookies</strong> ani sledovací
+          technologie. Nepoužíváme Google Analytics, reklamní pixely ani
+          remarketing. Proto na webu nenajdete otravnou cookie lištu — není co
+          odsouhlasit.
+        </p>
+      </div>
+      <p>
+        Provozovatel hostingu (Netlify) ukládá z technických a bezpečnostních
+        důvodů běžné serverové logy obsahující IP adresu, typ prohlížeče a čas
+        přístupu. Slouží výhradně k provozu a ochraně webu.
+      </p>
+
+      <h2><span class="num">07</span>Jaká máte práva</h2>
+      <p>Ve vztahu ke svým údajům máte podle GDPR právo:</p>
+      <ul>
+        <li><strong>na přístup</strong> — zjistit, co o vás vedeme, a dostat kopii;</li>
+        <li><strong>na opravu</strong> — nechat nepřesný údaj opravit;</li>
+        <li><strong>na výmaz</strong> — nechat údaje smazat, pokud už nejsou potřeba;</li>
+        <li><strong>na omezení zpracování</strong> — po dobu, než se něco vyjasní;</li>
+        <li><strong>na přenositelnost</strong> — dostat údaje ve strojově čitelném formátu;</li>
+        <li><strong>vznést námitku</strong> proti zpracování;</li>
+        <li>
+          <strong>podat stížnost</strong> u Úřadu pro ochranu osobních údajů,
+          Pplk. Sochora 27, 170 00 Praha 7,
+          <a href="https://uoou.gov.cz" rel="noopener">uoou.gov.cz</a>.
+        </li>
+      </ul>
+      <p>
+        Stačí napsat na <a href="mailto:info@webcozvoni.cz">info@webcozvoni.cz</a>.
+        Vyřídíme to nejpozději do jednoho měsíce a zdarma. Nejrychlejší cesta,
+        jak nechat poptávku smazat, je jedna věta e-mailem — nic složitého po vás
+        chtít nebudeme.
+      </p>
+
+      <h2><span class="num">08</span>Zabezpečení</h2>
+      <p>
+        Web běží výhradně přes šifrované spojení HTTPS. Přístup k odeslaným
+        poptávkám má jen správce uvedený v bodě 01, účty jsou chráněné silnými
+        hesly a dvoufaktorovým ověřením.
+      </p>
+
+      <h2><span class="num">09</span>Změny těchto zásad</h2>
+      <p>
+        Pokud se způsob zpracování změní, aktualizujeme tuto stránku a upravíme
+        datum nahoře. Doporučujeme se sem při další poptávce podívat.
+      </p>
+
+      <div class="foot mono">
+        <span>Matěj Kronus · IČO 29860873 · Plzeň</span>
+        <a href="/">webcozvoni.cz</a>
+      </div>
+    </main>
+  </body>
+</html>
