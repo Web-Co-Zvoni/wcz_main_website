@@ -1,15 +1,29 @@
 import { Asterisk } from "lucide-react";
-import { MARQUEE_TRADES } from "../content";
+
+const TRADES = [
+  "Instalatéři",
+  "Elektrikáři",
+  "Truhláři",
+  "Malíři",
+  "Autoservisy",
+  "Kadeřnictví",
+  "Obkladači",
+  "Zámečníci",
+  "Pekařství",
+  "Klempíři",
+  "Podlaháři",
+  "Hodináři",
+];
 
 export default function Marquee() {
   const row = (key: string) => (
     <div key={key} className="flex shrink-0 items-center">
-      {MARQUEE_TRADES.map((t, i) => (
+      {TRADES.map((t, i) => (
         <span key={i} className="flex items-center">
-          <span className="stretch px-3 text-lg font-extrabold uppercase tracking-tight text-paper/80 sm:px-5 sm:text-2xl md:px-8 md:text-3xl">
+          <span className="stretch px-6 text-2xl font-extrabold uppercase tracking-tight text-paper/80 md:px-8 md:text-3xl">
             {t}
           </span>
-          <Asterisk className="size-5 shrink-0 text-accent sm:size-6" strokeWidth={2.5} />
+          <Asterisk className="size-6 shrink-0 text-accent" strokeWidth={2.5} />
         </span>
       ))}
     </div>
