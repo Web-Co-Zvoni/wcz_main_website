@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
  */
 
 const WIDTH = 360;
-const COLORS = ["255,250,246", "255,214,206", "255,150,150", "255,82,96", "255,120,80"];
+const COLORS = ["244,249,255", "205,228,255", "140,195,255", "61,155,255", "80,220,245"];
 
 type Spark = {
   x: number;

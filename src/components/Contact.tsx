@@ -9,7 +9,7 @@ import { Kicker, Reveal } from "./ui";
 import { cz } from "../utils/typo";
 
 const inputCls =
-  "w-full rounded-xl border border-paper/12 bg-ink/80 px-4 py-3.5 text-[15px] text-paper placeholder:text-mute/55 outline-none transition-[border-color,box-shadow] duration-300 focus:border-accent/70 focus:shadow-[0_0_0_4px_rgba(255,59,71,0.14)]";
+  "w-full rounded-xl border border-paper/12 bg-ink/80 px-4 py-3.5 text-[15px] text-paper placeholder:text-mute/55 outline-none transition-[border-color,box-shadow] duration-300 focus:border-accent/70 focus:shadow-[0_0_0_4px_rgba(61,155,255,0.14)]";
 const labelCls = "text-[13px] font-medium text-mute";
 
 export default function Contact() {
@@ -47,7 +47,7 @@ export default function Contact() {
 
   return (
     <section id="kontakt" className="relative overflow-hidden px-4 pb-24 pt-16 md:pb-36">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-0 h-[640px] w-[min(1000px,100vw)] -translate-x-1/2 bg-[radial-gradient(ellipse_50%_45%_at_50%_30%,rgba(255,59,71,0.16),transparent)]" />
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-0 h-[640px] w-[min(1000px,100vw)] -translate-x-1/2 bg-[radial-gradient(ellipse_50%_45%_at_50%_30%,rgba(61,155,255,0.16),transparent)]" />
 
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
         <Reveal y={20}>
@@ -71,7 +71,7 @@ export default function Contact() {
               href={`tel:${SITE.phoneLink}`}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="group relative flex items-center gap-4 rounded-2xl bg-signal py-4 pl-4 pr-7 text-white shadow-[0_0_0_1px_rgba(255,59,71,0.6),0_20px_60px_-15px_rgba(255,59,71,0.9)] transition-colors hover:bg-accent"
+              className="group relative flex items-center gap-4 rounded-2xl bg-signal py-4 pl-4 pr-7 text-white shadow-[0_0_0_1px_rgba(61,155,255,0.6),0_20px_60px_-15px_rgba(61,155,255,0.9)] transition-colors hover:bg-accent"
             >
               <span className="relative grid size-12 place-items-center rounded-xl bg-ink/25 text-white">
                 <span className="pulse-ring" />
@@ -175,7 +175,7 @@ export default function Contact() {
                 disabled={state === "sending"}
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="group mt-2 flex items-center justify-center gap-2.5 rounded-xl bg-signal py-4 text-[16px] font-semibold text-white shadow-[0_0_0_1px_rgba(255,59,71,0.5),0_12px_44px_-12px_rgba(255,59,71,0.9)] transition-colors duration-300 hover:bg-accent disabled:opacity-70"
+                className="group mt-2 flex items-center justify-center gap-2.5 rounded-xl bg-signal py-4 text-[16px] font-semibold text-white shadow-[0_0_0_1px_rgba(61,155,255,0.5),0_12px_44px_-12px_rgba(61,155,255,0.9)] transition-colors duration-300 hover:bg-accent disabled:opacity-70"
               >
                 {state === "sending" ? (
                   <>
