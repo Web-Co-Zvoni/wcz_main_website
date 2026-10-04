@@ -31,7 +31,7 @@ function LaserOutline({ on }: { on: boolean }) {
         height="100%"
         rx="12"
         fill="none"
-        stroke="rgba(255,244,240,0.95)"
+        stroke="rgba(255,250,236,0.95)"
         strokeWidth={1.5}
         initial={{ pathLength: 0, opacity: 0 }}
         animate={on ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
@@ -39,7 +39,7 @@ function LaserOutline({ on }: { on: boolean }) {
           pathLength: { duration: on ? 0.75 : 0.45, ease: [0.65, 0, 0.35, 1] },
           opacity: { duration: on ? 0.15 : 0.45 },
         }}
-        style={{ filter: "drop-shadow(0 0 4px rgba(255,236,230,0.7)) drop-shadow(0 0 10px rgba(255,59,71,0.35))" }}
+        style={{ filter: "drop-shadow(0 0 4px rgba(255,246,220,0.7)) drop-shadow(0 0 10px rgba(255,214,10,0.35))" }}
       />
     </svg>
   );
@@ -59,7 +59,7 @@ export function PrimaryCta({ href, children }: { href: string; children: ReactNo
     if (reduce) return;
     angle.set((angle.get() + (speed.get() * delta) / 1000) % 360);
   });
-  const ring = useMotionTemplate`conic-gradient(from ${angle}deg, transparent 0deg, rgba(255,255,255,0.95) 28deg, rgba(255,214,210,0.55) 58deg, transparent 96deg, transparent 180deg, rgba(255,255,255,0.4) 212deg, transparent 248deg)`;
+  const ring = useMotionTemplate`conic-gradient(from ${angle}deg, transparent 0deg, rgba(255,255,255,0.95) 28deg, rgba(255,240,196,0.55) 58deg, transparent 96deg, transparent 180deg, rgba(255,255,255,0.4) 212deg, transparent 248deg)`;
 
   return (
     <motion.a
@@ -75,19 +75,19 @@ export function PrimaryCta({ href, children }: { href: string; children: ReactNo
         speed.set(64);
         setHover(false);
       }}
-      className="group relative inline-flex items-center justify-center gap-2.5 rounded-xl bg-signal px-8 py-[18px] text-[16.5px] font-semibold tracking-tight text-white shadow-[0_0_0_1px_rgba(255,59,71,0.5),0_10px_40px_-12px_rgba(255,59,71,0.8)] transition-shadow duration-500 hover:shadow-[0_0_0_1px_rgba(255,59,71,0.6),0_0_34px_-2px_rgba(255,59,71,0.75),0_18px_60px_-10px_rgba(255,59,71,1)]"
+      className="group relative inline-flex items-center justify-center gap-2.5 rounded-xl bg-signal px-8 py-[18px] text-[16.5px] font-semibold tracking-tight text-ink shadow-[0_0_0_1px_rgba(255,214,10,0.5),0_10px_40px_-12px_rgba(255,214,10,0.8)] transition-shadow duration-500 hover:shadow-[0_0_0_1px_rgba(255,214,10,0.6),0_0_34px_-2px_rgba(255,214,10,0.75),0_18px_60px_-10px_rgba(255,214,10,1)]"
     >
       {/* breath: a soft halo swells out and dissolves every few seconds */}
       {!reduce && (
         <motion.span
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-[inherit]"
-          initial={{ boxShadow: "0 0 0 0px rgba(255,59,71,0.5), 0 0 24px 0px rgba(255,59,71,0)" }}
+          initial={{ boxShadow: "0 0 0 0px rgba(255,214,10,0.5), 0 0 24px 0px rgba(255,214,10,0)" }}
           animate={{
             boxShadow: [
-              "0 0 0 0px rgba(255,59,71,0.5), 0 0 24px 0px rgba(255,59,71,0)",
-              "0 0 0 9px rgba(255,59,71,0), 0 0 34px 4px rgba(255,59,71,0.35)",
-              "0 0 0 9px rgba(255,59,71,0), 0 0 24px 0px rgba(255,59,71,0)",
+              "0 0 0 0px rgba(255,214,10,0.5), 0 0 24px 0px rgba(255,214,10,0)",
+              "0 0 0 9px rgba(255,214,10,0), 0 0 34px 4px rgba(255,214,10,0.35)",
+              "0 0 0 9px rgba(255,214,10,0), 0 0 24px 0px rgba(255,214,10,0)",
             ],
           }}
           transition={{ duration: 2.2, times: [0, 0.55, 1], ease: "easeOut", repeat: Infinity, repeatDelay: 1.8 }}
@@ -105,11 +105,11 @@ export function PrimaryCta({ href, children }: { href: string; children: ReactNo
 
       {/* glint across the face on hover */}
       <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
-        <span className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-[shine_0.9s_ease]" />
+        <span className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent group-hover:animate-[shine_0.9s_ease]" />
       </span>
 
       {/* label: light pours through the letters left to right while hovered */}
-      <span className="relative bg-[linear-gradient(110deg,rgba(255,255,255,0.8)_38%,#ffffff_47%,#fff4f2_50%,#ffffff_53%,rgba(255,255,255,0.8)_62%)] bg-[length:250%_100%] bg-[position:100%_0] bg-clip-text text-transparent group-hover:animate-[text-shimmer_1.6s_ease-in-out_infinite]">
+      <span className="relative bg-[linear-gradient(110deg,#141215_38%,#5a4300_47%,#7a5c00_50%,#5a4300_53%,#141215_62%)] bg-[length:250%_100%] bg-[position:100%_0] bg-clip-text text-transparent group-hover:animate-[text-shimmer_1.6s_ease-in-out_infinite]">
         {children}
       </span>
       <ArrowRight

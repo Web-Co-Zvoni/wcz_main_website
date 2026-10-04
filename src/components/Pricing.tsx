@@ -20,7 +20,7 @@ export default function Pricing() {
                 className={cn(
                   "relative mx-auto flex h-full max-w-md flex-col items-center rounded-[22px] px-7 pb-8 pt-10 text-center",
                   p.featured
-                    ? "bg-gradient-to-b from-accent/[0.14] via-card to-ink shadow-[0_40px_100px_-40px_rgba(255,59,71,0.6)] lg:py-14"
+                    ? "bg-gradient-to-b from-accent/[0.14] via-card to-ink shadow-[0_40px_100px_-40px_rgba(255,214,10,0.6)] lg:py-14"
                     : "border border-paper/10 bg-coal/60"
                 )}
               >
@@ -28,7 +28,7 @@ export default function Pricing() {
                   <>
                     <span className="conic-ring" aria-hidden />
                     <span className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-accent/25" aria-hidden />
-                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-signal px-4 py-1.5 text-[12px] font-semibold text-white shadow-[0_0_24px_-4px_var(--color-accent)]">
+                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-signal px-4 py-1.5 text-[12px] font-semibold text-ink shadow-[0_0_24px_-4px_var(--color-accent)]">
                       {PRICING.featuredLabel}
                     </span>
                   </>

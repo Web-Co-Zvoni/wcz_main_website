@@ -8,7 +8,7 @@ import { BellMark, Button, EASE } from "./ui";
 export function Logo({ className }: { className?: string }) {
   return (
     <a href="#top" className={cn("group flex items-center gap-2.5", className)} aria-label={SITE.domain}>
-      <span className="relative grid size-11 place-items-center rounded-[12px] bg-signal text-white shadow-[0_0_24px_-6px_var(--color-accent)] transition-shadow duration-500 group-hover:shadow-[0_0_32px_-2px_var(--color-accent)]">
+      <span className="relative grid size-11 place-items-center rounded-[12px] bg-signal text-ink shadow-[0_0_24px_-6px_var(--color-accent)] transition-shadow duration-500 group-hover:shadow-[0_0_32px_-2px_var(--color-accent)]">
         <BellMark className="size-[30px] origin-top transition-transform duration-500 group-hover:animate-ringshake" strokeWidth={9} compact />
       </span>
       <span className="display-soft text-[21px] leading-none">
@@ -135,7 +135,7 @@ export default function Header() {
             >
               <a
                 href={`tel:${SITE.phoneLink}`}
-                className="flex flex-col items-center gap-1 rounded-2xl bg-signal px-6 py-5 text-white shadow-[0_10px_40px_-12px_var(--color-accent)]"
+                className="flex flex-col items-center gap-1 rounded-2xl bg-signal px-6 py-5 text-ink shadow-[0_10px_40px_-12px_var(--color-accent)]"
               >
                 <span className="flex items-center gap-2 text-sm font-medium opacity-85">
                   <Phone className="size-4" fill="currentColor" />

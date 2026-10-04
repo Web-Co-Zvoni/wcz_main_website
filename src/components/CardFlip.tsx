@@ -56,7 +56,7 @@ export default function CardFlip({ title, subtitle, description, features, icon:
             "absolute inset-0 h-full w-full overflow-hidden rounded-2xl",
             "[backface-visibility:hidden] [transform:rotateY(0deg)]",
             "border border-paper/10 bg-gradient-to-b from-card to-ink",
-            "transition-[border-color,box-shadow] duration-500 group-hover:border-accent/30 group-hover:shadow-[0_30px_70px_-30px_rgba(255,59,71,0.45)]"
+            "transition-[border-color,box-shadow] duration-500 group-hover:border-accent/30 group-hover:shadow-[0_30px_70px_-30px_rgba(255,214,10,0.45)]"
           )}
         >
           <div aria-hidden className="absolute inset-0 flex items-start justify-center pt-20">
@@ -89,7 +89,7 @@ export default function CardFlip({ title, subtitle, description, features, icon:
             "absolute inset-0 flex h-full w-full flex-col items-center rounded-2xl p-7 text-center",
             "[backface-visibility:hidden] [transform:rotateY(180deg)]",
             "border border-accent/30 bg-gradient-to-b from-card via-ink to-ink",
-            "shadow-[0_30px_70px_-30px_rgba(255,59,71,0.5)]"
+            "shadow-[0_30px_70px_-30px_rgba(255,214,10,0.5)]"
           )}
         >
           <span aria-hidden className="pointer-events-none absolute inset-x-[15%] -top-px h-px bg-gradient-to-r from-transparent via-accent to-transparent" />

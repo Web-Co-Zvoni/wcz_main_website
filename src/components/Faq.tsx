@@ -23,7 +23,7 @@ export default function Faq() {
                   className={cn(
                     "rounded-2xl border transition-[border-color,background-color,box-shadow] duration-500",
                     isOpen
-                      ? "border-accent/35 bg-card/70 shadow-[0_20px_60px_-30px_rgba(255,59,71,0.45)]"
+                      ? "border-accent/35 bg-card/70 shadow-[0_20px_60px_-30px_rgba(255,214,10,0.45)]"
                       : "border-paper/[0.08] bg-coal/40 hover:border-paper/20"
                   )}
                 >
@@ -44,7 +44,7 @@ export default function Faq() {
                       className={cn(
                         "absolute right-5 grid size-8 shrink-0 place-items-center rounded-full border transition-all duration-500",
                         isOpen
-                          ? "rotate-45 border-accent bg-accent text-white shadow-[0_0_20px_-2px_var(--color-accent)]"
+                          ? "rotate-45 border-accent bg-accent text-ink shadow-[0_0_20px_-2px_var(--color-accent)]"
                           : "border-paper/15 text-mute group-hover:border-accent/60 group-hover:text-accent"
                       )}
                     >

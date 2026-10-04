@@ -129,8 +129,8 @@ export function Button({ variant = "primary", size = "md", shine = false, classN
         "group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-xl font-semibold tracking-tight transition-[box-shadow,background-color,border-color,color] duration-300",
         size === "lg" ? "px-7 py-4 text-[15.5px]" : "px-5 py-3 text-[14px]",
         variant === "primary"
-          ? "bg-signal text-white shadow-[0_0_0_1px_rgba(255,59,71,0.5),0_10px_40px_-12px_rgba(255,59,71,0.8)] hover:bg-accent hover:shadow-[0_0_0_1px_rgba(255,59,71,0.8),0_14px_56px_-10px_rgba(255,59,71,1)]"
-          : "border border-paper/15 bg-card text-paper hover:border-accent/60 hover:bg-[#2a1b20]",
+          ? "bg-signal text-ink shadow-[0_0_0_1px_rgba(255,214,10,0.5),0_10px_40px_-12px_rgba(255,214,10,0.8)] hover:bg-accent hover:shadow-[0_0_0_1px_rgba(255,214,10,0.8),0_14px_56px_-10px_rgba(255,214,10,1)]"
+          : "border border-paper/15 bg-card text-paper hover:border-accent/60 hover:bg-[#262012]",
         className
       )}
       {...rest}
