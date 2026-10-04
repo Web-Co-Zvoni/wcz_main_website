@@ -1,42 +1,24 @@
-import { Asterisk } from "lucide-react";
-
-const TRADES = [
-  "Instalatéři",
-  "Elektrikáři",
-  "Truhláři",
-  "Malíři",
-  "Autoservisy",
-  "Kadeřnictví",
-  "Obkladači",
-  "Zámečníci",
-  "Pekařství",
-  "Klempíři",
-  "Podlaháři",
-  "Hodináři",
-];
+import { MARQUEE_TRADES } from "../content";
+import { BellMark } from "./ui";
 
 export default function Marquee() {
   const row = (key: string) => (
     <div key={key} className="flex shrink-0 items-center">
-      {TRADES.map((t, i) => (
-        <span key={i} className="flex items-center">
-          <span className="stretch px-6 text-2xl font-extrabold uppercase tracking-tight text-paper/80 md:px-8 md:text-3xl">
-            {t}
-          </span>
-          <Asterisk className="size-6 shrink-0 text-accent" strokeWidth={2.5} />
+      {MARQUEE_TRADES.map((t) => (
+        <span key={t} className="flex items-center">
+          <span className="display px-7 text-[clamp(1.3rem,2.4vw,1.9rem)] text-paper/75 md:px-10">{t}</span>
+          <BellMark className="size-7 shrink-0 text-accent drop-shadow-[0_0_8px_var(--color-accent)]" strokeWidth={9} compact />
         </span>
       ))}
     </div>
   );
 
   return (
-    <section aria-hidden className="relative overflow-hidden border-y border-paper/10 bg-coal py-6">
+    <section aria-hidden className="relative overflow-hidden py-8 [mask-image:linear-gradient(90deg,transparent,#000_15%,#000_85%,transparent)]">
       <div className="animate-marquee flex w-max">
         {row("a")}
         {row("b")}
       </div>
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-coal to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-coal to-transparent" />
     </section>
   );
 }

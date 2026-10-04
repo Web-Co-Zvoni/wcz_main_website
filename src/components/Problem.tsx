@@ -1,52 +1,51 @@
-import { Clock, MonitorSmartphone, Search } from "lucide-react";
+import { motion } from "framer-motion";
 import { PROBLEM } from "../content";
-import { Reveal, SectionHead } from "./ui";
-
-const PAIN_ICONS = [MonitorSmartphone, Search, Clock];
+import { EASE, Kicker, Reveal } from "./ui";
+import { cz } from "../utils/typo";
 
 export default function Problem() {
   return (
-    <section className="relative py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <SectionHead
-          index="01"
-          eyebrow={PROBLEM.eyebrow}
-          title={
-            <>
-              {PROBLEM.titleLead} <span className="text-accent">{PROBLEM.titleAccent}</span>
-              <br />
-              {PROBLEM.titleEnd}
-            </>
-          }
-          desc={PROBLEM.description}
-        />
+    <section className="relative px-4 py-28 md:py-40">
+      <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
+        <Reveal>
+          <Kicker>{PROBLEM.kicker}</Kicker>
+        </Reveal>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-3">
-          {PROBLEM.items.map((p, i) => {
-            const Icon = PAIN_ICONS[i];
-            const number = String(i + 1).padStart(2, "0");
-            return (
-            <Reveal key={number} delay={i * 0.1}>
-              <div className="group relative h-full overflow-hidden rounded-3xl border border-paper/10 bg-card p-8 transition-colors duration-500 hover:border-accent/40">
-                <div className="absolute -right-4 -top-6 stretch text-[104px] font-black leading-none text-paper/[0.04] transition-colors duration-500 group-hover:text-accent/10">
-                  {number}
-                </div>
-                <div className="relative">
-                  <div className="grid size-12 place-items-center rounded-2xl border border-paper/10 bg-ink text-accent transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
-                    <Icon className="size-5.5" strokeWidth={2} />
-                  </div>
-                  <h3 className="mt-6 stretch text-xl font-extrabold tracking-tight">{p.title}</h3>
-                  <p className="mt-3 text-[14.5px] leading-relaxed text-mute">{p.text}</p>
-                </div>
-              </div>
-            </Reveal>
-          );})}
-        </div>
+        <ul className="mt-10 flex flex-col items-center gap-3 md:gap-4">
+          {PROBLEM.lines.map((line, i) => (
+            <motion.li
+              key={line}
+              initial="hidden"
+              whileInView="shown"
+              viewport={{ once: true, margin: "-120px" }}
+              className="relative"
+            >
+              <motion.span
+                variants={{
+                  hidden: { opacity: 0, y: 24, filter: "blur(8px)" },
+                  shown: { opacity: [0, 1, 0.38], y: 0, filter: "blur(0px)" },
+                }}
+                transition={{ duration: 1.6, times: [0, 0.4, 1], delay: i * 0.12, ease: EASE }}
+                className="display block text-[clamp(1.7rem,5vw,3.9rem)] leading-[1.12] text-paper"
+              >
+                {cz(line)}
+              </motion.span>
+              {/* red strike drawn through each excuse */}
+              <motion.span
+                aria-hidden
+                variants={{ hidden: { scaleX: 0 }, shown: { scaleX: 1 } }}
+                transition={{ duration: 0.7, delay: 0.55 + i * 0.12, ease: EASE }}
+                className="absolute inset-x-[-4%] top-[52%] h-[3px] origin-left rounded-full bg-accent shadow-[0_0_14px_var(--color-accent)] md:h-1"
+              />
+            </motion.li>
+          ))}
+        </ul>
 
-        <Reveal delay={0.15}>
-          <p className="mt-12 max-w-2xl border-l-2 border-accent pl-6 text-[17px] leading-relaxed text-paper/85">
-            {PROBLEM.closingStart}<strong>{PROBLEM.closingGoogle}</strong>{PROBLEM.closingMiddle}
-            <strong>{PROBLEM.closingContact}</strong>{PROBLEM.closingEnd}
+        <Reveal delay={0.2} className="mt-16 md:mt-20">
+          <p className="display-soft text-[clamp(1.35rem,2.8vw,2.1rem)] leading-tight">
+            <span className="text-mute">{PROBLEM.answerLead}</span>
+            <br />
+            <span className="glow-text text-paper">{PROBLEM.answer}</span>
           </p>
         </Reveal>
       </div>

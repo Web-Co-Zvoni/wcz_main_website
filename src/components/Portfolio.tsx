@@ -1,70 +1,54 @@
-import { Chip, Reveal, SectionHead } from "./ui";
+import { ArrowRight, MoveHorizontal } from "lucide-react";
 import { PORTFOLIO } from "../content";
+import FlexCarousel from "./fx/FlexCarousel";
+import { Reveal, SectionHead } from "./ui";
+import { cz } from "../utils/typo";
 
 export default function Portfolio() {
   return (
-    <section id="reference" className="relative bg-coal py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <SectionHead
-          index="04"
-          eyebrow={PORTFOLIO.eyebrow}
-          title={
-            <>
-              {PORTFOLIO.titleLead}
-              <br />
-              <span className="text-accent">{PORTFOLIO.titleAccent}</span>
-            </>
-          }
-          desc={PORTFOLIO.description}
-        />
+    <section id="koncepty" className="relative py-24 md:py-36">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-1/2 h-[520px] -translate-y-1/2 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(255,59,71,0.10),transparent)]" />
 
-        <div className="mt-14 grid gap-5 md:grid-cols-2">
-          {PORTFOLIO.items.map((p, i) => (
-            <Reveal key={p.name} delay={(i % 2) * 0.12}>
-              <article className="relative overflow-hidden rounded-3xl border border-paper/10">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                    src={p.img}
-                    alt={p.alt}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-transparent" />
-                  {/* chips top */}
-                  <div className="absolute left-5 top-5 flex flex-wrap gap-2">
-                    <Chip className="border-accent/40 bg-ink/80 text-accent backdrop-blur">{PORTFOLIO.conceptLabel}</Chip>
-                    {p.services.map((s) => (
-                      <Chip key={s} className="border-paper/20 bg-ink/60 text-paper backdrop-blur">
-                        {s}
-                      </Chip>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="absolute inset-x-0 bottom-0 p-6 md:p-7">
-                  <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-mute">
-                    <span className="size-1 rounded-full bg-accent" />
-                    {p.place}
-                  </p>
-                  <h3 className="mt-2 stretch text-2xl font-extrabold tracking-tight md:text-[28px]">
-                    {p.name}
-                  </h3>
-                  <p className="mt-2 max-w-lg text-sm leading-relaxed text-paper/75">{p.description}</p>
-                </div>
-              </article>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal delay={0.15}>
-          <p className="mt-10 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-mute">
-            {PORTFOLIO.closing}{" "}
-            <a href="#kontakt" className="text-accent underline-offset-4 hover:underline">
-              {PORTFOLIO.closingLink}
-            </a>
-          </p>
-        </Reveal>
+      <div className="relative px-4">
+        <SectionHead kicker={PORTFOLIO.kicker} title={PORTFOLIO.title} desc={PORTFOLIO.description} />
       </div>
+
+      <Reveal delay={0.1} y={40}>
+        <div
+          className="relative mt-10 h-[clamp(480px,78vh,720px)] w-full text-paper [&_.flex-carousel__count]:text-[13px] [&_.flex-carousel__subtitle]:font-sans [&_.flex-carousel__subtitle]:text-[14px] [&_.flex-carousel__title]:font-display [&_.flex-carousel__title]:text-[24px] [&_.flex-carousel__title]:font-bold [&_.flex-carousel__title]:tracking-tight [&_.flex-carousel:focus-visible]:shadow-[inset_0_0_0_2px_var(--color-accent)]"
+        >
+          <FlexCarousel
+            items={PORTFOLIO.items}
+            preset="liquid"
+            intro="rise"
+            fit="portrait"
+            cardHeight={0.56}
+            gap={16}
+            radius={14}
+            squeeze={0.2}
+            captureWheel={false}
+            focusOnClick
+            captions
+          />
+        </div>
+      </Reveal>
+
+      <Reveal delay={0.1}>
+        <div className="mt-6 flex flex-col items-center gap-4 px-4 text-center">
+          <p className="inline-flex items-center gap-2 text-[13px] text-mute/80">
+            <MoveHorizontal className="size-4 text-accent" />
+            {PORTFOLIO.hint}
+          </p>
+          <p className="max-w-md text-[15px] text-mute">{cz(PORTFOLIO.reviewsNote)}</p>
+          <a
+            href="#kontakt"
+            className="group inline-flex items-center gap-2 text-[15px] font-semibold text-paper transition-colors hover:text-accent"
+          >
+            {PORTFOLIO.closingLink}
+            <ArrowRight className="size-4 text-accent transition-transform duration-300 group-hover:translate-x-1" />
+          </a>
+        </div>
+      </Reveal>
     </section>
   );
 }

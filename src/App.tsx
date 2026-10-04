@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import Lenis from "lenis";
 import { Phone } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -14,7 +14,6 @@ import Pricing from "./components/Pricing";
 import Problem from "./components/Problem";
 import Process from "./components/Process";
 import Services from "./components/Services";
-import Testimonials from "./components/Testimonials";
 
 /** Butter-smooth scrolling + anchored navigation */
 function useSmoothScroll() {
@@ -51,53 +50,6 @@ function useSmoothScroll() {
   }, []);
 }
 
-/** Custom cursor — dot + trailing ring, grows over interactive elements */
-function Cursor() {
-  const [enabled, setEnabled] = useState(false);
-  const [hover, setHover] = useState(false);
-  const x = useMotionValue(-100);
-  const y = useMotionValue(-100);
-  const rx = useSpring(x, { stiffness: 260, damping: 24, mass: 0.6 });
-  const ry = useSpring(y, { stiffness: 260, damping: 24, mass: 0.6 });
-
-  useEffect(() => {
-    const fine = window.matchMedia("(pointer: fine)").matches;
-    if (!fine) return;
-    setEnabled(true);
-    const move = (e: MouseEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
-    };
-    const over = (e: MouseEvent) => {
-      const t = e.target as HTMLElement;
-      setHover(!!t.closest("a, button, [data-cursor], input, select, textarea, label"));
-    };
-    window.addEventListener("mousemove", move, { passive: true });
-    window.addEventListener("mouseover", over, { passive: true });
-    return () => {
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("mouseover", over);
-    };
-  }, [x, y]);
-
-  if (!enabled) return null;
-
-  return (
-    <>
-      <motion.div
-        className="pointer-events-none fixed left-0 top-0 z-[100] size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent mix-blend-difference"
-        style={{ x, y }}
-      />
-      <motion.div
-        className="pointer-events-none fixed left-0 top-0 z-[100] -translate-x-1/2 -translate-y-1/2 rounded-full border border-paper/50 mix-blend-difference"
-        style={{ x: rx, y: ry }}
-        animate={{ width: hover ? 52 : 30, height: hover ? 52 : 30, opacity: hover ? 1 : 0.55 }}
-        transition={{ duration: 0.25 }}
-      />
-    </>
-  );
-}
-
 /** Floating call button — the brand gesture */
 function FloatingCall() {
   const [show, setShow] = useState(false);
@@ -118,14 +70,14 @@ function FloatingCall() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 24 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="group fixed bottom-6 right-6 z-40 flex items-center gap-3 rounded-full bg-accent py-3 pl-4 pr-5 text-ink shadow-[0_16px_40px_-10px_rgba(255,92,31,0.55)] transition-colors hover:bg-flame"
+          className="group fixed bottom-5 right-5 z-40 flex items-center gap-3 rounded-2xl bg-signal py-2.5 pl-2.5 pr-5 text-white shadow-[0_0_0_1px_rgba(255,59,71,0.6),0_16px_44px_-10px_rgba(255,59,71,0.8)] transition-colors hover:bg-accent"
           aria-label={`Zavolat ${SITE.domain}`}
         >
-          <span className="relative grid size-9 place-items-center rounded-full bg-ink text-accent">
+          <span className="relative grid size-9 place-items-center rounded-xl bg-ink/25 text-white">
             <span className="pulse-ring" />
             <Phone className="animate-ringshake size-4" fill="currentColor" />
           </span>
-          <span className="stretch text-[15px] font-black tracking-tight">{SITE.phone}</span>
+          <span className="text-[17px] font-bold tabular-nums tracking-tight">{SITE.phone}</span>
         </motion.a>
       )}
     </AnimatePresence>
@@ -136,24 +88,24 @@ export default function App() {
   useSmoothScroll();
 
   return (
-    <div className="relative min-h-screen">
-      <div className="noise-layer" />
-      <Cursor />
-      <Header />
-      <main>
-        <Hero />
-        <Marquee />
-        <Problem />
-        <Services />
-        <Process />
-        <Portfolio />
-        <Pricing />
-        <Testimonials />
-        <Faq />
-        <Contact />
-      </main>
-      <Footer />
-      <FloatingCall />
-    </div>
+    <MotionConfig reducedMotion="user">
+      <div className="relative min-h-screen">
+        <div className="grain" />
+        <Header />
+        <main>
+          <Hero />
+          <Marquee />
+          <Problem />
+          <Services />
+          <Process />
+          <Portfolio />
+          <Pricing />
+          <Faq />
+          <Contact />
+        </main>
+        <Footer />
+        <FloatingCall />
+      </div>
+    </MotionConfig>
   );
 }
