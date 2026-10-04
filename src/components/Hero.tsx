@@ -37,26 +37,26 @@ const CTA_PHOTO = PORTFOLIO.items[0].src.replace("h=1000&w=800", "h=160&w=520");
 /** each layer: width px, rgb, peak alpha, alpha it already has at the very top (0–1), x offset */
 const BEAM_LAYERS = [
   // outer haze → inner core; inner layers are lit from the top so the beam has body all the way up
-  { w: 440, rgb: "110,8,22", a: 0.5, top: 0.06, dx: 0 },
-  { w: 220, rgb: "230,30,50", a: 0.34, top: 0.16, dx: 0 },
-  { w: 96, rgb: "255,90,110", a: 0.4, top: 0.55, dx: 0 },
+  { w: 440, rgb: "8,70,32", a: 0.5, top: 0.06, dx: 0 },
+  { w: 220, rgb: "22,200,98", a: 0.34, top: 0.16, dx: 0 },
+  { w: 96, rgb: "92,255,160", a: 0.4, top: 0.55, dx: 0 },
   // the beam's body: full strength from the very top so it never thins to a hairline
-  { w: 54, rgb: "255,70,92", a: 0.5, top: 1, dx: 0 },
-  { w: 20, rgb: "255,196,192", a: 0.75, top: 1, dx: 0 },
+  { w: 54, rgb: "60,240,135", a: 0.5, top: 1, dx: 0 },
+  { w: 20, rgb: "196,255,222", a: 0.75, top: 1, dx: 0 },
   // off-centre tints: cool magenta on one flank, warm orange on the other — reads as a lit cylinder
-  { w: 80, rgb: "255,56,150", a: 0.34, top: 0.22, dx: -16 },
-  { w: 80, rgb: "255,126,64", a: 0.3, top: 0.22, dx: 16 },
-  { w: 34, rgb: "255,170,165", a: 0.55, top: 0.85, dx: 0 },
-  { w: 12, rgb: "255,226,218", a: 0.85, top: 0.8, dx: 0 },
-  { w: 3, rgb: "255,250,246", a: 1, top: 0.92, dx: 0 },
+  { w: 80, rgb: "40,230,190", a: 0.34, top: 0.22, dx: -16 },
+  { w: 80, rgb: "170,255,90", a: 0.3, top: 0.22, dx: 16 },
+  { w: 34, rgb: "170,255,205", a: 0.55, top: 0.85, dx: 0 },
+  { w: 12, rgb: "222,255,236", a: 0.85, top: 0.8, dx: 0 },
+  { w: 3, rgb: "244,255,248", a: 1, top: 0.92, dx: 0 },
 ];
 
 /** bands of light travelling down the beam — darker and slower on the outside, bright and quick in the core */
 const FLOW_LAYERS = [
-  { w: 230, rgb: "120,8,24", a: 0.55, len: 300, dur: 3.2 },
-  { w: 150, rgb: "190,18,38", a: 0.45, len: 230, dur: 2.4 },
-  { w: 90, rgb: "235,40,60", a: 0.42, len: 170, dur: 1.8 },
-  { w: 44, rgb: "255,130,140", a: 0.4, len: 120, dur: 1.2 },
+  { w: 230, rgb: "8,72,34", a: 0.55, len: 300, dur: 3.2 },
+  { w: 150, rgb: "18,160,78", a: 0.45, len: 230, dur: 2.4 },
+  { w: 90, rgb: "50,230,128", a: 0.42, len: 170, dur: 1.8 },
+  { w: 44, rgb: "150,255,195", a: 0.4, len: 120, dur: 1.2 },
 ];
 
 /** bell-curve cross-section, so a layer has no visible edge */
@@ -131,7 +131,7 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
             left,
             marginLeft: dx,
             height,
-            background: "linear-gradient(to bottom, transparent 30%, rgba(255,170,170,0.18) 70%, rgba(255,205,200,0.45) 100%)",
+            background: "linear-gradient(to bottom, transparent 30%, rgba(150,255,200,0.18) 70%, rgba(200,255,225,0.45) 100%)",
           }}
         />
       ))}
@@ -148,7 +148,7 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
           width: 900,
           height: 320,
           background:
-            "radial-gradient(ellipse 5% 100% at 50% 100%, rgba(255,246,240,0.85), transparent 100%), radial-gradient(ellipse 13% 80% at 50% 100%, rgba(255,150,150,0.45), transparent 100%), radial-gradient(ellipse 30% 60% at 50% 100%, rgba(225,24,42,0.4), transparent 100%), radial-gradient(ellipse 50% 42% at 50% 100%, rgba(130,10,28,0.5), transparent 100%)",
+            "radial-gradient(ellipse 5% 100% at 50% 100%, rgba(240,255,246,0.85), transparent 100%), radial-gradient(ellipse 13% 80% at 50% 100%, rgba(140,255,190,0.45), transparent 100%), radial-gradient(ellipse 30% 60% at 50% 100%, rgba(28,210,104,0.4), transparent 100%), radial-gradient(ellipse 50% 42% at 50% 100%, rgba(6,80,38,0.5), transparent 100%)",
         }}
       />
 
@@ -165,7 +165,7 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
               height: 50,
               "--flow-len": "220px",
               "--flow-dur": "2.2s",
-              backgroundImage: `linear-gradient(to ${side === "left" ? "left" : "right"}, rgba(255,90,100,0) 0%, rgba(255,120,128,0.55) 30%, rgba(200,20,40,0.3) 60%, rgba(255,90,100,0) 100%)`,
+              backgroundImage: `linear-gradient(to ${side === "left" ? "left" : "right"}, rgba(92,255,160,0) 0%, rgba(120,255,175,0.55) 30%, rgba(16,170,80,0.3) 60%, rgba(92,255,160,0) 100%)`,
               backgroundSize: "220px 100%",
               ...masks(
                 `linear-gradient(to ${side}, #000 0%, rgba(0,0,0,0.6) 35%, transparent 100%)`,
@@ -265,7 +265,7 @@ export default function Hero() {
             {
               "--mx": "-9999px",
               "--my": "-9999px",
-              backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,59,71,0.5) 1px, transparent 1.6px)",
+              backgroundImage: "radial-gradient(circle at 1px 1px, rgba(61,245,140,0.5) 1px, transparent 1.6px)",
               backgroundSize: "22px 22px",
               maskImage: "radial-gradient(circle 220px at var(--mx) var(--my), #000 0%, rgba(0,0,0,0.4) 45%, transparent 100%)",
               WebkitMaskImage:
@@ -276,9 +276,9 @@ export default function Hero() {
 
         <Suspense fallback={null}>
           <LaserFlow
-            color="#FF3B47"
-            deepColor="#9E0F1E"
-            coreColor="#FFF1E8"
+            color="#3DF58C"
+            deepColor="#0B5E2E"
+            coreColor="#F0FFF5"
             coreStrength={0.9}
             arch={layout.arch}
             backgroundColor="transparent"
@@ -366,7 +366,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, delay: 0.25, ease: EASE }}
-        className="relative z-10 shadow-[0_-30px_120px_-50px_rgba(255,59,71,0.65)]"
+        className="relative z-10 shadow-[0_-30px_120px_-50px_rgba(61,245,140,0.65)]"
         style={{
           borderTopLeftRadius: `50% ${layout.arch}px`,
           borderTopRightRadius: `50% ${layout.arch}px`,
@@ -381,7 +381,7 @@ export default function Hero() {
         {/* rim catching the light — a top border on the same arch, so it can't drift off the edge */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-[inherit] border-t border-[#ffe9e2]/45"
+          className="pointer-events-none absolute inset-0 rounded-[inherit] border-t border-[#e6fff0]/45"
           style={{
             maskImage: `radial-gradient(ellipse 48% 140% at ${beamPct} 0%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 100%)`,
             WebkitMaskImage: `radial-gradient(ellipse 48% 140% at ${beamPct} 0%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 100%)`,

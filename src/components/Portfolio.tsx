@@ -7,7 +7,7 @@ import { cz } from "../utils/typo";
 export default function Portfolio() {
   return (
     <section id="koncepty" className="relative py-24 md:py-36">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-1/2 h-[520px] -translate-y-1/2 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(255,59,71,0.10),transparent)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-1/2 h-[520px] -translate-y-1/2 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(61,245,140,0.10),transparent)]" />
 
       <div className="relative px-4">
         <SectionHead kicker={PORTFOLIO.kicker} title={PORTFOLIO.title} desc={PORTFOLIO.description} />

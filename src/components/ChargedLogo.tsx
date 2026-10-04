@@ -31,8 +31,8 @@ export default function ChargedLogo({
       <div className="h-full w-full" style={EDGE_FADE}>
         <ElectricLogo
           src={src}
-          color="#fff0ea"
-          glowColor="#ff3b47"
+          color="#effff4"
+          glowColor="#3df58c"
           scale={scale}
           strands={3}
           bend={0.32}
