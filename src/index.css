@@ -131,15 +131,6 @@
 
 /* ---------- keyframes ---------- */
 
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-.animate-marquee {
-  animation: marquee 70s linear infinite;
-}
-
 @keyframes ringpulse {
   0% {
     transform: scale(1);
@@ -177,31 +168,6 @@
 }
 .animate-signal {
   animation: signal-blink 1.6s ease-in-out infinite;
-}
-
-/* flip-card halo: rings that breathe up from the card face */
-@keyframes halo {
-  0% {
-    transform: scale(2);
-    opacity: 0;
-    box-shadow: 0 0 50px color-mix(in srgb, var(--color-accent) 55%, transparent);
-  }
-  50% {
-    transform: translateY(-5px) scale(1);
-    opacity: 1;
-    box-shadow: 0 8px 20px color-mix(in srgb, var(--color-accent) 55%, transparent);
-  }
-  100% {
-    transform: translateY(5px) scale(0.1);
-    opacity: 0;
-    box-shadow: 0 10px 20px transparent;
-  }
-}
-.animate-halo {
-  animation: halo 3s linear infinite;
-}
-.group:hover .animate-halo {
-  animation-duration: 2s;
 }
 
 /* button shine sweep */
@@ -255,11 +221,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee,
   .pulse-ring,
   .animate-ringshake,
   .animate-signal,
-  .animate-halo,
   .conic-ring {
     animation: none !important;
   }

@@ -1,8 +1,8 @@
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import Lenis from "lenis";
-import { Phone } from "lucide-react";
+import { Send } from "lucide-react";
 import { useEffect, useState } from "react";
-import { SETTINGS, SITE } from "./content";
+import { CONTACT, SETTINGS } from "./content";
 import Contact from "./components/Contact";
 import Faq from "./components/Faq";
 import Footer from "./components/Footer";
@@ -11,7 +11,6 @@ import Hero from "./components/Hero";
 import Marquee from "./components/Marquee";
 import Portfolio from "./components/Portfolio";
 import Pricing from "./components/Pricing";
-import Problem from "./components/Problem";
 import Process from "./components/Process";
 import Services from "./components/Services";
 
@@ -50,34 +49,42 @@ function useSmoothScroll() {
   }, []);
 }
 
-/** Floating call button — the brand gesture */
-function FloatingCall() {
-  const [show, setShow] = useState(false);
+/** Floating shortcut to the enquiry form — steps aside once the form itself is on screen */
+function FloatingEnquiry() {
+  const [scrolled, setScrolled] = useState(false);
+  const [atForm, setAtForm] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > SETTINGS.floatingCallScrollThreshold);
+    const onScroll = () => setScrolled(window.scrollY > SETTINGS.floatingCallScrollThreshold);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const form = document.getElementById("kontakt");
+    const io = form ? new IntersectionObserver(([e]) => setAtForm(e.isIntersecting), { threshold: 0.15 }) : null;
+    if (form && io) io.observe(form);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      io?.disconnect();
+    };
   }, []);
+
+  const show = scrolled && !atForm;
 
   return (
     <AnimatePresence>
       {show && (
         <motion.a
-          href={`tel:${SITE.phoneLink}`}
+          href="#kontakt"
           initial={{ opacity: 0, scale: 0.5, y: 24 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 24 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           className="group fixed bottom-5 right-5 z-40 flex items-center gap-3 rounded-2xl bg-signal py-2.5 pl-2.5 pr-5 text-white shadow-[0_0_0_1px_rgba(255,59,71,0.6),0_16px_44px_-10px_rgba(255,59,71,0.8)] transition-colors hover:bg-accent"
-          aria-label={`Zavolat ${SITE.domain}`}
         >
           <span className="relative grid size-9 place-items-center rounded-xl bg-ink/25 text-white">
             <span className="pulse-ring" />
-            <Phone className="animate-ringshake size-4" fill="currentColor" />
+            <Send className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={2.5} />
           </span>
-          <span className="text-[17px] font-bold tabular-nums tracking-tight">{SITE.phone}</span>
+          <span className="text-[16px] font-bold tracking-tight">{CONTACT.formTitle}</span>
         </motion.a>
       )}
     </AnimatePresence>
@@ -95,7 +102,6 @@ export default function App() {
         <main>
           <Hero />
           <Marquee />
-          <Problem />
           <Services />
           <Process />
           <Portfolio />
@@ -104,7 +110,7 @@ export default function App() {
           <Contact />
         </main>
         <Footer />
-        <FloatingCall />
+        <FloatingEnquiry />
       </div>
     </MotionConfig>
   );

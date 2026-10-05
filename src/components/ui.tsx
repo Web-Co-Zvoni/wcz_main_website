@@ -48,24 +48,31 @@ export function SectionHead({
   kicker,
   title,
   desc,
+  size = "md",
   className,
 }: {
   kicker: string;
   title: ReactNode;
   desc?: string;
+  size?: "md" | "lg";
   className?: string;
 }) {
+  const lg = size === "lg";
   return (
-    <div className={cn("mx-auto flex max-w-3xl flex-col items-center text-center", className)}>
+    <div className={cn("mx-auto flex flex-col items-center text-center", lg ? "max-w-5xl" : "max-w-3xl", className)}>
       <Reveal>
-        <Kicker>{kicker}</Kicker>
+        <Kicker className={lg ? "xl:text-[16px]" : undefined}>{kicker}</Kicker>
       </Reveal>
       <Reveal delay={0.08}>
-        <h2 className="display mt-5 text-[clamp(2rem,4.8vw,4rem)]">{typeof title === "string" ? cz(title) : title}</h2>
+        <h2 className={cn("display mt-5", lg ? "text-[clamp(2.6rem,5vw,5.6rem)] leading-[0.98]" : "text-[clamp(2rem,4.8vw,4rem)]")}>
+          {typeof title === "string" ? cz(title) : title}
+        </h2>
       </Reveal>
       {desc && (
         <Reveal delay={0.16}>
-          <p className="mx-auto mt-5 max-w-md text-[16.5px] leading-relaxed text-mute">{cz(desc)}</p>
+          <p className={cn("mx-auto leading-relaxed text-mute", lg ? "mt-7 max-w-xl text-[clamp(1.1rem,1.4vw,1.4rem)]" : "mt-5 max-w-md text-[16.5px]")}>
+            {cz(desc)}
+          </p>
         </Reveal>
       )}
     </div>

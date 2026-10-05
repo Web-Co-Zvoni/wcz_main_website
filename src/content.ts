@@ -73,19 +73,13 @@ export const MARQUEE_TRADES = [
   "Hodináři",
 ];
 
-export const PROBLEM = {
-  kicker: "Znáte to?",
-  lines: ["Web z roku 2013.", "Na mobilu se rozpadá.", "Google vás neukazuje.", "A na opravu není čas."],
-  answerLead: "Řemeslu rozumíte vy.",
-  answer: "Webům my.",
-};
-
 export const SERVICES = {
-  kicker: "Co pro vás uděláme",
   title: "Všechno kolem webu pod jednou střechou",
   description: "Jeden telefon místo pěti dodavatelů.",
-  flipHint: "Najeďte nebo klepněte na kartu",
+  scrollHint: "Scrollujte, služby pojedou do strany",
   cta: "Chci to",
+  outroLead: "Nevíte, co z toho potřebujete?",
+  outroCta: "Napsat poptávku",
   items: [
     {
       title: "Weby na míru",
@@ -126,8 +120,52 @@ export const SERVICES = {
   ],
 };
 
+/** Copy for the mini-demos in Services. A made-up business, shown with a "ukázka" label — not a client. */
+export const SERVICE_DEMOS = {
+  sampleLabel: "ukázka",
+  business: "Instalatér Novák",
+  web: {
+    url: "instalater-novak.cz",
+    headline: "Teče vám voda? Přijedeme do hodiny.",
+    call: "Zavolat",
+    rows: ["Havárie vody a topení", "Výměna baterií a WC", "Kotle a radiátory"],
+  },
+  seo: {
+    query: "instalatér plzeň",
+    place: "Plzeň-Slovany · 2,1 km",
+    open: "Otevřeno do 18:00",
+    call: "Zavolat",
+    route: "Trasa",
+    others: ["Instalatérské práce Plzeň", "Voda-topení servis"],
+  },
+  booking: {
+    day: "Středa 15.",
+    slots: ["8:00", "10:30", "13:00", "15:30"],
+    bookedSlot: 1,
+    booked: "Rezervováno",
+    time: "21:04",
+    notice: "Nová poptávka",
+    noticeText: "Kapající baterie v koupelně",
+  },
+  shop: {
+    product: "Dubové prkénko",
+    price: "890 Kč",
+    add: "Do košíku",
+    added: "V košíku",
+    order: "Objednávka přijata",
+    orderNo: "č. 1024",
+  },
+  care: {
+    incoming: "Dobrý den, můžete prosím změnit ceník? Výměna baterie je teď za 1 200 Kč.",
+    reply: "Hotovo, už je to na webu.",
+    status: "Záloha dnes 3:00 · web běží",
+  },
+  photo: {
+    caption: "Nová koupelna za tři dny, včetně rozvodů.",
+  },
+};
+
 export const PROCESS = {
-  kicker: "Jak to funguje",
   title: "Od telefonátu k hotovému webu",
   steps: [
     { title: "Zavoláme si", text: "15 minut, zdarma a bez závazků.", meta: "Den 1" },
@@ -201,7 +239,6 @@ export const PRICING = {
 };
 
 export const FAQ = {
-  kicker: "Časté otázky",
   title: "Na rovinu odpovězeno",
   items: [
     {
@@ -229,29 +266,27 @@ export const FAQ = {
       answer: "Jasně. Firemní profil na Googlu, e-maily na vaší doméně i napojení na sociální sítě.",
     },
   ],
-  more: "Jiná otázka? Zavolejte.",
+  more: "Jiná otázka? Napište nám.",
+  formCta: "Zeptat se přes formulář",
 };
 
 export const CONTACT = {
-  kicker: "Kontakt",
   title: "Chcete web, co zvoní?",
   description: "Formulář zabere dvě minuty. Ozveme se do 24 hodin — většinou dřív.",
-  bellHint: "Zkuste na zvonek kliknout",
+  emailLead: "Nebo napište rovnou na e-mail",
   availability: "Volná kapacita od",
   monthsGenitive: [
     "ledna", "února", "března", "dubna", "května", "června",
     "července", "srpna", "září", "října", "listopadu", "prosince",
   ],
-  callNote: "Když nezvedneme, jsme u klienta — ozveme se zpět.",
   successTitle: "Díky, je to u nás.",
-  successStart: "Ozveme se do 24 hodin. Když to hoří, rovnou volejte",
+  successStart: "Ozveme se do 24 hodin. Když to spěchá, napište nám na",
   formTitle: "Nezávazná poptávka",
   fields: {
     name: "Jméno a příjmení *",
     phone: "Telefon *",
     email: "E-mail",
     trade: "Čím se živíte? *",
-    tradePlaceholder: "Vyberte obor…",
     message: "Co potřebujete? *",
     privacyNote: "Odesláním berete na vědomí, jak nakládáme s vašimi údaji. Nikomu je nepředáváme.",
     submit: "Odeslat poptávku",
