@@ -5,13 +5,23 @@ import { HEADER, NAV_LINKS, SITE } from "../content";
 import { cn } from "../utils/cn";
 import { BellMark, Button, EASE } from "./ui";
 
-export function Logo({ className }: { className?: string }) {
+/** `large` grows the mark on wide screens — the header's version; footer and menu keep the standard size */
+export function Logo({ className, large = false }: { className?: string; large?: boolean }) {
   return (
-    <a href="#top" className={cn("group flex items-center gap-2.5", className)} aria-label={SITE.domain}>
-      <span className="relative grid size-11 place-items-center rounded-[12px] bg-signal text-white shadow-[0_0_24px_-6px_var(--color-accent)] transition-shadow duration-500 group-hover:shadow-[0_0_32px_-2px_var(--color-accent)]">
-        <BellMark className="size-[30px] origin-top transition-transform duration-500 group-hover:animate-ringshake" strokeWidth={9} compact />
+    <a href="#top" className={cn("group flex items-center gap-2.5", large && "min-[1440px]:gap-3", className)} aria-label={SITE.domain}>
+      <span
+        className={cn(
+          "relative grid size-11 place-items-center rounded-[12px] bg-signal text-white shadow-[0_0_24px_-6px_var(--color-accent)] transition-shadow duration-500 group-hover:shadow-[0_0_32px_-2px_var(--color-accent)]",
+          large && "min-[1440px]:size-[58px] min-[1440px]:rounded-[16px]"
+        )}
+      >
+        <BellMark
+          className={cn("size-[30px] origin-top transition-transform duration-500 group-hover:animate-ringshake", large && "min-[1440px]:size-[40px]")}
+          strokeWidth={9}
+          compact
+        />
       </span>
-      <span className="display-soft text-[21px] leading-none">
+      <span className={cn("display-soft text-[21px] leading-none", large && "min-[1440px]:text-[26.5px]")}>
         {SITE.name}
         <span className="text-accent">{SITE.brandSuffix}</span>
       </span>
@@ -21,7 +31,7 @@ export function Logo({ className }: { className?: string }) {
 
 function NavLink({ href, label }: { href: string; label: string }) {
   return (
-    <a href={href} className="group relative px-1 py-2 text-[13.5px] font-medium text-mute transition-colors hover:text-paper lg:text-[15.5px] xl:text-[17px]">
+    <a href={href} className="group relative px-1 py-2 text-[13.5px] font-medium text-mute transition-colors hover:text-paper lg:text-[15.5px] xl:text-[17px] min-[1440px]:text-[19.5px]">
       {label}
       <span className="absolute inset-x-1 -bottom-0.5 h-px origin-center scale-x-0 bg-accent shadow-[0_0_8px_var(--color-accent)] transition-transform duration-300 group-hover:scale-x-100" />
     </a>
@@ -57,11 +67,12 @@ export default function Header() {
           scrolled ? "hairline bg-ink/80 backdrop-blur-xl" : "border-transparent bg-transparent"
         )}
       >
-        <div className="mx-auto flex h-[92px] max-w-7xl items-center px-4 md:px-8">
-          <Logo />
+        {/* everything grows from 1440px up — below that the row is already full and the beam needs its gap */}
+        <div className="mx-auto flex h-[92px] max-w-[88rem] items-center px-4 md:px-8 min-[1440px]:h-[110px]">
+          <Logo large />
 
           {/* nav sits left; the hero beam falls through the open space to its right */}
-          <nav className="ml-8 hidden items-center gap-4 md:flex lg:ml-10 lg:gap-6 xl:ml-12 xl:gap-7">
+          <nav className="ml-8 hidden items-center gap-4 md:flex lg:ml-10 lg:gap-6 xl:ml-12 xl:gap-7 min-[1440px]:ml-10 min-[1440px]:gap-6">
             {NAV_LINKS.map((l) => (
               <NavLink key={l.href} {...l} />
             ))}
@@ -70,7 +81,7 @@ export default function Header() {
           <div data-header-actions className="ml-auto flex items-center gap-3">
             <a
               href={`tel:${SITE.phoneLink}`}
-              className="hidden items-center gap-2 text-[16px] font-medium tabular-nums text-mute transition-colors hover:text-paper xl:flex"
+              className="hidden items-center gap-2 text-[16px] font-medium tabular-nums min-[1440px]:text-[18px] text-mute transition-colors hover:text-paper xl:flex"
             >
               <span className="relative flex size-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-volt opacity-60" />
@@ -78,7 +89,7 @@ export default function Header() {
               </span>
               {SITE.phone}
             </a>
-            <Button href="#kontakt" className="hidden px-7 py-4 text-[16px] lg:inline-flex">
+            <Button href="#kontakt" className="hidden px-7 py-4 text-[16px] lg:inline-flex min-[1440px]:px-9 min-[1440px]:py-5 min-[1440px]:text-[18.5px]">
               {HEADER.offerCta}
             </Button>
             <button

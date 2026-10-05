@@ -25,8 +25,12 @@ type Layout = {
   arch: number;
   /** distance from hero top to the impact point, px */
   hitPx: number;
-  /** vertical centre for the logo: midway between the header and the bottom of the CTAs, px */
+  /** logo centre x as a fraction of hero width */
+  logoX: number;
+  /** vertical centre for the logo: level with the middle of the copy block, px */
   logoY: number;
+  /** rough radius of the logo mark, px (0 when the logo is hidden) — the clouds pile up over it */
+  logoR: number;
 };
 
 const HEADER_H = 92;
@@ -184,7 +188,7 @@ export default function Hero() {
   const cardRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const [layout, setLayout] = useState<Layout>({ beamX: 0.62, beamY: -0.25, arch: 64, hitPx: 0, logoY: 0 });
+  const [layout, setLayout] = useState<Layout>({ beamX: 0.62, beamY: -0.25, arch: 64, hitPx: 0, logoX: 0.81, logoY: 0, logoR: 0 });
 
   useLayoutEffect(() => {
     const hero = heroRef.current;
@@ -210,8 +214,15 @@ export default function Hero() {
       const top = card.offsetTop + drop;
       // copy block is a direct child of the stage, which starts at the top of the hero
       const copy = copyRef.current;
+      const copyTop = copy ? copy.offsetTop : HEADER_H;
       const copyBottom = copy ? copy.offsetTop + copy.offsetHeight : h / 2;
-      setLayout({ beamX, beamY: 0.5 - top / h, arch, hitPx: top, logoY: (HEADER_H + copyBottom) / 2 });
+      // matches the logo box, w-[clamp(300px,30vw,520px)]; the mark fills a bit under half of it
+      const logoBox = Math.min(520, Math.max(300, window.innerWidth * 0.3));
+      const logoR = wide ? logoBox * 0.42 : 0;
+      // a touch left of midway between the beam and the right edge, but never crowding the beam
+      const markHalf = logoBox * 0.28;
+      const logoX = Math.max(((beamX + 1) / 2) * w - 80, beamX * w + markHalf + 60) / w;
+      setLayout({ beamX, beamY: 0.5 - top / h, arch, hitPx: top, logoX, logoY: (copyTop + copyBottom) / 2, logoR });
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -240,7 +251,7 @@ export default function Hero() {
   };
 
   const beamPct = `${layout.beamX * 100}%`;
-  const bellPct = `${((layout.beamX + 1) / 2) * 100}%`;
+  const bellPct = `${layout.logoX * 100}%`;
 
   return (
     <section
@@ -300,8 +311,40 @@ export default function Hero() {
           />
         </Suspense>
 
-        {/* clouds drifting round the beam; the cursor parts them to show the grid and beam behind */}
-        <CloudLayer beamX={layout.beamX} floorPx={layout.hitPx} className="absolute inset-0" />
+        {/* dims the sky behind the clouds, so it stays dark even where the cursor has parted them.
+            Spares the beam and its glow, and the wide flare where it lands on the card. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundColor: SKY,
+            opacity: 0.4,
+            ...masks(
+              `linear-gradient(to right, #000 calc(${beamPct} - 240px), transparent calc(${beamPct} - 80px), transparent calc(${beamPct} + 80px), #000 calc(${beamPct} + 240px))`,
+              `radial-gradient(ellipse 760px 420px at ${beamPct} ${layout.hitPx || 0}px, transparent 0%, transparent 30%, #000 100%)`
+            ),
+          }}
+        />
+
+        {/* logo sits behind the clouds: it glows faintly through and shows in full where the cursor parts them */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.4, delay: 0.9, ease: EASE }}
+          className="pointer-events-auto absolute hidden w-[clamp(300px,30vw,520px)] -translate-x-1/2 -translate-y-1/2 md:block"
+          // the mark sits high in its box — drop the box so the mark itself is level with the copy
+          style={{ left: bellPct, top: layout.logoY ? `calc(${layout.logoY}px + clamp(28px,2.8vw,48px))` : "50%" }}
+        >
+          <ChargedLogo src={logoWcz} scale={0.68} className="relative aspect-[5/6] w-full cursor-pointer" />
+        </motion.div>
+
+        {/* clouds drifting round the beam; the cursor parts them to show the grid, beam and logo behind */}
+        <CloudLayer
+          beamX={layout.beamX}
+          floorPx={layout.hitPx}
+          logo={layout.logoR > 0 ? { x: layout.logoX, y: layout.logoY, r: layout.logoR } : undefined}
+          className="absolute inset-0"
+        />
 
         {/* layered beam in front of the clouds: crimson haze → red glow → pink halo → white core, plus a flared skirt */}
         {layout.hitPx > 0 && <BeamLayers left={beamPct} height={layout.hitPx} />}
@@ -309,22 +352,25 @@ export default function Hero() {
         {layout.hitPx > 0 && <BeamParticles left={beamPct} height={layout.hitPx} />}
       </motion.div>
 
-      {/* stage: copy left of the beam, bell right of it */}
-      <div className="relative z-10">
-        <div className="mx-auto flex min-h-[clamp(640px,82svh,920px)] max-w-7xl flex-col justify-center px-4 pb-28 pt-[140px] md:min-h-[max(480px,calc(100svh-212px))] md:px-8 md:pb-[clamp(36px,6.5vh,76px)] md:pt-[clamp(108px,15vh,132px)]">
-          <div ref={copyRef} className="max-w-[80%] md:max-w-[min(42rem,52vw)]">
+      {/* stage: copy left of the beam (the bell lives behind the clouds) — lets the cursor through to the logo */}
+      <div className="pointer-events-none relative z-10">
+        <div className="mx-auto flex min-h-[clamp(640px,82svh,920px)] max-w-[88rem] flex-col justify-center px-4 pb-28 pt-[140px] md:min-h-[max(480px,calc(100svh-266px))] md:px-8 md:pb-[clamp(24px,4vh,56px)] min-[1440px]:pb-[clamp(20px,3.4vh,56px)] md:pt-[clamp(100px,13vh,124px)] min-[1440px]:pt-[clamp(122px,13vh,132px)]">
+          <div ref={copyRef} className="pointer-events-auto max-w-[80%] md:max-w-[min(48rem,52vw)]">
             <Reveal delay={0.45}>
-              <Kicker>{HERO.kicker}</Kicker>
+              <Kicker className="xl:text-[clamp(15px,2vh,17.5px)]">{HERO.kicker}</Kicker>
             </Reveal>
 
-            <h1 className="display mt-6 text-[clamp(3rem,min(5.8vw,10.4vh),6.5rem)] max-md:text-[clamp(2.5rem,11vw,3.8rem)]">
+            <h1 className="display mt-6 text-[clamp(3rem,min(5.8vw,10.4vh),6.5rem)] xl:text-[clamp(3rem,max(min(5.8vw,10.4vh),min(7.4vw,calc(17vh-52px))),8.5rem)] max-md:text-[clamp(2.5rem,11vw,3.8rem)]">
               {HERO.titleLines.map((line, i) => (
-                <span key={line} className="block overflow-hidden pb-[0.06em]">
+                // descenders (the y, the comma) hang below the tight line box: the mask and the text fill reach
+                // down to cover them, and a negative margin keeps the lines exactly where they were
+                <span key={line} className="-mb-[0.18em] block overflow-hidden pb-[0.24em]">
                   <motion.span
                     initial={{ y: "110%" }}
                     animate={{ y: 0 }}
                     transition={{ duration: 1.1, delay: 0.45 + i * 0.12, ease: EASE }}
-                    className="block bg-gradient-to-b from-white via-paper to-paper/60 bg-clip-text text-transparent"
+                    // white on top shading to grey at the foot of the letters, for a little depth
+                    className="-mb-[0.24em] block bg-[linear-gradient(180deg,#ffffff_8%,#f6f2f0_30%,#c4bdbf_50%,#8f878b_64%,#7d7579_84%)] bg-clip-text pb-[0.24em] text-transparent"
                   >
                     {line}
                   </motion.span>
@@ -333,7 +379,7 @@ export default function Hero() {
             </h1>
 
             <Reveal delay={0.75}>
-              <p className="mt-6 max-w-[36rem] text-[17px] leading-relaxed text-paper/70 md:text-[20.5px]">
+              <p className="mt-6 max-w-[40rem] text-[17px] leading-relaxed text-paper/70 md:text-[21px] xl:max-w-[44rem] xl:text-[clamp(21px,2.9vh,26px)]">
                 {cz(HERO.description)}
               </p>
             </Reveal>
@@ -348,16 +394,6 @@ export default function Hero() {
             </Reveal>
           </div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.4, delay: 0.9, ease: EASE }}
-          className="absolute hidden w-[clamp(270px,26vw,420px)] -translate-x-1/2 -translate-y-1/2 md:block"
-          style={{ left: bellPct, top: layout.logoY || "50%" }}
-        >
-          <ChargedLogo src={logoWcz} scale={0.68} className="relative aspect-[5/6] w-full cursor-pointer" />
-        </motion.div>
       </div>
 
       {/* the card the beam lands on — edge to edge, arched so it melts into the sides */}
@@ -389,14 +425,14 @@ export default function Hero() {
         />
 
         <Reveal delay={1} y={16}>
-          <dl className="relative mx-auto grid max-w-7xl grid-cols-2 px-4 pb-10 pt-14 md:grid-cols-4 md:px-8 md:pb-[clamp(12px,2.5vh,24px)] md:pt-[clamp(24px,4.5vh,48px)]">
+          <dl className="relative mx-auto grid max-w-[88rem] grid-cols-2 px-4 pb-10 pt-14 md:grid-cols-4 md:px-8 md:pb-[clamp(12px,2.5vh,24px)] md:pt-[clamp(24px,4.5vh,48px)]">
             {HERO.stats.map((s, i) => (
               <div
                 key={s.label}
                 className={`group flex flex-col items-center gap-2 px-3 py-8 text-center md:py-[clamp(12px,2.5vh,24px)] ${i % 2 === 1 ? "border-l border-paper/10" : ""} ${i > 1 ? "border-t border-paper/10 md:border-t-0" : ""} ${i === 2 ? "md:border-l" : ""}`}
               >
-                <dt className="order-2 text-[14px] text-mute md:text-[17px]">{s.label}</dt>
-                <dd className="display order-1 text-[clamp(2.2rem,min(4.4vw,8.4vh),4rem)] transition-colors duration-500 group-hover:text-accent">
+                <dt className="order-2 text-[15px] text-mute md:text-[18px] xl:text-[clamp(18px,2vh,20px)]">{s.label}</dt>
+                <dd className="display order-1 text-[clamp(2.4rem,min(5.4vw,9.6vh),5.4rem)] transition-colors duration-500 group-hover:text-accent">
                   {s.value}
                 </dd>
               </div>
