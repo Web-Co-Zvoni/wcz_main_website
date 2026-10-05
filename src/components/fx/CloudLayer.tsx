@@ -76,10 +76,10 @@ void main() {
   // red cast: lit by the beam, and slow patches drifting through
   float drift = smoothstep(0.56, 0.86, fbm(uv * 0.85 + vec2(t * 0.01, 3.0)));
   float beamLit = exp(-pow(dx / 0.12, 2.0));
-  vec3 red = vec3(0.6, 0.12, 0.16);
+  vec3 red = vec3(0.5, 0.14, 0.62);
   vec3 col = mix(grey, grey * 0.5 + red * 0.85, clamp(drift * 0.7 + beamLit * 0.55, 0.0, 0.85));
   // clouds right next to the beam catch its light
-  col += vec3(0.55, 0.12, 0.15) * beamLit * body * 0.5;
+  col += vec3(0.48, 0.14, 0.58) * beamLit * body * 0.5;
 
   // cursor trail parts the clouds; ragged edge from the cloud field itself
   float clear = 0.0;

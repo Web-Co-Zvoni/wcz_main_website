@@ -20,7 +20,7 @@ export default function Pricing() {
                 className={cn(
                   "relative mx-auto flex h-full max-w-md flex-col items-center rounded-[22px] px-7 pb-8 pt-10 text-center",
                   p.featured
-                    ? "bg-gradient-to-b from-accent/[0.14] via-card to-ink shadow-[0_40px_100px_-40px_rgba(255,59,71,0.6)] lg:py-14"
+                    ? "bg-gradient-to-b from-accent/[0.14] via-card to-ink shadow-[0_40px_100px_-40px_rgba(217,70,239,0.6)] lg:py-14"
                     : "border border-paper/10 bg-coal/60"
                 )}
               >

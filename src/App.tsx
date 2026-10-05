@@ -70,7 +70,7 @@ function FloatingCall() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 24 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="group fixed bottom-5 right-5 z-40 flex items-center gap-3 rounded-2xl bg-signal py-2.5 pl-2.5 pr-5 text-white shadow-[0_0_0_1px_rgba(255,59,71,0.6),0_16px_44px_-10px_rgba(255,59,71,0.8)] transition-colors hover:bg-accent"
+          className="group fixed bottom-5 right-5 z-40 flex items-center gap-3 rounded-2xl bg-signal py-2.5 pl-2.5 pr-5 text-white shadow-[0_0_0_1px_rgba(217,70,239,0.6),0_16px_44px_-10px_rgba(217,70,239,0.8)] transition-colors hover:bg-accent"
           aria-label={`Zavolat ${SITE.domain}`}
         >
           <span className="relative grid size-9 place-items-center rounded-xl bg-ink/25 text-white">

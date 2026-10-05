@@ -9,10 +9,10 @@
   --color-paper: #f4efec;
   --color-mute: #a39a9d;
 
-  /* signal red: glow / text accent vs. button fill (AA with white text) */
-  --color-accent: #ff3b47;
-  --color-signal: #e0182a;
-  --color-flame: #ff8a1f;
+  /* signal magenta: glow / text accent vs. button fill (AA with white text) */
+  --color-accent: #d946ef;
+  --color-signal: #c026d3;
+  --color-flame: #8b5cf6;
   --color-volt: #3bff8f;
 
   --font-display: "Montserrat", ui-sans-serif, system-ui, sans-serif;

@@ -23,7 +23,7 @@ export default function Faq() {
                   className={cn(
                     "rounded-2xl border transition-[border-color,background-color,box-shadow] duration-500",
                     isOpen
-                      ? "border-accent/35 bg-card/70 shadow-[0_20px_60px_-30px_rgba(255,59,71,0.45)]"
+                      ? "border-accent/35 bg-card/70 shadow-[0_20px_60px_-30px_rgba(217,70,239,0.45)]"
                       : "border-paper/[0.08] bg-coal/40 hover:border-paper/20"
                   )}
                 >

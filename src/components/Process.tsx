@@ -34,8 +34,8 @@ export default function Process() {
             >
               <motion.span
                 variants={{
-                  off: { borderColor: "rgba(244,239,236,0.15)", color: "#a39a9d", boxShadow: "0 0 0 0 rgba(255,59,71,0)" },
-                  on: { borderColor: "rgba(255,59,71,0.9)", color: "#ffffff", boxShadow: "0 0 36px -4px rgba(255,59,71,0.75)" },
+                  off: { borderColor: "rgba(244,239,236,0.15)", color: "#a39a9d", boxShadow: "0 0 0 0 rgba(217,70,239,0)" },
+                  on: { borderColor: "rgba(217,70,239,0.9)", color: "#ffffff", boxShadow: "0 0 36px -4px rgba(217,70,239,0.75)" },
                 }}
                 transition={{ duration: 0.6, ease: EASE }}
                 className="display grid size-16 place-items-center rounded-full border-2 bg-ink text-2xl"
