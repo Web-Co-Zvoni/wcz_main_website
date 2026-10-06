@@ -1,12 +1,12 @@
 /**
- * Mini-demos for the Services journey: each one shows its service doing the job for a
- * made-up business (labelled "ukázka" on the page). They only run while their panel is the
- * active one; otherwise they rest on their finished state.
+ * Mini-demos for the Services bento: each one shows its service doing the job for a made-up
+ * business (the tile labels it "ukázka"). They fill the panel slot their tile gives them and
+ * only run while the tile is on screen; otherwise they rest on their finished state.
  */
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Bell, Check, MapPin, Phone, Search, ShoppingBag } from "lucide-react";
+import { Bell, Check, MapPin, Phone, Search } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import { PORTFOLIO, SERVICE_DEMOS as D } from "../content";
+import { SERVICE_DEMOS as D } from "../content";
 import { cn } from "../utils/cn";
 import { EASE } from "./ui";
 
@@ -40,19 +40,16 @@ function useSteps(active: boolean, durations: readonly number[]) {
   return state;
 }
 
-const photo = (i: number) => PORTFOLIO.items[i].src.replace("h=1000&w=800", "h=640&w=640");
-
 function Frame({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
       className={cn(
-        "relative aspect-[4/5] w-full max-w-[400px] overflow-hidden rounded-[28px] border border-paper/10 bg-[#0d0b0e]",
-        "shadow-[0_50px_100px_-50px_rgba(0,0,0,0.95),0_40px_90px_-60px_rgba(255,59,71,0.55)]",
+        "relative size-full overflow-hidden rounded-[22px] border border-paper/12 bg-[#0d0b0e]",
+        "shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_40px_80px_-30px_rgba(0,0,0,0.95)]",
         className
       )}
     >
       {children}
-      <span className="absolute bottom-3 right-4 text-[11.5px] text-mute/55">{D.sampleLabel}</span>
     </div>
   );
 }
@@ -78,7 +75,7 @@ function WebDemo({ active }: { active: boolean }) {
   const { step } = useSteps(active, WEB_STEPS);
   return (
     <Frame className="grid place-items-center bg-[radial-gradient(ellipse_70%_55%_at_50%_100%,rgba(255,59,71,0.16),transparent)]">
-      <div className="relative h-[86%] w-[60%] overflow-hidden rounded-[30px] border-[5px] border-[#2b272b] bg-ink shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)]">
+      <div className="relative aspect-[1/2] h-[90%] overflow-hidden rounded-[30px] border-[5px] border-[#2b272b] bg-ink shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)]">
         <span className="absolute left-1/2 top-1.5 z-10 h-3.5 w-16 -translate-x-1/2 rounded-full bg-[#2b272b]" />
         <motion.div animate={{ y: step >= 1 ? -64 : 0 }} transition={{ duration: 1.1, ease: EASE }} className="px-3.5 pt-8">
           <div className="flex items-center gap-2">
@@ -271,73 +268,6 @@ function BookingDemo({ active }: { active: boolean }) {
   );
 }
 
-/* ---------------- e-shop: into the basket, order in ---------------- */
-
-const SHOP_STEPS = [1400, 1500, 2600] as const;
-
-function ShopDemo({ active }: { active: boolean }) {
-  const { step } = useSteps(active, SHOP_STEPS);
-  const inCart = step >= 1;
-  return (
-    <Frame className="flex flex-col p-4">
-      <div className="flex items-center justify-end">
-        <span className="relative grid size-9 place-items-center rounded-full border border-paper/12 text-paper">
-          <ShoppingBag className="size-4" />
-          <motion.span
-            key={inCart ? "1" : "0"}
-            initial={{ scale: 0.4 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 600, damping: 14 }}
-            className={cn(
-              "absolute -right-1 -top-1 grid size-4.5 place-items-center rounded-full text-[10px] font-bold tabular-nums",
-              inCart ? "bg-signal text-white" : "bg-paper/15 text-paper/70"
-            )}
-          >
-            {inCart ? 1 : 0}
-          </motion.span>
-        </span>
-      </div>
-      <div className="relative mt-3 h-[52%] overflow-hidden rounded-2xl">
-        <img src={photo(2)} alt="" loading="lazy" className="size-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-      </div>
-      <div className="mt-3 flex items-baseline justify-between">
-        <p className="text-[14px] font-semibold text-paper">{D.shop.product}</p>
-        <p className="text-[14px] font-semibold tabular-nums text-paper">{D.shop.price}</p>
-      </div>
-      <motion.span
-        animate={{ scale: step === 1 ? [1, 0.94, 1] : 1 }}
-        transition={{ duration: 0.4 }}
-        className={cn(
-          "mt-3 flex items-center justify-center gap-2 rounded-xl py-2.5 text-[12.5px] font-semibold transition-colors duration-300",
-          inCart ? "bg-paper/[0.07] text-paper" : "bg-signal text-white"
-        )}
-      >
-        {inCart ? <Check className="size-3.5" strokeWidth={3} /> : <ShoppingBag className="size-3.5" />}
-        {inCart ? D.shop.added : D.shop.add}
-      </motion.span>
-
-      <AnimatePresence>
-        {step >= 2 && (
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
-            transition={{ duration: 0.5, ease: EASE }}
-            className="absolute inset-x-4 bottom-9 flex items-center gap-2.5 rounded-2xl border border-volt/30 bg-[#0f1a14] px-3.5 py-3 text-[12px] text-paper"
-          >
-            <span className="grid size-6 place-items-center rounded-full bg-volt/15 text-volt">
-              <Check className="size-3.5" strokeWidth={3} />
-            </span>
-            {D.shop.order}
-            <span className="ml-auto tabular-nums text-mute">{D.shop.orderNo}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </Frame>
-  );
-}
-
 /* ---------------- správa: one text message and it's done ---------------- */
 
 const CARE_STEPS = [1500, 1300, 2700] as const;
@@ -399,51 +329,4 @@ function CareDemo({ active }: { active: boolean }) {
   );
 }
 
-/* ---------------- texty a fotky: focus, shutter, caption ---------------- */
-
-const PHOTO_STEPS = [1300, 900, 2800] as const;
-
-function PhotoDemo({ active }: { active: boolean }) {
-  const { step, loop } = useSteps(active, PHOTO_STEPS);
-  const shot = step >= 1;
-  return (
-    <Frame className="flex flex-col p-4">
-      <div className="relative h-[70%] overflow-hidden rounded-2xl bg-[#141115]">
-        <motion.img
-          src={photo(0)}
-          alt=""
-          loading="lazy"
-          animate={{ opacity: shot ? 1 : 0.25, filter: shot ? "blur(0px) saturate(1)" : "blur(6px) saturate(0)", scale: shot ? 1 : 1.08 }}
-          transition={{ duration: 0.9, ease: EASE }}
-          className="size-full object-cover"
-        />
-        {/* viewfinder */}
-        <motion.div
-          animate={shot ? { top: "8%", left: "8%", right: "8%", bottom: "8%" } : { top: "18%", left: "18%", right: "18%", bottom: "18%" }}
-          transition={{ duration: 0.8, ease: EASE }}
-          className="pointer-events-none absolute"
-        >
-          {["left-0 top-0 border-l-2 border-t-2", "right-0 top-0 border-r-2 border-t-2", "bottom-0 left-0 border-b-2 border-l-2", "bottom-0 right-0 border-b-2 border-r-2"].map((c) => (
-            <span key={c} className={cn("absolute size-5", c, shot ? "border-white/70" : "border-accent")} />
-          ))}
-        </motion.div>
-        <AnimatePresence>
-          {step === 1 && (
-            <motion.span
-              key={`flash-${loop}`}
-              initial={{ opacity: 0.95 }}
-              animate={{ opacity: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="absolute inset-0 bg-white"
-            />
-          )}
-        </AnimatePresence>
-      </div>
-      <div className="mt-4 min-h-[3.2em] text-[14px] leading-snug text-paper/90">
-        {step >= 2 && active ? <Typed text={D.photo.caption} run={loop} /> : step >= 2 ? D.photo.caption : null}
-      </div>
-    </Frame>
-  );
-}
-
-export const SERVICE_DEMO_COMPONENTS = [WebDemo, SeoDemo, BookingDemo, ShopDemo, CareDemo, PhotoDemo];
+export const SERVICE_DEMO_COMPONENTS = { web: WebDemo, seo: SeoDemo, booking: BookingDemo, care: CareDemo };

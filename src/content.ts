@@ -28,6 +28,15 @@ export const SETTINGS = {
   floatingCallScrollThreshold: 640,
 };
 
+/**
+ * Detail pages the niche cards and concept cards click through to. The pages themselves come
+ * later — until then these links lead nowhere (404).
+ */
+export const ROUTES = {
+  niche: (slug: string) => `/obory/${slug}/`,
+  concept: (slug: string) => `/koncepty/${slug}/`,
+};
+
 export const NAV_LINKS = [
   { label: "Služby", href: "#sluzby" },
   { label: "Postup", href: "#postup" },
@@ -58,66 +67,38 @@ export const HERO = {
   ],
 };
 
-export const MARQUEE_TRADES = [
-  "Instalatéři",
-  "Elektrikáři",
-  "Truhláři",
-  "Malíři",
-  "Autoservisy",
-  "Kadeřnictví",
-  "Obkladači",
-  "Zámečníci",
-  "Pekařství",
-  "Klempíři",
-  "Podlaháři",
-  "Hodináři",
-];
+const nichePhoto = (id: number) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600`;
+
+/** The trades we build for, in the grainy carousel under the hero. Photos are illustrative (Pexels). */
+export const NICHES = {
+  title: "Pro koho pracujeme",
+  note: "Fotky jsou ilustrační.",
+  items: [
+    { slug: "elektrikari", name: "Elektrikáři", group: "Řemesla", icon: "zap", src: nichePhoto(257736), alt: "Elektrikář zapojuje jističe v rozvaděči" },
+    { slug: "fotovoltaika", name: "Fotovoltaika", group: "Technika do domu", icon: "sun", src: nichePhoto(9875418), alt: "Montážník nese solární panel na střechu" },
+    { slug: "instalateri-a-topenari", name: "Instalatéři a topenáři", group: "Řemesla", icon: "wrench", src: nichePhoto(6419128), alt: "Instalatér utahuje spoj na vodovodním potrubí" },
+    { slug: "tepelna-cerpadla-a-klimatizace", name: "Tepelná čerpadla a klimatizace", group: "Technika do domu", icon: "fan", src: nichePhoto(27134985), alt: "Venkovní jednotka klimatizace na fasádě" },
+    { slug: "tesari-a-truhlari", name: "Tesaři a truhláři", group: "Řemesla", icon: "hammer", src: nichePhoto(32357250), alt: "Truhlář opracovává dřevo v dílně" },
+    { slug: "okna-a-dvere", name: "Okna a dveře", group: "Technika do domu", icon: "window", src: nichePhoto(5691544), alt: "Montážník osazuje okenní rám" },
+    { slug: "stavby-a-rekonstrukce", name: "Stavby a rekonstrukce", group: "Řemesla", icon: "hardhat", src: nichePhoto(5691622), alt: "Řemeslník stěrkuje zeď" },
+    { slug: "strechy-a-fasady", name: "Střechy a fasády", group: "Technika do domu", icon: "house", src: nichePhoto(33404248), alt: "Pokrývač pokládá šindel na střechu" },
+    { slug: "autoservisy", name: "Autoservisy", group: "Řemesla", icon: "car", src: nichePhoto(3807517), alt: "Automechanik kontroluje motor" },
+    { slug: "hotely-a-penziony", name: "Hotely a penziony", group: "Ubytování", icon: "bed", src: nichePhoto(5883728), alt: "Pokoj v penzionu s manželskou postelí" },
+  ],
+};
 
 export const SERVICES = {
   title: "Všechno kolem webu pod jednou střechou",
   description: "Jeden telefon místo pěti dodavatelů.",
-  scrollHint: "Scrollujte, služby pojedou do strany",
-  cta: "Chci to",
-  outroLead: "Nevíte, co z toho potřebujete?",
   outroCta: "Napsat poptávku",
+  // the four main services, each a bento tile with its working demo
   items: [
-    {
-      title: "Weby na míru",
-      subtitle: "Stavěné hlavně pro mobil",
-      text: "Žádná šablona. Web pro vaše řemeslo a zákazníky, kteří vás hledají v telefonu.",
-      tags: ["Návrh", "Vývoj", "Mobil"],
-    },
-    {
-      title: "Lokální SEO",
-      subtitle: "Ať vás najdou v Plzni",
-      text: "Profil na Googlu, mapy a obsah — když někdo hledá „řemeslo + Plzeň“.",
-      tags: ["Google profil", "Mapy", "Obsah"],
-    },
-    {
-      title: "Rezervace a poptávky",
-      subtitle: "Zakázky i v devět večer",
-      text: "Formuláře a online kalendář. Zákazník se ozve, i když zrovna nezvedáte telefon.",
-      tags: ["Formuláře", "Kalendář"],
-    },
-    {
-      title: "E-shopy",
-      subtitle: "Prodávejte, co vyrábíte",
-      text: "Obchod, který zvládnete obsluhovat sami. Bez programátora na telefonu.",
-      tags: ["Prodej online", "Platby"],
-    },
-    {
-      title: "Správa a hosting",
-      subtitle: "Jedna SMS a je hotovo",
-      text: "Aktualizace, zálohy a drobné úpravy. Vy děláte svou práci, my hlídáme web.",
-      tags: ["Hosting", "Zálohy", "Podpora"],
-    },
-    {
-      title: "Texty a fotky",
-      subtitle: "Prodávají vaši práci",
-      text: "Napíšeme texty a když je potřeba, přijedeme nafotit dílnu i hotové zakázky.",
-      tags: ["Copywriting", "Foto"],
-    },
-  ],
+    { demo: "web", title: "Weby na míru.", text: "Žádná šablona. Web pro vaše řemeslo a zákazníky, kteří vás hledají v telefonu." },
+    { demo: "seo", title: "Lokální SEO.", text: "Profil na Googlu, mapy a obsah — když někdo hledá „řemeslo + Plzeň“." },
+    { demo: "booking", title: "Rezervace a poptávky.", text: "Formuláře a online kalendář. Zákazník se ozve, i když zrovna nezvedáte telefon." },
+    { demo: "care", title: "Správa a hosting.", text: "Aktualizace, zálohy a drobné úpravy. Vy děláte svou práci, my hlídáme web." },
+  ] as const,
 };
 
 /** Copy for the mini-demos in Services. A made-up business, shown with a "ukázka" label — not a client. */
@@ -147,22 +128,33 @@ export const SERVICE_DEMOS = {
     notice: "Nová poptávka",
     noticeText: "Kapající baterie v koupelně",
   },
-  shop: {
-    product: "Dubové prkénko",
-    price: "890 Kč",
-    add: "Do košíku",
-    added: "V košíku",
-    order: "Objednávka přijata",
-    orderNo: "č. 1024",
-  },
   care: {
     incoming: "Dobrý den, můžete prosím změnit ceník? Výměna baterie je teď za 1 200 Kč.",
     reply: "Hotovo, už je to na webu.",
     status: "Záloha dnes 3:00 · web běží",
   },
-  photo: {
-    caption: "Nová koupelna za tři dny, včetně rozvodů.",
-  },
+};
+
+/**
+ * The wide metric tile at the foot of the Services bento. The numbers are a made-up business's
+ * enquiries, labelled "ukázka" on the page — an illustration of the goal, not a client result.
+ */
+export const GROWTH = {
+  title: "Pomáháme vám vydělávat víc",
+  lead: "Víc lidí vás najde, víc jich napíše. Tak vypadá web, který dělá svou práci.",
+  metric: "Poptávky z webu",
+  sample: "ukázka · vymyšlená firma",
+  unit: "poptávek",
+  pointLabel: (i: number) => `${i}. měsíc po spuštění`,
+  deltaLabel: "za poslední měsíc",
+  stats: { peak: "nejvíc", low: "nejméně", avg: "průměr" },
+  views: { curve: "Křivka", bars: "Sloupce" },
+  periods: [
+    { label: "3 měsíce", points: 3 },
+    { label: "6 měsíců", points: 6 },
+    { label: "Rok", points: 12 },
+  ],
+  data: [3, 5, 6, 8, 9, 11, 10, 13, 15, 14, 17, 19],
 };
 
 export const PROCESS = {
@@ -175,6 +167,11 @@ export const PROCESS = {
   ],
   guarantee: "Zpozdíme se z naší viny? Máte slevu 10 %.",
   guaranteeCta: "Chci termín návrhu",
+  // figures for the little pictures in the milestone tiles — the same promises as above
+  callMinutes: 15,
+  draftLabel: "72 h",
+  launchDays: 14,
+  discount: 10,
 };
 
 const pexels = (id: number) =>
@@ -184,20 +181,24 @@ export const PORTFOLIO = {
   kicker: "Oborové koncepty",
   title: "Koncepty, ne reference",
   description: "Hotové klientské weby zatím ukázat nemůžeme. Tohle jsou oborové koncepty — fotky jsou ilustrační.",
-  hint: "Táhněte do stran, kliknutím přiblížíte",
+  hint: "Přepínejte šipkami, tečkami nebo kliknutím na vedlejší kartu",
+  sampleLabel: "koncept",
+  open: "Prohlédnout koncept",
+  prev: "Předchozí koncept",
+  next: "Další koncept",
   reviewsNote: "Recenze zveřejníme, až je budeme mít od skutečných klientů. Žádné vymyšlené.",
   closingLink: "Probrat váš web",
   items: [
-    { src: pexels(6419128), alt: "Instalatér montuje rozvody vody v koupelně", title: "Instalatér", subtitle: "Služby a poptávkový formulář" },
-    { src: pexels(257736), alt: "Elektrikář zapojuje rozvaděč", title: "Elektrikář", subtitle: "Výjezdy a rychlý kontakt" },
-    { src: pexels(32357250), alt: "Truhlář opracovává dřevo v dílně", title: "Truhlář", subtitle: "Realizace a fotogalerie" },
-    { src: pexels(3985360), alt: "Kosmetické ošetření pleti", title: "Kosmetický salon", subtitle: "Ceník a online rezervace" },
-    { src: pexels(3807517), alt: "Automechanik kontroluje motor", title: "Autoservis", subtitle: "Objednání na termín" },
-    { src: pexels(6474471), alt: "Malíř natírá stěnu válečkem", title: "Malíř pokojů", subtitle: "Kalkulace a reference" },
-    { src: pexels(1855214), alt: "Vitrína pekárny s pečivem", title: "Pekařství", subtitle: "Denní nabídka a mapa" },
-    { src: pexels(39559306), alt: "Kadeřník stříhá vlasy v salonu", title: "Kadeřnictví", subtitle: "Rezervace a ceník" },
-    { src: pexels(6195125), alt: "Tým úklidové firmy v bytě", title: "Úklidová firma", subtitle: "Balíčky a poptávka" },
-    { src: pexels(5691622), alt: "Řemeslník stěrkuje zeď", title: "Stavební práce", subtitle: "Služby a oblast výjezdu" },
+    { src: pexels(6419128), alt: "Instalatér montuje rozvody vody v koupelně", slug: "instalater", title: "Instalatér", subtitle: "Služby a poptávkový formulář" },
+    { src: pexels(257736), alt: "Elektrikář zapojuje rozvaděč", slug: "elektrikar", title: "Elektrikář", subtitle: "Výjezdy a rychlý kontakt" },
+    { src: pexels(32357250), alt: "Truhlář opracovává dřevo v dílně", slug: "truhlar", title: "Truhlář", subtitle: "Realizace a fotogalerie" },
+    { src: pexels(3985360), alt: "Kosmetické ošetření pleti", slug: "kosmeticky-salon", title: "Kosmetický salon", subtitle: "Ceník a online rezervace" },
+    { src: pexels(3807517), alt: "Automechanik kontroluje motor", slug: "autoservis", title: "Autoservis", subtitle: "Objednání na termín" },
+    { src: pexels(6474471), alt: "Malíř natírá stěnu válečkem", slug: "malir-pokoju", title: "Malíř pokojů", subtitle: "Kalkulace a reference" },
+    { src: pexels(1855214), alt: "Vitrína pekárny s pečivem", slug: "pekarstvi", title: "Pekařství", subtitle: "Denní nabídka a mapa" },
+    { src: pexels(39559306), alt: "Kadeřník stříhá vlasy v salonu", slug: "kadernictvi", title: "Kadeřnictví", subtitle: "Rezervace a ceník" },
+    { src: pexels(6195125), alt: "Tým úklidové firmy v bytě", slug: "uklidova-firma", title: "Úklidová firma", subtitle: "Balíčky a poptávka" },
+    { src: pexels(5691622), alt: "Řemeslník stěrkuje zeď", slug: "stavebni-prace", title: "Stavební práce", subtitle: "Služby a oblast výjezdu" },
   ],
 };
 
@@ -282,6 +283,7 @@ export const CONTACT = {
   successTitle: "Díky, je to u nás.",
   successStart: "Ozveme se do 24 hodin. Když to spěchá, napište nám na",
   formTitle: "Nezávazná poptávka",
+  progress: (done: number, total: number) => (done === total ? "Hotovo, můžete odeslat" : `Vyplněno ${done} z ${total}`),
   fields: {
     name: "Jméno a příjmení *",
     phone: "Telefon *",

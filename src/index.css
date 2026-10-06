@@ -129,6 +129,40 @@
   }
 }
 
+/* light orbiting a card's border (FAQ deck); wrap it in .orbit-glow for the blurred halo */
+.orbit-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--spin),
+    transparent 0deg,
+    var(--color-accent) 70deg,
+    #ffc2c5 100deg,
+    var(--color-accent) 130deg,
+    transparent 200deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin-ring 4.5s linear infinite;
+  pointer-events: none;
+}
+.orbit-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  filter: blur(14px);
+  pointer-events: none;
+}
+.orbit-glow > .orbit-ring {
+  padding: 5px;
+}
+
 /* ---------- keyframes ---------- */
 
 @keyframes ringpulse {
@@ -224,7 +258,8 @@
   .pulse-ring,
   .animate-ringshake,
   .animate-signal,
-  .conic-ring {
+  .conic-ring,
+  .orbit-ring {
     animation: none !important;
   }
 }

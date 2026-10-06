@@ -23,7 +23,7 @@ webcozvoni.cz is the site of a one-person web agency (Matěj Kronus, Plzeň). It
 
 ## Operating Context
 
-Visitors arrive on mobile and desktop; the primary action is the Netlify enquiry form, the secondary one e-mail (info@webcozvoni.cz). As of 2026-10-05 the phone number (608 228 124) appears only in the header and the footer — the agency does not want calls to be the main channel, so sections point to the form or e-mail instead. The site is a single-page landing page with sections: Hero, Services, Process, Concepts (portfolio carousel), Pricing, FAQ, Contact, Footer.
+Visitors arrive on mobile and desktop; the primary action is the Netlify enquiry form, the secondary one e-mail (info@webcozvoni.cz). As of 2026-10-05 the phone number (608 228 124) appears only in the header and the footer — the agency does not want calls to be the main channel, so sections point to the form or e-mail instead. The site is a single-page landing page with sections: Hero, Services, Process, Concepts (morph gallery), Pricing, FAQ, Contact, Footer.
 
 ## Capabilities and Constraints
 
@@ -36,7 +36,7 @@ Visitors arrive on mobile and desktop; the primary action is the Netlify enquiry
 ## Brand Commitments
 
 - Name and wordmark webcozvoni.cz, bell mark, "Weby, co zvoní." claim; plain, direct Czech voice, no marketing fluff.
-- Hero, Concepts (portfolio carousel) and Footer are locked as of 2026-10-05 — do not change them. Pricing keeps its structure; it was only enlarged at the owner's request.
+- Hero and Footer are locked as of 2026-10-05 — do not change them. Concepts became a WebGL morph gallery and FAQ a scroll-stack deck at the owner's request (2026-10-06). Pricing keeps its structure; it was only enlarged at the owner's request.
 - When redesigning sections, keep their facts and messages; wording may be shortened or regrouped, nothing new invented.
 
 ## Evidence on Hand

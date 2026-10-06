@@ -8,7 +8,7 @@ import Faq from "./components/Faq";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
-import Marquee from "./components/Marquee";
+import Niches from "./components/Niches";
 import Portfolio from "./components/Portfolio";
 import Pricing from "./components/Pricing";
 import Process from "./components/Process";
@@ -101,7 +101,7 @@ export default function App() {
         <Header />
         <main>
           <Hero />
-          <Marquee />
+          <Niches />
           <Services />
           <Process />
           <Portfolio />

@@ -1,19 +1,51 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Check, CheckCircle2, Loader2, Mail, Send } from "lucide-react";
+import { ArrowUpRight, AtSign, Check, CheckCircle2, Loader2, Mail, MessageSquareText, Phone, Send, UserRound, type LucideIcon } from "lucide-react";
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { CONTACT, SITE } from "../content";
 import { cn } from "../utils/cn";
 import { cz } from "../utils/typo";
-import { EASE, Reveal } from "./ui";
+import GlowFrame from "./fx/GlowFrame";
+import { EASE, Reveal, ShineBorder } from "./ui";
 
 const inputCls =
-  "w-full rounded-2xl border border-paper/12 bg-ink/70 px-4.5 py-4 text-[16px] text-paper placeholder:text-mute/50 outline-none transition-[border-color,box-shadow,background-color] duration-300 hover:border-paper/22 focus:border-accent/70 focus:bg-ink focus:shadow-[0_0_0_4px_rgba(255,59,71,0.14)]";
+  "w-full rounded-2xl border border-paper/12 bg-ink/70 py-4 pl-12 pr-11 text-[16px] text-paper placeholder:text-mute/50 outline-none transition-[border-color,box-shadow,background-color] duration-300 hover:border-paper/22 focus:border-accent/70 focus:bg-ink focus:shadow-[0_0_0_4px_rgba(255,59,71,0.14)]";
 const labelCls = "text-[14px] font-medium text-paper/70";
+
+/** a labelled input with its icon, which lights up on focus, and a tick once it has a value */
+function Field({ label, icon: Icon, done, children }: { label: string; icon: LucideIcon; done: boolean; children: ReactNode }) {
+  return (
+    <label className="group/field flex flex-col gap-2">
+      <span className={labelCls}>{label}</span>
+      <span className="relative block">
+        <Icon className="pointer-events-none absolute left-4 top-[1.15rem] size-[18px] text-mute/60 transition-colors duration-300 group-focus-within/field:text-accent" />
+        {children}
+        <AnimatePresence>
+          {done && (
+            <motion.span
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 520, damping: 22 }}
+              className="pointer-events-none absolute right-4 top-[1.05rem] grid size-5 place-items-center rounded-full bg-volt/15 text-volt"
+            >
+              <Check className="size-3" strokeWidth={3} />
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </span>
+    </label>
+  );
+}
+
+const REQUIRED = 4;
 
 export default function Contact() {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [trade, setTrade] = useState("");
+  const [filled, setFilled] = useState({ jmeno: false, telefon: false, email: false, zprava: false });
+  const done = [filled.jmeno, filled.telefon, trade !== "", filled.zprava].filter(Boolean).length;
+  const ready = done === REQUIRED;
   const nextMonth = CONTACT.monthsGenitive[(new Date().getMonth() + 1) % 12];
   const privacyLinkText = "jak nakládáme s vašimi údaji";
   const privacyNoteParts = CONTACT.fields.privacyNote.split(privacyLinkText);
@@ -47,11 +79,6 @@ export default function Contact() {
 
   return (
     <section id="kontakt" className="relative overflow-hidden pb-28 pt-24 md:pb-40 md:pt-32">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-[10%] top-[10%] h-[720px] w-[min(1100px,90vw)] bg-[radial-gradient(ellipse_50%_50%_at_40%_40%,rgba(255,59,71,0.14),transparent)]"
-      />
-
       <div className="relative mx-auto grid max-w-[88rem] gap-16 px-4 md:grid-cols-12 md:gap-10 md:px-8">
         {/* the phone first: it's the fastest way in */}
         <div className="md:col-span-5">
@@ -73,7 +100,7 @@ export default function Contact() {
                 transition={{ type: "spring", stiffness: 400, damping: 22 }}
                 className="group relative mt-3 inline-flex items-center gap-5 rounded-[22px] border border-paper/12 bg-coal/80 py-4 pl-4 pr-6 text-paper transition-colors duration-300 hover:border-accent/50"
               >
-                <span className="grid size-14 place-items-center rounded-2xl bg-signal text-white shadow-[0_10px_30px_-10px_rgba(255,59,71,0.9)]">
+                <span className="grid size-14 place-items-center rounded-2xl bg-signal text-white">
                   <Mail className="size-6" />
                 </span>
                 <span className="text-[clamp(1.3rem,1.8vw,1.75rem)] font-bold tracking-tight">{SITE.email}</span>
@@ -89,12 +116,13 @@ export default function Contact() {
         </div>
 
         <Reveal delay={0.1} className="md:col-span-7">
-          <div className="relative overflow-hidden rounded-[32px] border border-paper/10 bg-coal/80 p-6 shadow-[0_60px_120px_-60px_rgba(0,0,0,0.9)] md:p-11">
-            <span aria-hidden className="pointer-events-none absolute inset-x-[12%] -top-px h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-[radial-gradient(closest-side,rgba(255,59,71,0.16),transparent)]"
-            />
+          <div className="relative rounded-[32px] border border-paper/10 bg-coal p-6 shadow-[0_60px_120px_-60px_rgba(0,0,0,0.9)] md:p-11">
+            {/* two lights glowing out of the frame from opposite corners, moving on now and then */}
+            <GlowFrame radius={32} />
+            {/* a faint dot grid fading in from the top corner */}
+            <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+              <span className="absolute inset-0 bg-[radial-gradient(rgba(244,239,236,0.09)_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_70%_60%_at_100%_0%,#000,transparent)]" />
+            </span>
             <AnimatePresence mode="wait" initial={false}>
               {state === "sent" ? (
                 <motion.div
@@ -127,6 +155,11 @@ export default function Contact() {
                   data-netlify="true"
                   data-netlify-honeypot="bot-field"
                   onSubmit={onSubmit}
+                  onInput={(e) => {
+                    const fd = new FormData(e.currentTarget);
+                    const has = (n: string) => String(fd.get(n) ?? "").trim() !== "";
+                    setFilled({ jmeno: has("jmeno"), telefon: has("telefon"), email: has("email"), zprava: has("zprava") });
+                  }}
                   className="relative flex flex-col gap-6 text-left"
                 >
                   <input type="hidden" name="form-name" value="poptavka" />
@@ -135,23 +168,40 @@ export default function Contact() {
                       Nevyplňujte toto pole: <input name="bot-field" tabIndex={-1} autoComplete="off" />
                     </label>
                   </div>
-                  <h3 className="display-soft text-[clamp(1.6rem,2.2vw,2.1rem)]">{CONTACT.formTitle}</h3>
-
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <label className="flex flex-col gap-2">
-                      <span className={labelCls}>{CONTACT.fields.name}</span>
-                      <input required name="jmeno" autoComplete="name" placeholder={CONTACT.fields.namePlaceholder} className={inputCls} />
-                    </label>
-                    <label className="flex flex-col gap-2">
-                      <span className={labelCls}>{CONTACT.fields.phone}</span>
-                      <input required name="telefon" type="tel" autoComplete="tel" placeholder={CONTACT.fields.phonePlaceholder} className={inputCls} />
-                    </label>
+                  <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+                    <h3 className="display-soft text-[clamp(1.6rem,2.2vw,2.1rem)]">{CONTACT.formTitle}</h3>
+                    {/* how far along the required fields are */}
+                    <div className="flex flex-col items-end gap-2" aria-live="polite">
+                      <span className={cn("text-[13px] tabular-nums transition-colors duration-500", ready ? "text-volt" : "text-mute")}>
+                        {CONTACT.progress(done, REQUIRED)}
+                      </span>
+                      <span className="flex gap-1.5" aria-hidden>
+                        {Array.from({ length: REQUIRED }, (_, i) => (
+                          <span key={i} className="h-1.5 w-9 overflow-hidden rounded-full bg-paper/10">
+                            <motion.span
+                              className={cn("block h-full origin-left rounded-full", ready ? "bg-volt" : "bg-accent")}
+                              initial={false}
+                              animate={{ scaleX: i < done ? 1 : 0 }}
+                              transition={{ duration: 0.5, ease: EASE }}
+                            />
+                          </span>
+                        ))}
+                      </span>
+                    </div>
                   </div>
 
-                  <label className="flex flex-col gap-2">
-                    <span className={labelCls}>{CONTACT.fields.email}</span>
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <Field label={CONTACT.fields.name} icon={UserRound} done={filled.jmeno}>
+                      <input required name="jmeno" autoComplete="name" placeholder={CONTACT.fields.namePlaceholder} className={inputCls} />
+                    </Field>
+                    <Field label={CONTACT.fields.phone} icon={Phone} done={filled.telefon}>
+                      <input required name="telefon" type="tel" autoComplete="tel" placeholder={CONTACT.fields.phonePlaceholder} className={inputCls} />
+                    </Field>
+                  </div>
+
+                  <Field label={CONTACT.fields.email} icon={AtSign} done={filled.email}>
                     <input name="email" type="email" autoComplete="email" placeholder={CONTACT.fields.emailPlaceholder} className={inputCls} />
-                  </label>
+                  </Field>
 
                   {/* trade as tap-to-pick chips — one radio group, same "obor" field the form always sent */}
                   <fieldset className="flex flex-col gap-3">
@@ -174,7 +224,7 @@ export default function Contact() {
                               className={cn(
                                 "flex items-center gap-2 rounded-full border px-4 py-2.5 text-[14.5px] transition-[background-color,border-color,color,box-shadow] duration-300 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent",
                                 on
-                                  ? "border-signal bg-signal text-white shadow-[0_8px_24px_-10px_rgba(255,59,71,0.9)]"
+                                  ? "border-signal bg-signal text-white"
                                   : "border-paper/12 bg-ink/50 text-paper/80 hover:border-paper/30 hover:text-paper"
                               )}
                             >
@@ -199,18 +249,22 @@ export default function Contact() {
                     </div>
                   </fieldset>
 
-                  <label className="flex flex-col gap-2">
-                    <span className={labelCls}>{CONTACT.fields.message}</span>
-                    <textarea required name="zprava" rows={4} placeholder={CONTACT.fields.messagePlaceholder} className={`${inputCls} resize-none`} />
-                  </label>
+                  <Field label={CONTACT.fields.message} icon={MessageSquareText} done={filled.zprava}>
+                    <textarea required name="zprava" rows={4} placeholder={CONTACT.fields.messagePlaceholder} className={`${inputCls} block resize-none`} />
+                  </Field>
 
                   <motion.button
                     type="submit"
                     disabled={state === "sending"}
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    className="group relative mt-1 flex items-center justify-center gap-3 overflow-hidden rounded-2xl bg-signal py-5 text-[17px] font-semibold text-white shadow-[0_0_0_1px_rgba(255,59,71,0.5),0_16px_50px_-14px_rgba(255,59,71,0.9)] transition-colors duration-300 hover:bg-accent disabled:opacity-70"
+                    className={cn(
+                      "group relative mt-1 flex items-center justify-center gap-3 overflow-hidden rounded-2xl bg-signal py-5 text-[17px] font-semibold text-white transition-colors duration-300 hover:bg-accent disabled:opacity-70",
+                      ready && "bg-accent"
+                    )}
                   >
+                    {/* once everything required is filled, a light starts running round the button */}
+                    {ready && <ShineBorder width={1.5} duration={4} />}
                     <span
                       aria-hidden
                       className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-[shine_0.9s_ease]"

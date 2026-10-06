@@ -50,7 +50,9 @@ export default function Footer() {
             fill="url(#wm)"
             style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: 150, letterSpacing: "-0.04em" }}
           >
-            {SITE.wordmark}
+            {/* Z and V touch at the top with this tight tracking — nudge the V along a little */}
+            {SITE.wordmark.slice(0, SITE.wordmark.indexOf("ZV") + 1)}
+            <tspan dx="16">{SITE.wordmark.slice(SITE.wordmark.indexOf("ZV") + 1)}</tspan>
           </text>
         </svg>
       </div>
