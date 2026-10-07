@@ -109,7 +109,7 @@ export default function GrowthTile({ className }: { className?: string }) {
 
   return (
     <BentoCard className={className}>
-      <div ref={ref} className="relative flex min-h-[440px] flex-col">
+      <div ref={ref} className="relative flex min-h-[27.5rem] flex-col">
         {/* ---- chart, filling the right of the card behind the copy ---- */}
         <div className="absolute inset-y-0 right-0 w-[64%]">
           <div className="absolute inset-0 bg-[linear-gradient(to_left,rgba(255,59,71,0.12),transparent_75%)]" />
@@ -128,7 +128,7 @@ export default function GrowthTile({ className }: { className?: string }) {
             ref={plotRef}
             onPointerMove={onMove}
             onPointerLeave={() => setHover(null)}
-            className="absolute inset-x-0 bottom-[60px] top-[84px] cursor-crosshair"
+            className="absolute inset-x-0 bottom-[3.75rem] top-[5.25rem] cursor-crosshair"
             role="img"
             aria-label={`${G.metric} (${G.sample}): ${s.vals.join(", ")}`}
           >
@@ -188,7 +188,7 @@ export default function GrowthTile({ className }: { className?: string }) {
               <>
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute bottom-[-60px] top-0 w-px bg-gradient-to-b from-paper/0 via-paper/25 to-paper/0 transition-[left] duration-300 ease-out"
+                  className="pointer-events-none absolute bottom-[-3.75rem] top-0 w-px bg-gradient-to-b from-paper/0 via-paper/25 to-paper/0 transition-[left] duration-300 ease-out"
                   style={{ left: `${ax}%` }}
                 />
                 <span
@@ -198,12 +198,12 @@ export default function GrowthTile({ className }: { className?: string }) {
                 />
                 <div
                   className="pointer-events-none absolute w-max whitespace-nowrap rounded-xl border border-paper/10 bg-[#0f0d10]/95 px-3.5 py-2.5 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.9)] transition-[left,top] duration-300 ease-out"
-                  style={{ left: `${ax}%`, top: `${ay}%`, translate: ax > 60 ? "calc(-100% - 20px) -50%" : "20px -50%" }}
+                  style={{ left: `${ax}%`, top: `${ay}%`, translate: ax > 60 ? "calc(-100% - 1.25rem) -50%" : "1.25rem -50%" }}
                 >
-                  <p className="text-[15px] font-bold tabular-nums text-paper">
+                  <p className="text-[0.9375rem] font-bold tabular-nums text-paper">
                     {s.vals[active]} {G.unit}
                   </p>
-                  <p className="mt-0.5 text-[12px] text-mute">{G.pointLabel(offset + active + 1)}</p>
+                  <p className="mt-0.5 text-[0.75rem] text-mute">{G.pointLabel(offset + active + 1)}</p>
                 </div>
               </>
             )}
@@ -219,7 +219,7 @@ export default function GrowthTile({ className }: { className?: string }) {
                   onClick={() => setPeriodIdx(i)}
                   aria-pressed={i === periodIdx}
                   className={cn(
-                    "relative rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors duration-300",
+                    "relative rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium transition-colors duration-300",
                     i === periodIdx ? "text-white" : "text-paper/60 hover:text-paper"
                   )}
                 >
@@ -259,13 +259,13 @@ export default function GrowthTile({ className }: { className?: string }) {
           <p className="mt-4 max-w-[34ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-paper/65">{cz(G.lead)}</p>
 
           <div className="mt-auto pt-10">
-            <p className="flex items-center gap-2.5 text-[14px] font-medium text-paper/80">
+            <p className="flex items-center gap-2.5 text-[0.875rem] font-medium text-paper/80">
               {G.metric}
-              <span className="rounded-full border border-paper/10 px-2 py-0.5 text-[11.5px] font-normal text-mute">{G.sample}</span>
+              <span className="rounded-full border border-paper/10 px-2 py-0.5 text-[0.7188rem] font-normal text-mute">{G.sample}</span>
             </p>
             <div className="mt-3 flex items-end gap-5">
               <span className="display text-[clamp(4rem,6.4vw,6.6rem)] leading-[0.85] tabular-nums">{total}</span>
-              <span className="mb-2 flex items-center gap-1 text-[17px] font-semibold text-accent">
+              <span className="mb-2 flex items-center gap-1 text-[1.0625rem] font-semibold text-accent">
                 <ArrowUp className="size-4.5" strokeWidth={2.6} />
                 {s.pct}&nbsp;%
               </span>
@@ -274,7 +274,7 @@ export default function GrowthTile({ className }: { className?: string }) {
         </div>
 
         {/* ---- footer ---- */}
-        <div className="relative z-10 flex items-center justify-between gap-4 border-t border-paper/[0.07] bg-[#19171a] px-8 py-4 text-[14px] xl:px-11">
+        <div className="relative z-10 flex items-center justify-between gap-4 border-t border-paper/[0.07] bg-[#19171a] px-8 py-4 text-[0.875rem] xl:px-11">
           <p>
             <span className="font-semibold text-accent">
               {s.step >= 0 ? "+" : "−"}
@@ -282,7 +282,7 @@ export default function GrowthTile({ className }: { className?: string }) {
             </span>{" "}
             <span className="text-mute">{G.deltaLabel}</span>
           </p>
-          <p className="flex items-center gap-2.5 text-[13px] text-mute">
+          <p className="flex items-center gap-2.5 text-[0.8125rem] text-mute">
             <span>
               <span className="font-semibold text-paper/85">{s.peak}</span> {G.stats.peak}
             </span>

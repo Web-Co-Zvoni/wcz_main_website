@@ -29,7 +29,7 @@ function Caption({ n }: { n: Niche }) {
         <Icon className="size-4 group-data-[hover=true]/cap:animate-ringshake" strokeWidth={2.2} />
       </span>
       <div className="absolute inset-x-4 bottom-4">
-        <p className="text-[11.5px] font-medium text-paper/60 transition-colors duration-500 group-data-[hover=true]/cap:text-accent">{n.group}</p>
+        <p className="text-[0.7188rem] font-medium text-paper/60 transition-colors duration-500 group-data-[hover=true]/cap:text-accent">{n.group}</p>
         <p className="display mt-0.5 text-[clamp(1.05rem,1.2vw,1.3rem)] leading-[1.08]">{n.name}</p>
       </div>
     </div>
@@ -49,7 +49,7 @@ export default function Niches() {
       <ul className="sr-only focus-within:not-sr-only focus-within:flex focus-within:flex-wrap focus-within:justify-center focus-within:gap-3 focus-within:pt-4">
         {NICHES.items.map((n) => (
           <li key={n.name}>
-            <a href={ROUTES.niche(n.slug)} className="text-[14px] text-paper underline-offset-4 focus:underline">
+            <a href={ROUTES.niche(n.slug)} className="text-[0.875rem] text-paper underline-offset-4 focus:underline">
               {n.name}
             </a>
           </li>
@@ -59,7 +59,7 @@ export default function Niches() {
       <Reveal delay={0.1} y={30} className="mt-2">
         <GrainyCarousel items={cards} renderCaption={(i) => <Caption n={NICHES.items[i]} />} />
       </Reveal>
-      <p className="-mt-6 text-center text-[12.5px] text-mute/70">{NICHES.note}</p>
+      <p className="-mt-6 text-center text-[0.7812rem] text-mute/70">{NICHES.note}</p>
     </section>
   );
 }

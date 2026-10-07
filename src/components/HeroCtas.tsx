@@ -75,7 +75,7 @@ export function PrimaryCta({ href, children }: { href: string; children: ReactNo
         speed.set(64);
         setHover(false);
       }}
-      className="group relative inline-flex items-center justify-center gap-2.5 rounded-xl bg-signal px-8 py-[18px] text-[16.5px] xl:gap-3 xl:px-10 xl:py-[clamp(18px,2.6vh,24px)] xl:text-[clamp(16.5px,2.2vh,20px)] font-semibold tracking-tight text-white shadow-[0_0_0_1px_rgba(255,59,71,0.5),0_10px_40px_-12px_rgba(255,59,71,0.8)] transition-shadow duration-500 hover:shadow-[0_0_0_1px_rgba(255,59,71,0.6),0_0_34px_-2px_rgba(255,59,71,0.75),0_18px_60px_-10px_rgba(255,59,71,1)]"
+      className="group relative inline-flex items-center justify-center gap-2.5 rounded-xl bg-signal px-8 py-[1.125rem] text-[1.0312rem] xl:gap-3 xl:px-10 xl:py-[clamp(1.125rem,2.6vh,1.5rem)] xl:text-[clamp(1.0312rem,2.2vh,1.25rem)] font-semibold tracking-tight text-white shadow-[0_0_0_1px_rgba(255,59,71,0.5),0_10px_40px_-12px_rgba(255,59,71,0.8)] transition-shadow duration-500 hover:shadow-[0_0_0_1px_rgba(255,59,71,0.6),0_0_34px_-2px_rgba(255,59,71,0.75),0_18px_60px_-10px_rgba(255,59,71,1)]"
     >
       {/* breath: a soft halo swells out and dissolves every few seconds */}
       {!reduce && (
@@ -134,7 +134,7 @@ export function SecondaryCta({ href, children, photo }: { href: string; children
       transition={SPRING}
       onHoverStart={() => setHover(true)}
       onHoverEnd={() => setHover(false)}
-      className="group relative inline-flex items-center justify-center gap-2.5 rounded-xl border border-paper/15 bg-card px-8 py-[18px] text-[16.5px] xl:gap-3 xl:px-10 xl:py-[clamp(18px,2.6vh,24px)] xl:text-[clamp(16.5px,2.2vh,20px)] font-semibold tracking-tight text-paper transition-[color,border-color] duration-700 ease-out hover:border-paper/5 hover:text-accent"
+      className="group relative inline-flex items-center justify-center gap-2.5 rounded-xl border border-paper/15 bg-card px-8 py-[1.125rem] text-[1.0312rem] xl:gap-3 xl:px-10 xl:py-[clamp(1.125rem,2.6vh,1.5rem)] xl:text-[clamp(1.0312rem,2.2vh,1.25rem)] font-semibold tracking-tight text-paper transition-[color,border-color] duration-700 ease-out hover:border-paper/5 hover:text-accent"
     >
       {/* the photo surfacing behind the label — dimmed so the text stays readable */}
       <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">

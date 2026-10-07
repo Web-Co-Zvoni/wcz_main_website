@@ -38,7 +38,7 @@ function CallVisual({ lit }: { lit: boolean }) {
 /** Den 3 — the 72 hours closing into a full ring */
 function DraftVisual({ lit }: { lit: boolean }) {
   return (
-    <div className="relative size-[88px]">
+    <div className="relative size-[5.5rem]">
       <svg viewBox="0 0 88 88" className="size-full -rotate-90">
         <circle cx="44" cy="44" r="38" fill="none" stroke="rgba(244,239,236,0.08)" strokeWidth="6" />
         <motion.circle
@@ -60,7 +60,7 @@ function DraftVisual({ lit }: { lit: boolean }) {
           </linearGradient>
         </defs>
       </svg>
-      <span className="display absolute inset-0 grid place-items-center text-[19px]">{PROCESS.draftLabel}</span>
+      <span className="display absolute inset-0 grid place-items-center text-[1.1875rem]">{PROCESS.draftLabel}</span>
     </div>
   );
 }
@@ -79,7 +79,7 @@ function LaunchVisual({ lit }: { lit: boolean }) {
             scale: lit && d === days - 1 ? [1, 1.35, 1] : 1,
           }}
           transition={{ duration: 0.35, delay: lit ? 0.2 + d * 0.09 : 0 }}
-          className={cn("size-[18px] rounded-[5px]", d === days - 1 && lit && "shadow-[0_0_14px_var(--color-accent)]")}
+          className={cn("size-[1.125rem] rounded-[0.3125rem]", d === days - 1 && lit && "shadow-[0_0_14px_var(--color-accent)]")}
         />
       ))}
     </div>
@@ -89,7 +89,7 @@ function LaunchVisual({ lit }: { lit: boolean }) {
 /** Pořád — the bell keeps ringing */
 function RingVisual({ lit }: { lit: boolean }) {
   return (
-    <span className="relative grid size-[72px] place-items-center text-accent">
+    <span className="relative grid size-[4.5rem] place-items-center text-accent">
       {lit && <span className="pulse-ring rounded-full" />}
       {lit && <span className="pulse-ring rounded-full [animation-delay:1.1s]" />}
       <BellMark className={cn("size-14 drop-shadow-[0_0_14px_var(--color-accent)]", lit && "animate-ringshake")} strokeWidth={8} compact />
@@ -105,8 +105,8 @@ function Milestone({ s, i, lit }: { s: (typeof PROCESS.steps)[number]; i: number
   const Visual = VISUALS[i];
   return (
     <BentoCard as="li" delay={0.08 * i} className={cn("transition-[border-color] duration-700", lit && "border-accent/30")}>
-      <div className="flex h-full min-h-[400px] flex-col px-7 pb-8 pt-[76px] xl:px-8">
-        <div className="flex h-[96px] items-center">
+      <div className="flex h-full min-h-[25rem] flex-col px-7 pb-8 pt-[4.75rem] xl:px-8">
+        <div className="flex h-[6rem] items-center">
           <Visual lit={lit} />
         </div>
         <motion.p
@@ -118,7 +118,7 @@ function Milestone({ s, i, lit }: { s: (typeof PROCESS.steps)[number]; i: number
         </motion.p>
         <motion.div animate={{ opacity: lit ? 1 : 0.4 }} transition={{ duration: 0.8, ease: EASE }}>
           <h3 className="display-soft mt-4 text-[clamp(1.25rem,1.6vw,1.6rem)] leading-tight">{s.title}</h3>
-          <p className="mt-2.5 text-[15.5px] leading-relaxed text-paper/65 xl:text-[16.5px]">{cz(s.text)}</p>
+          <p className="mt-2.5 text-[0.9688rem] leading-relaxed text-paper/65 xl:text-[1.0312rem]">{cz(s.text)}</p>
         </motion.div>
       </div>
     </BentoCard>
@@ -148,7 +148,7 @@ function GuaranteeTile() {
           </p>
           <p className="display-soft mt-6 max-w-[24ch] text-[clamp(1.3rem,1.9vw,1.9rem)] leading-tight">{cz(PROCESS.guarantee)}</p>
         </div>
-        <Button href="#kontakt" size="lg" className="shrink-0 self-start lg:self-end xl:px-8 xl:py-5 xl:text-[16.5px]">
+        <Button href="#kontakt" size="lg" className="shrink-0 self-start lg:self-end xl:px-8 xl:py-5 xl:text-[1.0312rem]">
           {PROCESS.guaranteeCta}
           <ArrowRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
         </Button>
@@ -160,9 +160,9 @@ function GuaranteeTile() {
 function TitleTile() {
   return (
     <BentoCard className="md:col-span-2">
-      <div className="relative flex h-full min-h-[340px] flex-col justify-end p-8 xl:p-11">
+      <div className="relative flex h-full min-h-[21.25rem] flex-col justify-end p-8 xl:p-11">
         {/* a wire with light running along it — the road from the call to the site */}
-        <svg aria-hidden viewBox="0 0 600 160" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 top-6 h-[96px] w-full">
+        <svg aria-hidden viewBox="0 0 600 160" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 top-6 h-[6rem] w-full">
           <path d="M-10 120 C120 120 150 40 280 44 S470 130 610 30" fill="none" stroke="rgba(244,239,236,0.08)" strokeWidth="2" />
           <motion.path
             d="M-10 120 C120 120 150 40 280 44 S470 130 610 30"
@@ -212,14 +212,14 @@ export default function Process() {
           </ol>
 
           {/* the current threading through all four tiles, from the first node to the last */}
-          <div aria-hidden className="pointer-events-none absolute left-[36px] right-[calc((100%-48px)/4-36px)] top-[40px] z-30 hidden lg:block">
+          <div aria-hidden className="pointer-events-none absolute left-[2.25rem] right-[calc((100%-3rem)/4-2.25rem)] top-[2.5rem] z-30 hidden lg:block">
             <div className="relative h-px bg-paper/12">
               <motion.div
                 style={{ scaleX: fill }}
                 className="absolute inset-0 origin-left bg-gradient-to-r from-signal via-accent to-[#ffb4b8] shadow-[0_0_14px_var(--color-accent)]"
               />
               <div
-                className={cn("absolute inset-y-0 left-full w-[calc(100%/3-76px)] transition-opacity duration-700", done ? "opacity-100" : "opacity-0")}
+                className={cn("absolute inset-y-0 left-full w-[calc(100%/3-4.75rem)] transition-opacity duration-700", done ? "opacity-100" : "opacity-0")}
                 style={
                   {
                     backgroundImage: "linear-gradient(90deg, rgba(255,59,71,0.9) 0 10px, transparent 10px 22px)",

@@ -28,7 +28,7 @@ export default function Faq() {
                 <span className="display-soft text-[clamp(1.25rem,1.7vw,1.7rem)]">{SITE.email}</span>
               </a>
               <div className="mt-8">
-                <Button href="#kontakt" size="lg" className="xl:px-9 xl:py-5 xl:text-[17px]">
+                <Button href="#kontakt" size="lg" className="xl:px-9 xl:py-5 xl:text-[1.0625rem]">
                   {FAQ.formCta}
                   <ArrowRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
                 </Button>
@@ -40,18 +40,18 @@ export default function Faq() {
         {/* the answers pile up into a deck as you scroll */}
         <ScrollStack className="md:col-span-7" itemDistance={56} itemStackDistance={26} itemScale={0.025} baseScale={0.88} stackPosition="center" lift={0.06} asideRef={asideRef} scaleEndPosition={0.09}>
           {FAQ.items.map((f, i) => (
-            <ScrollStackItem key={f.question} className="rounded-[32px]">
-              <article className="group/card relative flex min-h-[clamp(300px,36vh,360px)] flex-col rounded-[32px] border border-paper/[0.09] bg-[linear-gradient(160deg,#25212a,#19171a_70%)] p-8 shadow-[0_-24px_60px_-28px_rgba(0,0,0,0.95)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.025] xl:p-11">
+            <ScrollStackItem key={f.question} className="rounded-[2rem]">
+              <article className="group/card relative flex min-h-[clamp(18.75rem,36vh,22.5rem)] flex-col rounded-[2rem] border border-paper/[0.09] bg-[linear-gradient(160deg,#25212a,#19171a_70%)] p-8 shadow-[0_-24px_60px_-28px_rgba(0,0,0,0.95)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.025] xl:p-11">
                 {/* light running round the border: full on the card being read or hovered, faint on the rest */}
                 <span aria-hidden className="orbit-glow opacity-0 transition-opacity duration-700 group-hover/card:opacity-70 group-data-[active=true]/stack:opacity-60">
                   <span className="orbit-ring" />
                 </span>
                 <span aria-hidden className="orbit-ring opacity-20 transition-opacity duration-700 group-hover/card:opacity-100 group-data-[active=true]/stack:opacity-100" />
                 <div className="flex items-center justify-between">
-                  <span className="grid size-11 place-items-center rounded-full border border-accent/40 text-[14px] font-bold tabular-nums text-accent">
+                  <span className="grid size-11 place-items-center rounded-full border border-accent/40 text-[0.875rem] font-bold tabular-nums text-accent">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-[13px] tabular-nums text-mute">
+                  <span className="text-[0.8125rem] tabular-nums text-mute">
                     {i + 1} / {FAQ.items.length}
                   </span>
                 </div>

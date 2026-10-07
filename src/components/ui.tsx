@@ -33,7 +33,7 @@ export function Reveal({
 /** Small signal label: red dot + sentence-case text */
 export function Kicker({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5 text-[13px] font-medium text-mute md:text-[14.5px]", className)}>
+    <span className={cn("inline-flex items-center gap-2.5 text-[0.8125rem] font-medium text-mute md:text-[0.9062rem]", className)}>
       <span className="relative flex size-1.5">
         <span className="absolute inset-0 rounded-full bg-accent text-accent">
           <span className="pulse-ring" />
@@ -61,7 +61,7 @@ export function SectionHead({
   return (
     <div className={cn("mx-auto flex flex-col items-center text-center", lg ? "max-w-5xl" : "max-w-3xl", className)}>
       <Reveal>
-        <Kicker className={lg ? "xl:text-[16px]" : undefined}>{kicker}</Kicker>
+        <Kicker className={lg ? "xl:text-[1rem]" : undefined}>{kicker}</Kicker>
       </Reveal>
       <Reveal delay={0.08}>
         <h2 className={cn("display mt-5", lg ? "text-[clamp(2.6rem,5vw,5.6rem)] leading-[0.98]" : "text-[clamp(2rem,4.8vw,4rem)]")}>
@@ -70,7 +70,7 @@ export function SectionHead({
       </Reveal>
       {desc && (
         <Reveal delay={0.16}>
-          <p className={cn("mx-auto leading-relaxed text-mute", lg ? "mt-7 max-w-xl text-[clamp(1.1rem,1.4vw,1.4rem)]" : "mt-5 max-w-md text-[16.5px]")}>
+          <p className={cn("mx-auto leading-relaxed text-mute", lg ? "mt-7 max-w-xl text-[clamp(1.1rem,1.4vw,1.4rem)]" : "mt-5 max-w-md text-[1.0312rem]")}>
             {cz(desc)}
           </p>
         </Reveal>
@@ -134,7 +134,7 @@ export function Button({ variant = "primary", size = "md", shine = false, classN
       transition={{ type: "spring", stiffness: 400, damping: 22 }}
       className={cn(
         "group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-xl font-semibold tracking-tight transition-[box-shadow,background-color,border-color,color] duration-300",
-        size === "lg" ? "px-7 py-4 text-[15.5px]" : "px-5 py-3 text-[14px]",
+        size === "lg" ? "px-7 py-4 text-[0.9688rem]" : "px-5 py-3 text-[0.875rem]",
         variant === "primary"
           ? "bg-signal text-white shadow-[0_0_0_1px_rgba(255,59,71,0.5),0_10px_40px_-12px_rgba(255,59,71,0.8)] hover:bg-accent hover:shadow-[0_0_0_1px_rgba(255,59,71,0.8),0_14px_56px_-10px_rgba(255,59,71,1)]"
           : "border border-paper/15 bg-card text-paper hover:border-accent/60 hover:bg-[#2a1b20]",

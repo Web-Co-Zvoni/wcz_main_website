@@ -14,6 +14,7 @@
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
+import { remScale } from "../../utils/remScale";
 
 export type GrainyItem = {
   src: string;
@@ -33,7 +34,7 @@ type Props = {
   className?: string;
 };
 
-/** room above and below the cards for the dust to fly into, px */
+/** room above and below the cards for the dust to fly into, design px (× remScale) */
 const PAD = 70;
 const GAP = 16;
 const RADIUS = 20;
@@ -42,7 +43,7 @@ const DUST_COLS = 60;
 const DUST_ROWS = 58;
 
 /** smaller cards, more of them on screen — and not much taller than wide */
-const cardWidth = (w: number) => Math.min(300, Math.max(190, w * 0.155));
+const cardWidth = (w: number, s: number) => Math.min(300 * s, Math.max(190 * s, w * 0.155));
 const cardHeight = (cw: number) => Math.round(cw * 0.98);
 
 const SHARED = `
@@ -185,7 +186,7 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
   const captionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const reduce = useReducedMotion();
   const [failed, setFailed] = useState(false);
-  const [size, setSize] = useState({ w: 0, cw: 0, ch: 0 });
+  const [size, setSize] = useState({ w: 0, cw: 0, ch: 0, pad: PAD });
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -209,6 +210,8 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
     let CW = 0;
     let CH = 0;
     let pitch = 0;
+    let pad = PAD;
+    let radius = RADIUS;
     let dpr = 1;
     let clock = 0;
     let last = 0;
@@ -283,19 +286,22 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
 
     const resize = () => {
       W = wrap.clientWidth;
-      CW = Math.round(cardWidth(W));
+      const s = remScale();
+      pad = Math.round(PAD * s);
+      radius = RADIUS * s;
+      CW = Math.round(cardWidth(W, s));
       CH = cardHeight(CW);
-      H = CH + PAD * 2;
-      pitch = CW + GAP;
+      H = CH + pad * 2;
+      pitch = CW + GAP * s;
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       gl.viewport(0, 0, canvas.width, canvas.height);
-      setSize((s) => (s.w === W && s.cw === CW ? s : { w: W, cw: CW, ch: CH }));
+      setSize((v) => (v.w === W && v.cw === CW && v.pad === pad ? v : { w: W, cw: CW, ch: CH, pad }));
     };
 
     const setShared = (u: Record<string, WebGLUniformLocation | null>, x: number, i: number) => {
-      gl.uniform4f(u.rect, x, PAD, CW, CH);
+      gl.uniform4f(u.rect, x, pad, CW, CH);
       gl.uniform2f(u.res, W, H);
       gl.uniform1f(u.zone, zone);
       gl.uniform1f(u.aspect, aspects[i]);
@@ -329,12 +335,12 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
         const x = ((((i * pitch + X) % total) + total) % total) - pitch;
         const cap = captionRefs.current[i];
         const centre = Math.abs(x + CW / 2 - half) / half;
-        const hovered = hovering && hoverX >= x && hoverX <= x + CW && hoverY >= PAD && hoverY <= PAD + CH && centre < zone;
+        const hovered = hovering && hoverX >= x && hoverX <= x + CW && hoverY >= pad && hoverY <= pad + CH && centre < zone;
         if (hovered) underPointer = i;
         lights[i] += ((hovered ? 0.95 : 0.62) - lights[i]) * Math.min(1, dt * 6);
 
         if (cap) {
-          cap.style.transform = `translate3d(${x.toFixed(1)}px,${PAD}px,0)`;
+          cap.style.transform = `translate3d(${x.toFixed(1)}px,${pad}px,0)`;
           cap.style.opacity = String(1 - smooth(zone - 0.12, zone + 0.22, centre));
           if (cap.dataset.hover !== String(hovered)) cap.dataset.hover = String(hovered);
         }
@@ -345,7 +351,7 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
 
         gl.useProgram(cardP);
         setShared(cardU, x, i);
-        gl.uniform1f(cardU.radius, RADIUS);
+        gl.uniform1f(cardU.radius, radius);
         gl.uniform1f(cardU.grain, Math.max(1, 2 * dpr));
         gl.uniform1f(cardU.seed, i * 17.3);
         gl.bindBuffer(gl.ARRAY_BUFFER, quad);
@@ -431,14 +437,14 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
     };
   }, [items, stepDuration, zone, reduce]);
 
-  const height = size.ch ? size.ch + PAD * 2 : undefined;
+  const height = size.ch ? size.ch + size.pad * 2 : undefined;
 
   if (failed) {
     // no WebGL: the same cards as a still strip, faded at the sides
     return (
-      <div className={cn("flex justify-center gap-5 overflow-hidden py-[90px] [mask-image:linear-gradient(90deg,transparent,#000_20%,#000_80%,transparent)]", className)}>
+      <div className={cn("flex justify-center gap-5 overflow-hidden py-[5.625rem] [mask-image:linear-gradient(90deg,transparent,#000_20%,#000_80%,transparent)]", className)}>
         {items.map((item, i) => (
-          <div key={item.src} className="relative h-[360px] w-[280px] shrink-0 overflow-hidden rounded-[24px]">
+          <div key={item.src} className="relative h-[22.5rem] w-[17.5rem] shrink-0 overflow-hidden rounded-[1.5rem]">
             <img src={item.src} alt={item.alt ?? ""} className="size-full object-cover brightness-[0.62]" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink to-transparent" />
             <div className="absolute inset-0">{renderCaption?.(i)}</div>

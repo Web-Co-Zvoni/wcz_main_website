@@ -8,9 +8,10 @@
  * card (negative z-index), so only what spills past the edge shows; the lit border sits on top.
  */
 import { useEffect, useRef, useState } from "react";
+import { remScale } from "../../utils/remScale";
 
 type Props = {
-  /** corner radius of the card, px */
+  /** corner radius of the card, design px (scaled with the root font size) */
   radius: number;
   /** how long a light rests on a corner, ms */
   hold?: number;
@@ -55,7 +56,7 @@ export default function GlowFrame({ radius, hold = 2600, speed = 230 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const g1 = useRef<SVGRadialGradientElement>(null);
   const g2 = useRef<SVGRadialGradientElement>(null);
-  const [box, setBox] = useState({ w: 0, h: 0 });
+  const [box, setBox] = useState({ w: 0, h: 0, s: 1 });
 
   useEffect(() => {
     const el = rootRef.current;
@@ -63,7 +64,8 @@ export default function GlowFrame({ radius, hold = 2600, speed = 230 }: Props) {
     const ro = new ResizeObserver(([e]) => {
       const w = Math.round(e.contentRect.width);
       const h = Math.round(e.contentRect.height);
-      setBox((b) => (b.w === w && b.h === h ? b : { w, h }));
+      const s = remScale();
+      setBox((b) => (b.w === w && b.h === h && b.s === s ? b : { w, h, s }));
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -73,14 +75,14 @@ export default function GlowFrame({ radius, hold = 2600, speed = 230 }: Props) {
     const el = rootRef.current;
     const { w: W, h: H } = box;
     if (!el || !W) return;
-    const r = Math.min(radius, W / 2, H / 2);
+    const r = Math.min(radius * box.s, W / 2, H / 2);
     const a = W - 2 * r;
     const b = H - 2 * r;
     const q = (Math.PI * r) / 2;
     const P = 2 * a + 2 * b + 4 * q;
     // the middles of the four corners along the outline, from the top-left one round to it again
     const stops = [-q / 2, a + q / 2, a + q + b + q / 2, 2 * a + 2 * q + b + q / 2, P - q / 2];
-    const moves = stops.slice(1).map((c, i) => ((c - stops[i]) / speed) * 1000);
+    const moves = stops.slice(1).map((c, i) => ((c - stops[i]) / (speed * box.s)) * 1000);
     const cycle = moves.reduce((x, y) => x + y, 0) + hold * 4;
 
     const along = (t: number) => {
@@ -132,8 +134,8 @@ export default function GlowFrame({ radius, hold = 2600, speed = 230 }: Props) {
 
   // the halo layers are SPILL px bigger on every side, so their gradients are offset by it
   const at = (n: 1 | 2) => `calc(var(--l${n}x) + ${SPILL}px) calc(var(--l${n}y) + ${SPILL}px)`;
-  const halo = `radial-gradient(90px circle at ${at(1)}, rgba(255,255,255,0.16), transparent 70%), radial-gradient(90px circle at ${at(2)}, rgba(255,255,255,0.16), transparent 70%), radial-gradient(210px circle at ${at(1)}, rgba(255,59,71,0.28), transparent 72%), radial-gradient(210px circle at ${at(2)}, rgba(255,59,71,0.28), transparent 72%)`;
-  const dotsMask = `radial-gradient(180px circle at ${at(1)}, #000, transparent 75%), radial-gradient(180px circle at ${at(2)}, #000, transparent 75%)`;
+  const halo = `radial-gradient(5.625rem circle at ${at(1)}, rgba(255,255,255,0.16), transparent 70%), radial-gradient(5.625rem circle at ${at(2)}, rgba(255,255,255,0.16), transparent 70%), radial-gradient(13.125rem circle at ${at(1)}, rgba(255,59,71,0.28), transparent 72%), radial-gradient(13.125rem circle at ${at(2)}, rgba(255,59,71,0.28), transparent 72%)`;
+  const dotsMask = `radial-gradient(11.25rem circle at ${at(1)}, #000, transparent 75%), radial-gradient(11.25rem circle at ${at(2)}, #000, transparent 75%)`;
   const inset = 0.75;
 
   return (
@@ -156,7 +158,7 @@ export default function GlowFrame({ radius, hold = 2600, speed = 230 }: Props) {
         <svg className="absolute inset-0 size-full overflow-visible">
           <defs>
             {[g1, g2].map((g, i) => (
-              <radialGradient key={i} ref={g} id={`glow-frame-${i}`} gradientUnits="userSpaceOnUse" r="230">
+              <radialGradient key={i} ref={g} id={`glow-frame-${i}`} gradientUnits="userSpaceOnUse" r={230 * box.s}>
                 <stop offset="0" stopColor="#fff" stopOpacity="0.85" />
                 <stop offset="0.2" stopColor="#ff7a82" stopOpacity="0.8" />
                 <stop offset="0.6" stopColor="#ff3b47" stopOpacity="0.3" />
@@ -171,7 +173,7 @@ export default function GlowFrame({ radius, hold = 2600, speed = 230 }: Props) {
               y={inset}
               width={box.w - inset * 2}
               height={box.h - inset * 2}
-              rx={radius - inset}
+              rx={radius * box.s - inset}
               fill="none"
               stroke={`url(#glow-frame-${i})`}
               strokeWidth={1.5}

@@ -84,7 +84,7 @@ function FloatingEnquiry() {
             <span className="pulse-ring" />
             <Send className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={2.5} />
           </span>
-          <span className="text-[16px] font-bold tracking-tight">{CONTACT.formTitle}</span>
+          <span className="text-[1rem] font-bold tracking-tight">{CONTACT.formTitle}</span>
         </motion.a>
       )}
     </AnimatePresence>

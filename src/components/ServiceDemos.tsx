@@ -44,7 +44,7 @@ function Frame({ children, className }: { children: ReactNode; className?: strin
   return (
     <div
       className={cn(
-        "relative size-full overflow-hidden rounded-[22px] border border-paper/12 bg-[#0d0b0e]",
+        "relative size-full overflow-hidden rounded-[1.375rem] border border-paper/12 bg-[#0d0b0e]",
         "shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_40px_80px_-30px_rgba(0,0,0,0.95)]",
         className
       )}
@@ -75,25 +75,25 @@ function WebDemo({ active }: { active: boolean }) {
   const { step } = useSteps(active, WEB_STEPS);
   return (
     <Frame className="grid place-items-center bg-[radial-gradient(ellipse_70%_55%_at_50%_100%,rgba(255,59,71,0.16),transparent)]">
-      <div className="relative aspect-[1/2] h-[90%] overflow-hidden rounded-[30px] border-[5px] border-[#2b272b] bg-ink shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)]">
+      <div className="relative aspect-[1/2] h-[90%] overflow-hidden rounded-[1.875rem] border-[5px] border-[#2b272b] bg-ink shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)]">
         <span className="absolute left-1/2 top-1.5 z-10 h-3.5 w-16 -translate-x-1/2 rounded-full bg-[#2b272b]" />
         <motion.div animate={{ y: step >= 1 ? -64 : 0 }} transition={{ duration: 1.1, ease: EASE }} className="px-3.5 pt-8">
           <div className="flex items-center gap-2">
-            <span className="grid size-6 place-items-center rounded-md bg-signal text-[11px] font-bold text-white">N</span>
-            <span className="text-[11.5px] font-semibold text-paper">{D.business}</span>
+            <span className="grid size-6 place-items-center rounded-md bg-signal text-[0.6875rem] font-bold text-white">N</span>
+            <span className="text-[0.7188rem] font-semibold text-paper">{D.business}</span>
           </div>
           <motion.p
             initial={false}
             animate={{ opacity: step === 0 ? [0, 1] : 1, y: step === 0 ? [10, 0] : 0 }}
             transition={{ duration: 0.7, ease: EASE }}
-            className="display mt-5 text-[19px] leading-[1.08] text-paper"
+            className="display mt-5 text-[1.1875rem] leading-[1.08] text-paper"
           >
             {D.web.headline}
           </motion.p>
           <motion.span
             animate={{ scale: step === 2 ? [1, 0.93, 1] : 1 }}
             transition={{ duration: 0.45 }}
-            className="relative mt-4 flex items-center justify-center gap-2 rounded-xl bg-signal py-2.5 text-[12.5px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(255,59,71,0.9)]"
+            className="relative mt-4 flex items-center justify-center gap-2 rounded-xl bg-signal py-2.5 text-[0.7812rem] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(255,59,71,0.9)]"
           >
             {step === 2 && <span className="pulse-ring rounded-xl text-accent" />}
             <Phone className={cn("size-3.5", step === 2 && "animate-ringshake")} fill="currentColor" />
@@ -105,7 +105,7 @@ function WebDemo({ active }: { active: boolean }) {
                 key={r}
                 animate={{ opacity: step >= 1 ? 1 : 0.25, x: step >= 1 ? 0 : 8 }}
                 transition={{ duration: 0.6, delay: step >= 1 ? 0.25 + i * 0.12 : 0, ease: EASE }}
-                className="flex items-center gap-2 rounded-lg bg-paper/[0.05] px-2.5 py-2 text-[11px] text-paper/85"
+                className="flex items-center gap-2 rounded-lg bg-paper/[0.05] px-2.5 py-2 text-[0.6875rem] text-paper/85"
               >
                 <span className="size-1.5 rounded-full bg-accent" />
                 {r}
@@ -116,7 +116,7 @@ function WebDemo({ active }: { active: boolean }) {
         </motion.div>
         <div className="absolute inset-x-0 top-0 h-7 bg-gradient-to-b from-ink to-transparent" />
       </div>
-      <span className="absolute left-5 top-4 text-[11.5px] text-mute/70">{D.web.url}</span>
+      <span className="absolute left-5 top-4 text-[0.7188rem] text-mute/70">{D.web.url}</span>
     </Frame>
   );
 }
@@ -129,7 +129,7 @@ function SeoDemo({ active }: { active: boolean }) {
   const { step, loop } = useSteps(active, SEO_STEPS);
   return (
     <Frame className="flex flex-col p-4">
-      <div className="flex items-center gap-2.5 rounded-full border border-paper/12 bg-paper/[0.04] px-4 py-2.5 text-[13px] text-paper">
+      <div className="flex items-center gap-2.5 rounded-full border border-paper/12 bg-paper/[0.04] px-4 py-2.5 text-[0.8125rem] text-paper">
         <Search className="size-4 text-mute" />
         {active ? <Typed text={D.seo.query} run={loop} /> : <span>{D.seo.query}</span>}
         <motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.9, repeat: Infinity }} className="-ml-1.5 h-4 w-px bg-accent" />
@@ -175,19 +175,19 @@ function SeoDemo({ active }: { active: boolean }) {
           transition={{ duration: 0.55, ease: EASE, delay: step >= 1 ? 0.25 : 0 }}
           className="rounded-2xl border border-accent/45 bg-accent/[0.08] p-3"
         >
-          <p className="text-[13px] font-semibold text-paper">{D.business}</p>
-          <p className="mt-0.5 text-[11.5px] text-mute">{D.seo.place}</p>
-          <p className="mt-0.5 text-[11.5px] text-volt">{D.seo.open}</p>
+          <p className="text-[0.8125rem] font-semibold text-paper">{D.business}</p>
+          <p className="mt-0.5 text-[0.7188rem] text-mute">{D.seo.place}</p>
+          <p className="mt-0.5 text-[0.7188rem] text-volt">{D.seo.open}</p>
           <div className="mt-2.5 flex gap-2">
-            <span className="flex items-center gap-1.5 rounded-full bg-signal px-3 py-1 text-[11px] font-semibold text-white">
+            <span className="flex items-center gap-1.5 rounded-full bg-signal px-3 py-1 text-[0.6875rem] font-semibold text-white">
               <Phone className="size-3" fill="currentColor" />
               {D.seo.call}
             </span>
-            <span className="rounded-full border border-paper/15 px-3 py-1 text-[11px] text-paper/80">{D.seo.route}</span>
+            <span className="rounded-full border border-paper/15 px-3 py-1 text-[0.6875rem] text-paper/80">{D.seo.route}</span>
           </div>
         </motion.div>
         {D.seo.others.map((o) => (
-          <div key={o} className="rounded-xl px-3 py-1.5 text-[11.5px] text-mute/60">
+          <div key={o} className="rounded-xl px-3 py-1.5 text-[0.7188rem] text-mute/60">
             {o}
           </div>
         ))}
@@ -205,8 +205,8 @@ function BookingDemo({ active }: { active: boolean }) {
   return (
     <Frame className="flex flex-col p-5">
       <div className="flex items-baseline justify-between">
-        <p className="display text-[22px] text-paper">{D.booking.day}</p>
-        <p className="text-[13px] tabular-nums text-mute">{D.booking.time}</p>
+        <p className="display text-[1.375rem] text-paper">{D.booking.day}</p>
+        <p className="text-[0.8125rem] tabular-nums text-mute">{D.booking.time}</p>
       </div>
 
       <AnimatePresence>
@@ -222,11 +222,11 @@ function BookingDemo({ active }: { active: boolean }) {
               <Bell className="animate-ringshake size-4" />
             </span>
             <span className="min-w-0">
-              <span className="flex items-baseline gap-2 text-[12.5px] font-semibold text-paper">
+              <span className="flex items-baseline gap-2 text-[0.7812rem] font-semibold text-paper">
                 {D.booking.notice}
                 <span className="font-normal tabular-nums text-mute">{D.booking.time}</span>
               </span>
-              <span className="mt-0.5 block text-[11.5px] leading-snug text-mute">{D.booking.noticeText}</span>
+              <span className="mt-0.5 block text-[0.7188rem] leading-snug text-mute">{D.booking.noticeText}</span>
             </span>
           </motion.div>
         )}
@@ -240,7 +240,7 @@ function BookingDemo({ active }: { active: boolean }) {
               key={s}
               layout
               className={cn(
-                "flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-[12.5px] transition-colors duration-500",
+                "flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-[0.7812rem] transition-colors duration-500",
                 booked ? "border-accent/60 bg-accent/[0.12] text-paper" : "border-paper/[0.08] text-paper/70"
               )}
             >
@@ -251,7 +251,7 @@ function BookingDemo({ active }: { active: boolean }) {
                     key="booked"
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-1.5 text-[11.5px] font-semibold text-accent"
+                    className="flex items-center gap-1.5 text-[0.7188rem] font-semibold text-accent"
                   >
                     <Check className="size-3.5" strokeWidth={3} />
                     {D.booking.booked}
@@ -277,14 +277,14 @@ function CareDemo({ active }: { active: boolean }) {
   return (
     <Frame className="flex flex-col p-5">
       <div className="flex items-center gap-2.5 border-b border-paper/[0.07] pb-3">
-        <span className="grid size-8 place-items-center rounded-full bg-paper/10 text-[12px] font-bold text-paper">N</span>
-        <span className="text-[13px] font-semibold text-paper">{D.business}</span>
+        <span className="grid size-8 place-items-center rounded-full bg-paper/10 text-[0.75rem] font-bold text-paper">N</span>
+        <span className="text-[0.8125rem] font-semibold text-paper">{D.business}</span>
       </div>
       <div className="mt-4 flex flex-1 flex-col gap-3">
         <motion.p
           initial={false}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-[86%] rounded-2xl rounded-bl-md bg-card px-3.5 py-2.5 text-[12.5px] leading-snug text-paper/90"
+          className="max-w-[86%] rounded-2xl rounded-bl-md bg-card px-3.5 py-2.5 text-[0.7812rem] leading-snug text-paper/90"
         >
           {D.care.incoming}
         </motion.p>
@@ -313,7 +313,7 @@ function CareDemo({ active }: { active: boolean }) {
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.45, ease: EASE }}
-              className="flex max-w-[80%] items-center gap-2 self-end rounded-2xl rounded-br-md bg-signal px-3.5 py-2.5 text-[12.5px] font-medium text-white"
+              className="flex max-w-[80%] items-center gap-2 self-end rounded-2xl rounded-br-md bg-signal px-3.5 py-2.5 text-[0.7812rem] font-medium text-white"
             >
               {D.care.reply}
               <Check className="size-3.5 shrink-0" strokeWidth={3} />
@@ -321,7 +321,7 @@ function CareDemo({ active }: { active: boolean }) {
           )}
         </AnimatePresence>
       </div>
-      <p className="mb-5 flex items-center gap-2 text-[11.5px] text-mute">
+      <p className="mb-5 flex items-center gap-2 text-[0.7188rem] text-mute">
         <span className="size-1.5 animate-signal rounded-full bg-volt" />
         {D.care.status}
       </p>

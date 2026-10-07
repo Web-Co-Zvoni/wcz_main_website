@@ -36,10 +36,10 @@ type Props = {
 /** where a card sits for each distance from the current one (beyond ±2 they wait out of sight) */
 const POSES: Record<number, { t: string; o: number; z: number; f: string }> = {
   0: { t: "translateX(0px) scale(1) rotateY(0deg)", o: 1, z: 30, f: "brightness(1)" },
-  1: { t: "translateX(320px) scale(0.84) rotateY(-24deg)", o: 0.65, z: 20, f: "brightness(0.7)" },
-  2: { t: "translateX(575px) scale(0.68) rotateY(-38deg)", o: 0.38, z: 10, f: "brightness(0.5) blur(1px)" },
-  [-1]: { t: "translateX(-320px) scale(0.84) rotateY(24deg)", o: 0.65, z: 20, f: "brightness(0.7)" },
-  [-2]: { t: "translateX(-575px) scale(0.68) rotateY(38deg)", o: 0.38, z: 10, f: "brightness(0.5) blur(1px)" },
+  1: { t: "translateX(20rem) scale(0.84) rotateY(-24deg)", o: 0.65, z: 20, f: "brightness(0.7)" },
+  2: { t: "translateX(35.9375rem) scale(0.68) rotateY(-38deg)", o: 0.38, z: 10, f: "brightness(0.5) blur(1px)" },
+  [-1]: { t: "translateX(-20rem) scale(0.84) rotateY(24deg)", o: 0.65, z: 20, f: "brightness(0.7)" },
+  [-2]: { t: "translateX(-35.9375rem) scale(0.68) rotateY(38deg)", o: 0.38, z: 10, f: "brightness(0.5) blur(1px)" },
 };
 const HIDDEN = { t: "translateX(0px) scale(0.4) rotateY(0deg)", o: 0, z: 0, f: "brightness(0.4) blur(2px)" };
 
@@ -129,7 +129,7 @@ export default function CoverFlow({
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center px-4">
         {/* the stage */}
-        <div className="relative mb-9 flex h-[590px] w-full items-center justify-center [perspective:1600px]">
+        <div className="relative mb-9 flex h-[36.875rem] w-full items-center justify-center [perspective:1600px]">
           {items.map((it, i) => {
             let off = (i - current + total) % total;
             if (off > total / 2) off -= total;
@@ -141,7 +141,7 @@ export default function CoverFlow({
                 onClick={() => !centre && setCurrent(i)}
                 aria-hidden={!centre}
                 className={cn(
-                  "absolute h-[560px] w-[370px] overflow-hidden rounded-[26px] border border-paper/12 bg-coal transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none",
+                  "absolute h-[35rem] w-[23.125rem] overflow-hidden rounded-[1.625rem] border border-paper/12 bg-coal transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none",
                   centre ? "shadow-[0_25px_60px_rgba(0,0,0,0.9),0_0_40px_rgba(255,59,71,0.22)]" : "cursor-pointer shadow-[0_15px_35px_rgba(0,0,0,0.5)] hover:brightness-110"
                 )}
                 style={{ transform: pose.t, opacity: pose.o, zIndex: pose.z, filter: pose.f }}
@@ -159,16 +159,16 @@ export default function CoverFlow({
                   )}
                 >
                   <div className="text-right">
-                    <span className="rounded-full border border-paper/25 bg-black/30 px-3 py-1 text-[13px] font-medium text-paper/90">{it.tag}</span>
+                    <span className="rounded-full border border-paper/25 bg-black/30 px-3 py-1 text-[0.8125rem] font-medium text-paper/90">{it.tag}</span>
                   </div>
                   <div className="flex flex-col items-center gap-1">
                     <h3 className="display text-[2.15rem] uppercase leading-[1.05] tracking-[0.02em] [text-shadow:0_3px_12px_rgba(0,0,0,0.95)]">{it.title}</h3>
-                    {it.subtitle && <p className="text-[17px] font-medium text-paper/85 [text-shadow:0_2px_8px_rgba(0,0,0,0.9)]">{it.subtitle}</p>}
+                    {it.subtitle && <p className="text-[1.0625rem] font-medium text-paper/85 [text-shadow:0_2px_8px_rgba(0,0,0,0.9)]">{it.subtitle}</p>}
                     <span className="mx-auto my-3 h-0.5 w-9 rounded-full bg-accent shadow-[0_0_8px_rgba(255,59,71,0.8)]" />
                     <a
                       href={it.href}
                       tabIndex={centre ? 0 : -1}
-                      className="group/cta pointer-events-auto inline-flex items-center gap-2 rounded-full bg-signal px-6 py-3 text-[14.5px] font-bold text-white shadow-[0_4px_14px_rgba(0,0,0,0.4)] transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-accent"
+                      className="group/cta pointer-events-auto inline-flex items-center gap-2 rounded-full bg-signal px-6 py-3 text-[0.9062rem] font-bold text-white shadow-[0_4px_14px_rgba(0,0,0,0.4)] transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-accent"
                     >
                       {ctaText}
                       <ArrowRight className="size-4 transition-transform duration-200 group-hover/cta:translate-x-0.5" strokeWidth={2.6} />

@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Suspense, lazy, useLayoutEffect, useRef, useState } from "react";
 import { HERO, PORTFOLIO } from "../content";
+import { remScale } from "../utils/remScale";
 import { cz } from "../utils/typo";
 import ChargedLogo from "./ChargedLogo";
 import { PrimaryCta, SecondaryCta } from "./HeroCtas";
@@ -70,6 +71,9 @@ const softProfile = (rgb: string, a: number) =>
 const SOFT_MASK =
   "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.08) 18%, rgba(0,0,0,0.35) 32%, rgba(0,0,0,0.8) 44%, #000 50%, rgba(0,0,0,0.8) 56%, rgba(0,0,0,0.35) 68%, rgba(0,0,0,0.08) 82%, transparent 100%)";
 
+/** design px → rem, so the beam's layers shrink with the rest of the desktop layout */
+const rem = (px: number) => `${px / 16}rem`;
+
 const masks = (...layers: string[]): React.CSSProperties => ({
   maskImage: layers.join(", "),
   WebkitMaskImage: layers.join(", "),
@@ -92,8 +96,8 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
             className="absolute top-0 origin-top -translate-x-1/2 mix-blend-screen"
             style={{
               left,
-              marginLeft: l.dx,
-              width: l.w,
+              marginLeft: rem(l.dx),
+              width: rem(l.w),
               height: height + 6,
               background: l.w <= 3 ? `rgba(${l.rgb},${l.a})` : softProfile(l.rgb, l.a),
               maskImage: fade,
@@ -111,12 +115,12 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
           style={
             {
               left,
-              width: f.w,
+              width: rem(f.w),
               height,
-              "--flow-len": `${f.len}px`,
+              "--flow-len": rem(f.len),
               "--flow-dur": `${f.dur}s`,
               backgroundImage: `linear-gradient(to bottom, rgba(${f.rgb},0) 0%, rgba(${f.rgb},${f.a}) 38%, rgba(${f.rgb},${f.a * 0.25}) 62%, rgba(${f.rgb},0) 100%)`,
-              backgroundSize: `100% ${f.len}px`,
+              backgroundSize: `100% ${rem(f.len)}`,
               ...masks(SOFT_MASK, "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 30%, #000 85%, #000 100%)"),
             } as React.CSSProperties
           }
@@ -133,7 +137,7 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
           className="absolute top-0 w-px -translate-x-1/2 mix-blend-screen"
           style={{
             left,
-            marginLeft: dx,
+            marginLeft: rem(dx),
             height,
             background: "linear-gradient(to bottom, transparent 30%, rgba(255,170,170,0.18) 70%, rgba(255,205,200,0.45) 100%)",
           }}
@@ -149,8 +153,8 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
         style={{
           left,
           top: height + 4,
-          width: 900,
-          height: 320,
+          width: rem(900),
+          height: rem(320),
           background:
             "radial-gradient(ellipse 5% 100% at 50% 100%, rgba(255,246,240,0.85), transparent 100%), radial-gradient(ellipse 13% 80% at 50% 100%, rgba(255,150,150,0.45), transparent 100%), radial-gradient(ellipse 30% 60% at 50% 100%, rgba(225,24,42,0.4), transparent 100%), radial-gradient(ellipse 50% 42% at 50% 100%, rgba(130,10,28,0.5), transparent 100%)",
         }}
@@ -164,13 +168,13 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
           style={
             {
               left,
-              top: height - 44,
-              width: 620,
-              height: 50,
-              "--flow-len": "220px",
+              top: `calc(${height}px - ${rem(44)})`,
+              width: rem(620),
+              height: rem(50),
+              "--flow-len": rem(220),
               "--flow-dur": "2.2s",
               backgroundImage: `linear-gradient(to ${side === "left" ? "left" : "right"}, rgba(255,90,100,0) 0%, rgba(255,120,128,0.55) 30%, rgba(200,20,40,0.3) 60%, rgba(255,90,100,0) 100%)`,
-              backgroundSize: "220px 100%",
+              backgroundSize: `${rem(220)} 100%`,
               ...masks(
                 `linear-gradient(to ${side}, #000 0%, rgba(0,0,0,0.6) 35%, transparent 100%)`,
                 "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 85%, rgba(0,0,0,0.4) 100%)"
@@ -196,6 +200,7 @@ export default function Hero() {
     if (!hero || !card) return;
     const measure = () => {
       const w = hero.clientWidth || 1;
+      const s = remScale();
       const h = hero.clientHeight || 1;
       const wide = w >= 768;
       // drop the beam through the open gap between the nav and the header actions, so it never crosses a link
@@ -206,7 +211,7 @@ export default function Hero() {
         const gapMid = (nav.getBoundingClientRect().right + actions.getBoundingClientRect().left) / 2;
         beamX = Math.min(0.7, Math.max(0.58, gapMid / w));
       }
-      const arch = wide ? 64 : 28;
+      const arch = (wide ? 64 : 28) * s;
       // the arch is half an ellipse across the full width — find its height under the beam
       const dx = (beamX - 0.5) * 2;
       const drop = arch * (1 - Math.sqrt(Math.max(0, 1 - dx * dx)));
@@ -214,14 +219,14 @@ export default function Hero() {
       const top = card.offsetTop + drop;
       // copy block is a direct child of the stage, which starts at the top of the hero
       const copy = copyRef.current;
-      const copyTop = copy ? copy.offsetTop : HEADER_H;
+      const copyTop = copy ? copy.offsetTop : HEADER_H * s;
       const copyBottom = copy ? copy.offsetTop + copy.offsetHeight : h / 2;
-      // matches the logo box, w-[clamp(300px,30vw,520px)]; the mark fills a bit under half of it
-      const logoBox = Math.min(520, Math.max(300, window.innerWidth * 0.3));
+      // matches the logo box, w-[clamp(18.75rem,30vw,32.5rem)]; the mark fills a bit under half of it
+      const logoBox = Math.min(520 * s, Math.max(300 * s, window.innerWidth * 0.3));
       const logoR = wide ? logoBox * 0.42 : 0;
       // a touch left of midway between the beam and the right edge, but never crowding the beam
       const markHalf = logoBox * 0.28;
-      const logoX = Math.max(((beamX + 1) / 2) * w - 80, beamX * w + markHalf + 60) / w;
+      const logoX = Math.max(((beamX + 1) / 2) * w - 80 * s, beamX * w + markHalf + 60 * s) / w;
       setLayout({ beamX, beamY: 0.5 - top / h, arch, hitPx: top, logoX, logoY: (copyTop + copyBottom) / 2, logoR });
     };
     measure();
@@ -277,10 +282,10 @@ export default function Hero() {
               "--mx": "-9999px",
               "--my": "-9999px",
               backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,59,71,0.5) 1px, transparent 1.6px)",
-              backgroundSize: "22px 22px",
-              maskImage: "radial-gradient(circle 220px at var(--mx) var(--my), #000 0%, rgba(0,0,0,0.4) 45%, transparent 100%)",
+              backgroundSize: `${rem(22)} ${rem(22)}`,
+              maskImage: "radial-gradient(circle 13.75rem at var(--mx) var(--my), #000 0%, rgba(0,0,0,0.4) 45%, transparent 100%)",
               WebkitMaskImage:
-                "radial-gradient(circle 220px at var(--mx) var(--my), #000 0%, rgba(0,0,0,0.4) 45%, transparent 100%)",
+                "radial-gradient(circle 13.75rem at var(--mx) var(--my), #000 0%, rgba(0,0,0,0.4) 45%, transparent 100%)",
             } as React.CSSProperties
           }
         />
@@ -320,8 +325,8 @@ export default function Hero() {
             backgroundColor: SKY,
             opacity: 0.4,
             ...masks(
-              `linear-gradient(to right, #000 calc(${beamPct} - 240px), transparent calc(${beamPct} - 80px), transparent calc(${beamPct} + 80px), #000 calc(${beamPct} + 240px))`,
-              `radial-gradient(ellipse 760px 420px at ${beamPct} ${layout.hitPx || 0}px, transparent 0%, transparent 30%, #000 100%)`
+              `linear-gradient(to right, #000 calc(${beamPct} - ${rem(240)}), transparent calc(${beamPct} - ${rem(80)}), transparent calc(${beamPct} + ${rem(80)}), #000 calc(${beamPct} + ${rem(240)}))`,
+              `radial-gradient(ellipse ${rem(760)} ${rem(420)} at ${beamPct} ${layout.hitPx || 0}px, transparent 0%, transparent 30%, #000 100%)`
             ),
           }}
         />
@@ -331,9 +336,9 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.4, delay: 0.9, ease: EASE }}
-          className="pointer-events-auto absolute hidden w-[clamp(300px,30vw,520px)] -translate-x-1/2 -translate-y-1/2 md:block"
+          className="pointer-events-auto absolute hidden w-[clamp(18.75rem,30vw,32.5rem)] -translate-x-1/2 -translate-y-1/2 md:block"
           // the mark sits high in its box — drop the box so the mark itself is level with the copy
-          style={{ left: bellPct, top: layout.logoY ? `calc(${layout.logoY}px + clamp(28px,2.8vw,48px))` : "50%" }}
+          style={{ left: bellPct, top: layout.logoY ? `calc(${layout.logoY}px + clamp(1.75rem,2.8vw,3rem))` : "50%" }}
         >
           <ChargedLogo src={logoWcz} scale={0.68} className="relative aspect-[5/6] w-full cursor-pointer" />
         </motion.div>
@@ -354,13 +359,13 @@ export default function Hero() {
 
       {/* stage: copy left of the beam (the bell lives behind the clouds) — lets the cursor through to the logo */}
       <div className="pointer-events-none relative z-10">
-        <div className="mx-auto flex min-h-[clamp(640px,82svh,920px)] max-w-[88rem] flex-col justify-center px-4 pb-28 pt-[140px] md:min-h-[max(480px,calc(100svh-266px))] md:px-8 md:pb-[clamp(24px,4vh,56px)] min-[1440px]:pb-[clamp(20px,3.4vh,56px)] md:pt-[clamp(100px,13vh,124px)] min-[1440px]:pt-[clamp(122px,13vh,132px)]">
+        <div className="mx-auto flex min-h-[clamp(40rem,82svh,57.5rem)] max-w-[88rem] flex-col justify-center px-4 pb-28 pt-[8.75rem] md:min-h-[max(30rem,calc(100svh-16.625rem))] md:px-8 md:pb-[clamp(1.5rem,4vh,3.5rem)] min-[1224px]:pb-[clamp(1.25rem,3.4vh,3.5rem)] md:pt-[clamp(6.25rem,13vh,7.75rem)] min-[1224px]:pt-[clamp(7.625rem,13vh,8.25rem)]">
           <div ref={copyRef} className="pointer-events-auto max-w-[80%] md:max-w-[min(48rem,52vw)]">
             <Reveal delay={0.45}>
-              <Kicker className="xl:text-[clamp(15px,2vh,17.5px)]">{HERO.kicker}</Kicker>
+              <Kicker className="xl:text-[clamp(0.9375rem,2vh,1.0938rem)]">{HERO.kicker}</Kicker>
             </Reveal>
 
-            <h1 className="display mt-6 text-[clamp(3rem,min(5.8vw,10.4vh),6.5rem)] xl:text-[clamp(3rem,max(min(5.8vw,10.4vh),min(7.4vw,calc(17vh-52px))),8.5rem)] max-md:text-[clamp(2.5rem,11vw,3.8rem)]">
+            <h1 className="display mt-6 text-[clamp(3rem,min(5.8vw,10.4vh),6.5rem)] xl:text-[clamp(3rem,max(min(5.8vw,10.4vh),min(7.4vw,calc(17vh-3.25rem))),8.5rem)] max-md:text-[clamp(2.5rem,11vw,3.8rem)]">
               {HERO.titleLines.map((line, i) => (
                 // descenders (the y, the comma) hang below the tight line box: the mask and the text fill reach
                 // down to cover them, and a negative margin keeps the lines exactly where they were
@@ -379,7 +384,7 @@ export default function Hero() {
             </h1>
 
             <Reveal delay={0.75}>
-              <p className="mt-6 max-w-[40rem] text-[17px] leading-relaxed text-paper/70 md:text-[21px] xl:max-w-[44rem] xl:text-[clamp(21px,2.9vh,26px)]">
+              <p className="mt-6 max-w-[40rem] text-[1.0625rem] leading-relaxed text-paper/70 md:text-[1.3125rem] xl:max-w-[44rem] xl:text-[clamp(1.3125rem,2.9vh,1.625rem)]">
                 {cz(HERO.description)}
               </p>
             </Reveal>
@@ -425,13 +430,13 @@ export default function Hero() {
         />
 
         <Reveal delay={1} y={16}>
-          <dl className="relative mx-auto grid max-w-[88rem] grid-cols-2 px-4 pb-10 pt-14 md:grid-cols-4 md:px-8 md:pb-[clamp(12px,2.5vh,24px)] md:pt-[clamp(24px,4.5vh,48px)]">
+          <dl className="relative mx-auto grid max-w-[88rem] grid-cols-2 px-4 pb-10 pt-14 md:grid-cols-4 md:px-8 md:pb-[clamp(0.75rem,2.5vh,1.5rem)] md:pt-[clamp(1.5rem,4.5vh,3rem)]">
             {HERO.stats.map((s, i) => (
               <div
                 key={s.label}
-                className={`group flex flex-col items-center gap-2 px-3 py-8 text-center md:py-[clamp(12px,2.5vh,24px)] ${i % 2 === 1 ? "border-l border-paper/10" : ""} ${i > 1 ? "border-t border-paper/10 md:border-t-0" : ""} ${i === 2 ? "md:border-l" : ""}`}
+                className={`group flex flex-col items-center gap-2 px-3 py-8 text-center md:py-[clamp(0.75rem,2.5vh,1.5rem)] ${i % 2 === 1 ? "border-l border-paper/10" : ""} ${i > 1 ? "border-t border-paper/10 md:border-t-0" : ""} ${i === 2 ? "md:border-l" : ""}`}
               >
-                <dt className="order-2 text-[15px] text-mute md:text-[18px] xl:text-[clamp(18px,2vh,20px)]">{s.label}</dt>
+                <dt className="order-2 text-[0.9375rem] text-mute md:text-[1.125rem] xl:text-[clamp(1.125rem,2vh,1.25rem)]">{s.label}</dt>
                 <dd className="display order-1 text-[clamp(2.4rem,min(5.4vw,9.6vh),5.4rem)] transition-colors duration-500 group-hover:text-accent">
                   {s.value}
                 </dd>

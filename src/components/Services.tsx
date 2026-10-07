@@ -49,8 +49,8 @@ function Ghost({ side }: { side: "left" | "right" }) {
     <div
       aria-hidden
       className={cn(
-        "absolute top-24 hidden h-[300px] w-[230px] rounded-[20px] border border-paper/[0.07] bg-[#0f0d10] p-5 opacity-40 [mask-image:linear-gradient(#000_40%,transparent)] md:block",
-        side === "left" ? "right-[calc(50%+185px)]" : "left-[calc(50%+185px)]"
+        "absolute top-24 hidden h-[18.75rem] w-[14.375rem] rounded-[1.25rem] border border-paper/[0.07] bg-[#0f0d10] p-5 opacity-40 [mask-image:linear-gradient(#000_40%,transparent)] md:block",
+        side === "left" ? "right-[calc(50%+11.5625rem)]" : "left-[calc(50%+11.5625rem)]"
       )}
     >
       <span className="block h-2.5 w-24 rounded-full bg-paper/15" />
@@ -70,7 +70,7 @@ function ServiceTile({ s, i }: { s: Service; i: number }) {
 
   return (
     <BentoCard delay={0.08 * i} className={cn("bg-[#121013]", tile.span)}>
-      <div ref={ref} className="relative h-[480px]">
+      <div ref={ref} className="relative h-[30rem]">
         <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: tile.light }} />
         {tile.wide && (
           <>
@@ -79,12 +79,12 @@ function ServiceTile({ s, i }: { s: Service; i: number }) {
           </>
         )}
 
-        <span className="absolute left-5 top-5 z-10 rounded-full border border-paper/15 bg-ink/50 px-2.5 py-0.5 text-[11.5px] text-mute">
+        <span className="absolute left-5 top-5 z-10 rounded-full border border-paper/15 bg-ink/50 px-2.5 py-0.5 text-[0.7188rem] text-mute">
           {SERVICE_DEMOS.sampleLabel}
         </span>
 
         {/* the demo, standing in the light; the bottom of it sinks into the caption */}
-        <div className="absolute left-1/2 top-11 h-[420px] w-[min(330px,82%)] -translate-x-1/2 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/tile:-translate-y-2">
+        <div className="absolute left-1/2 top-11 h-[26.25rem] w-[min(20.625rem,82%)] -translate-x-1/2 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/tile:-translate-y-2">
           <Demo active={live} />
         </div>
 
@@ -111,7 +111,7 @@ export default function Services() {
             </Reveal>
           </div>
           <Reveal delay={0.16}>
-            <Button href="#kontakt" size="lg" shine className="xl:px-9 xl:py-5 xl:text-[17px]">
+            <Button href="#kontakt" size="lg" shine className="xl:px-9 xl:py-5 xl:text-[1.0625rem]">
               {SERVICES.outroCta}
               <ArrowRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
             </Button>

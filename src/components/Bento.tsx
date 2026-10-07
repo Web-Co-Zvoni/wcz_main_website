@@ -25,8 +25,8 @@ export function BentoCard({
   const Tile = as === "li" ? motion.li : motion.div;
   const mx = useMotionValue(-1000);
   const my = useMotionValue(-1000);
-  const spot = useMotionTemplate`radial-gradient(460px circle at ${mx}px ${my}px, rgba(255,59,71,0.13), transparent 70%)`;
-  const edge = useMotionTemplate`radial-gradient(280px circle at ${mx}px ${my}px, rgba(255,90,100,0.85), transparent 70%)`;
+  const spot = useMotionTemplate`radial-gradient(28.75rem circle at ${mx}px ${my}px, rgba(255,59,71,0.13), transparent 70%)`;
+  const edge = useMotionTemplate`radial-gradient(17.5rem circle at ${mx}px ${my}px, rgba(255,90,100,0.85), transparent 70%)`;
 
   return (
     <Tile
@@ -40,7 +40,7 @@ export function BentoCard({
         my.set(e.clientY - r.top);
       }}
       className={cn(
-        "group/tile relative isolate overflow-hidden rounded-[28px] border",
+        "group/tile relative isolate overflow-hidden rounded-[1.75rem] border",
         tone === "signal"
           ? "border-accent/25 bg-[radial-gradient(ellipse_90%_80%_at_100%_0%,rgba(255,59,71,0.22),transparent_65%),linear-gradient(180deg,#221a1e,#171418)]"
           : "border-paper/[0.08] bg-[linear-gradient(180deg,#1d1a1e,#171518)]",

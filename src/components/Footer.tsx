@@ -11,17 +11,17 @@ export default function Footer() {
       <span aria-hidden className="pointer-events-none absolute inset-x-[25%] top-0 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent" />
       <div className="mx-auto flex max-w-5xl flex-col items-center px-4 text-center">
         <Logo />
-        <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-mute">{cz(SITE.footerDescription)}</p>
+        <p className="mt-5 max-w-sm text-[0.9375rem] leading-relaxed text-mute">{cz(SITE.footerDescription)}</p>
 
         <nav className="mt-9 flex flex-wrap justify-center gap-x-7 gap-y-3">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="text-[14.5px] font-medium text-paper/80 transition-colors hover:text-accent">
+            <a key={l.href} href={l.href} className="text-[0.9062rem] font-medium text-paper/80 transition-colors hover:text-accent">
               {l.label}
             </a>
           ))}
         </nav>
 
-        <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[14px] text-mute">
+        <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[0.875rem] text-mute">
           <a href={`tel:${SITE.phoneLink}`} className="tabular-nums transition-colors hover:text-accent">
             {SITE.phone}
           </a>
@@ -58,7 +58,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-paper/[0.08]">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-7 text-center text-[12.5px] text-mute/70">
+        <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-7 text-center text-[0.7812rem] text-mute/70">
           <p className="flex flex-wrap justify-center gap-x-3 gap-y-1">
             {legalDetails.map((detail) => (
               <span key={detail}>{detail}</span>

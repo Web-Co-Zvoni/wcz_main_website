@@ -10,6 +10,7 @@
 import { useReducedMotion } from "framer-motion";
 import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
 import { cn } from "../../utils/cn";
+import { remScale } from "../../utils/remScale";
 
 export function ScrollStackItem({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -94,7 +95,7 @@ export default function ScrollStack({
     const shades = cards.map((c) => c.querySelector<HTMLElement>("[data-stack-shade]"));
 
     cards.forEach((c, i) => {
-      c.style.marginBottom = i < cards.length - 1 ? `${itemDistance}px` : "0px";
+      c.style.marginBottom = i < cards.length - 1 ? `${itemDistance / 16}rem` : "0px";
       c.style.willChange = reduce ? "" : "transform";
     });
     if (reduce) {
@@ -109,9 +110,12 @@ export default function ScrollStack({
     let asideH = 0;
     let beside = false;
     let vh = window.innerHeight;
+    /** px distances below are design px — scale them with the root font size */
+    let unit = remScale();
     const aside = asideRef?.current ?? null;
     const measure = () => {
       vh = window.innerHeight;
+      unit = remScale();
       tops = cards.map(docTop);
       endTop = docTop(end);
       lastH = cards[cards.length - 1]?.offsetHeight ?? 0;
@@ -126,19 +130,20 @@ export default function ScrollStack({
 
     const last: string[] = [];
     const update = () => {
+      const step = itemStackDistance * unit;
       const y = window.scrollY;
-      const deckH = lastH + itemStackDistance * (cards.length - 1);
-      const pinAt = Math.max(minTop, stackPosition === "center" ? (vh - deckH) / 2 - vh * lift : vh * stackPosition);
+      const deckH = lastH + step * (cards.length - 1);
+      const pinAt = Math.max(minTop * unit, stackPosition === "center" ? (vh - deckH) / 2 - vh * lift : vh * stackPosition);
       const scaleEnd = vh * scaleEndPosition;
       // the deck lets go when its bottom card would pass the end marker, so it never spills out
-      const pinEnd = endTop - pinAt - itemStackDistance * (cards.length - 1) - lastH;
+      const pinEnd = endTop - pinAt - step * (cards.length - 1) - lastH;
 
       // the card currently on top of the deck
       let topIndex = -1;
-      for (let i = 0; i < cards.length; i++) if (y >= tops[i] - pinAt - itemStackDistance * i) topIndex = i;
+      for (let i = 0; i < cards.length; i++) if (y >= tops[i] - pinAt - step * i) topIndex = i;
       // the card being read: the newest one that has come a third of the screen up toward its pin
       let reading = 0;
-      for (let i = 0; i < cards.length; i++) if (y >= tops[i] - pinAt - itemStackDistance * i - vh * 0.3) reading = i;
+      for (let i = 0; i < cards.length; i++) if (y >= tops[i] - pinAt - step * i - vh * 0.3) reading = i;
 
       if (aside && beside) {
         // the aside's top sits level with the middle of the finished deck, from the moment the
@@ -150,7 +155,7 @@ export default function ScrollStack({
       } else if (aside && aside.style.transform) aside.style.transform = "";
 
       cards.forEach((card, i) => {
-        const pinStart = tops[i] - pinAt - itemStackDistance * i;
+        const pinStart = tops[i] - pinAt - step * i;
         const s = progress(y, pinStart, tops[i] - scaleEnd);
         const scale = 1 - s * (1 - (baseScale + i * itemScale));
         const ty = y < pinStart ? 0 : Math.min(y, pinEnd) - pinStart;

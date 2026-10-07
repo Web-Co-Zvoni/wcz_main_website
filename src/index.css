@@ -17,11 +17,24 @@
 
   --font-display: "Montserrat", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+
+  /* desktop breakpoints at 85% of the defaults (64/80/96rem), matching the 85% root size below —
+     the layout switches where it would under 85% browser zoom. sm/md stay for the mobile pass. */
+  --breakpoint-lg: 54.4rem;
+  --breakpoint-xl: 68rem;
+  --breakpoint-2xl: 81.6rem;
 }
 
 @layer base {
   html {
     scroll-behavior: auto;
+  }
+  /* desktop runs at 85% scale: every rem (Tailwind spacing, type, the converted px values) shrinks with it.
+     vw/vh-based sizes stay put, exactly like browser zoom. JS-computed px read it via utils/remScale. */
+  @media (min-width: 54.4rem) {
+    html {
+      font-size: 85%;
+    }
   }
   body {
     @apply bg-ink text-paper font-sans antialiased overflow-x-hidden;
