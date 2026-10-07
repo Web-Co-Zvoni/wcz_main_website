@@ -1,15 +1,51 @@
-import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, Clock, Loader2, Mail, MapPin, Phone, Send } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, AtSign, Check, CheckCircle2, Loader2, Mail, MessageSquareText, Phone, Send, UserRound, type LucideIcon } from "lucide-react";
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { CONTACT, SITE } from "../content";
-import { Chip, Eyebrow, Reveal } from "./ui";
+import { cn } from "../utils/cn";
+import { cz } from "../utils/typo";
+import GlowFrame from "./fx/GlowFrame";
+import { EASE, Reveal, ShineBorder } from "./ui";
 
 const inputCls =
-  "w-full rounded-xl border border-paper/12 bg-ink px-4.5 py-3.5 text-[15px] text-paper placeholder:text-mute/60 outline-none transition-all duration-300 focus:border-accent/70 focus:shadow-[0_0_0_3px_rgba(255,92,31,0.15)]";
+  "w-full rounded-2xl border border-paper/12 bg-ink/70 py-4 pl-12 pr-11 text-[16px] text-paper placeholder:text-mute/50 outline-none transition-[border-color,box-shadow,background-color] duration-300 hover:border-paper/22 focus:border-accent/70 focus:bg-ink focus:shadow-[0_0_0_4px_rgba(255,59,71,0.14)]";
+const labelCls = "text-[14px] font-medium text-paper/70";
+
+/** a labelled input with its icon, which lights up on focus, and a tick once it has a value */
+function Field({ label, icon: Icon, done, children }: { label: string; icon: LucideIcon; done: boolean; children: ReactNode }) {
+  return (
+    <label className="group/field flex flex-col gap-2">
+      <span className={labelCls}>{label}</span>
+      <span className="relative block">
+        <Icon className="pointer-events-none absolute left-4 top-[1.15rem] size-[18px] text-mute/60 transition-colors duration-300 group-focus-within/field:text-accent" />
+        {children}
+        <AnimatePresence>
+          {done && (
+            <motion.span
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 520, damping: 22 }}
+              className="pointer-events-none absolute right-4 top-[1.05rem] grid size-5 place-items-center rounded-full bg-volt/15 text-volt"
+            >
+              <Check className="size-3" strokeWidth={3} />
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </span>
+    </label>
+  );
+}
+
+const REQUIRED = 4;
 
 export default function Contact() {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [trade, setTrade] = useState("");
+  const [filled, setFilled] = useState({ jmeno: false, telefon: false, email: false, zprava: false });
+  const done = [filled.jmeno, filled.telefon, trade !== "", filled.zprava].filter(Boolean).length;
+  const ready = done === REQUIRED;
   const nextMonth = CONTACT.monthsGenitive[(new Date().getMonth() + 1) % 12];
   const privacyLinkText = "jak nakládáme s vašimi údaji";
   const privacyNoteParts = CONTACT.fields.privacyNote.split(privacyLinkText);
@@ -42,238 +78,226 @@ export default function Contact() {
   };
 
   return (
-    <section id="kontakt" className="relative overflow-hidden bg-coal py-24 md:py-32">
-      <div className="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_60%_60%_at_80%_20%,black,transparent)]" />
-      <div className="absolute -bottom-40 right-0 h-[420px] w-[620px] rounded-full bg-accent/10 blur-[120px]" />
-
-      <div className="relative mx-auto max-w-7xl px-5 md:px-8">
-        <div className="grid gap-14 lg:grid-cols-12">
-          {/* left — pitch + contacts */}
-          <div className="lg:col-span-5">
+    <section id="kontakt" className="relative overflow-hidden pb-28 pt-24 md:pb-40 md:pt-32">
+      <div className="relative mx-auto grid max-w-[88rem] gap-16 px-4 md:grid-cols-12 md:gap-10 md:px-8">
+        {/* the phone first: it's the fastest way in */}
+        <div className="md:col-span-5">
+          <div className="md:sticky md:top-[clamp(120px,16vh,160px)]">
             <Reveal>
-              <Eyebrow>{CONTACT.eyebrow}</Eyebrow>
+              <h2 className="display max-w-[10ch] text-[clamp(2.8rem,5.6vw,6.2rem)] leading-[0.96]">{CONTACT.title}</h2>
             </Reveal>
             <Reveal delay={0.08}>
-              <h2 className="mt-5 stretch font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2.6rem,5.5vw,4.8rem)]">
-                {CONTACT.titleLead}
-                <br />
-                co <span className="text-accent">{CONTACT.titleAccent}</span>
-              </h2>
+              <p className="mt-7 max-w-[32ch] text-[clamp(1.1rem,1.4vw,1.4rem)] leading-relaxed text-paper/70">{cz(CONTACT.description)}</p>
             </Reveal>
+
             <Reveal delay={0.16}>
-              <p className="mt-6 max-w-md text-[16px] leading-relaxed text-mute">
-                {CONTACT.descriptionStart}
-                <span className="text-paper">{CONTACT.descriptionHighlight}</span>{CONTACT.descriptionEnd}
+              <p className="mt-12 text-[14.5px] text-mute">{CONTACT.emailLead}</p>
+              {/* e-mail as the second way in: big, but quieter than the form */}
+              <motion.a
+                href={`mailto:${SITE.email}`}
+                whileHover={{ y: -3 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                className="group relative mt-3 inline-flex items-center gap-5 rounded-[22px] border border-paper/12 bg-coal/80 py-4 pl-4 pr-6 text-paper transition-colors duration-300 hover:border-accent/50"
+              >
+                <span className="grid size-14 place-items-center rounded-2xl bg-signal text-white">
+                  <Mail className="size-6" />
+                </span>
+                <span className="text-[clamp(1.3rem,1.8vw,1.75rem)] font-bold tracking-tight">{SITE.email}</span>
+                <ArrowUpRight className="size-5 text-mute transition-[transform,color] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
+              </motion.a>
+
+              <p className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-volt/25 bg-volt/[0.06] px-4 py-2 text-[13.5px] text-volt">
+                <span className="size-1.5 animate-signal rounded-full bg-volt" />
+                {CONTACT.availability} {nextMonth}
               </p>
-            </Reveal>
-
-            <Reveal delay={0.24}>
-              <div className="mt-6 flex flex-wrap gap-2.5">
-                <Chip className="border-leaf/30 text-leaf">
-                  <span className="size-1.5 animate-blink rounded-full bg-leaf" />
-                  {CONTACT.availability} {nextMonth}
-                </Chip>
-                <Chip>{CONTACT.firstDraft}</Chip>
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.3}>
-              <div className="mt-10 flex flex-col gap-2">
-                <a
-                  href={`tel:${SITE.phoneLink}`}
-                  className="group relative flex items-center justify-between overflow-hidden rounded-2xl bg-accent p-6 text-ink transition-all duration-300 hover:bg-flame"
-                >
-                  <span className="relative z-10">
-                    <span className="flex items-center gap-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.2em] opacity-80">
-                      <span className="relative flex size-2">
-                        <span className="absolute h-full w-full animate-ping rounded-full bg-ink opacity-60" />
-                        <span className="relative size-2 rounded-full bg-ink" />
-                      </span>
-                      {SITE.openingHours}
-                    </span>
-                    <span className="stretch mt-1 block text-3xl font-black tracking-tight md:text-4xl">
-                      {SITE.phone}
-                    </span>
-                  </span>
-                  <span className="relative z-10 grid size-14 place-items-center rounded-full bg-ink text-accent transition-transform duration-500 group-hover:rotate-12">
-                    <Phone className="size-6" fill="currentColor" />
-                  </span>
-                </a>
-
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <a
-                    href={`mailto:${SITE.email}`}
-                    className="flex items-center gap-3 rounded-2xl border border-paper/10 bg-card p-5 transition-colors duration-300 hover:border-accent/50"
-                  >
-                    <Mail className="size-5 shrink-0 text-accent" />
-                    <span>
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-mute">{CONTACT.emailLabel}</span>
-                      <span className="text-[14.5px] font-bold">{SITE.email}</span>
-                    </span>
-                  </a>
-                  <div className="flex items-center gap-3 rounded-2xl border border-paper/10 bg-card p-5">
-                    <MapPin className="size-5 shrink-0 text-accent" />
-                    <span>
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-mute">{CONTACT.locationLabel}</span>
-                      <span className="text-[14.5px] font-bold">{SITE.contactLocation}</span>
-                    </span>
-                  </div>
-                </div>
-
-                <p className="mt-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-mute">
-                  <Clock className="size-3.5" />
-                  {CONTACT.callNote}
-                </p>
-              </div>
-            </Reveal>
-          </div>
-
-          {/* right — form */}
-          <div className="lg:col-span-7">
-            <Reveal delay={0.15}>
-              <div className="relative rounded-3xl border border-paper/10 bg-card p-7 md:p-10">
-                {state === "sent" ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="flex min-h-[480px] flex-col items-center justify-center text-center"
-                  >
-                    <span className="relative grid size-20 place-items-center rounded-full bg-leaf/15 text-leaf">
-                      <span className="pulse-ring" />
-                      <CheckCircle2 className="size-9" />
-                    </span>
-                    <h3 className="mt-7 stretch text-3xl font-extrabold tracking-tight">{CONTACT.successTitle}</h3>
-                    <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-mute">
-                      {CONTACT.successStart}{" "}
-                      <a href={`tel:${SITE.phoneLink}`} className="font-bold text-accent">
-                        {SITE.phone}
-                      </a>
-                      .
-                    </p>
-                  </motion.div>
-                ) : (
-                  <form
-                    name="poptavka"
-                    method="POST"
-                    data-netlify="true"
-                    data-netlify-honeypot="bot-field"
-                    onSubmit={onSubmit}
-                    className="flex flex-col gap-5"
-                  >
-                    <input type="hidden" name="form-name" value="poptavka" />
-                    <div className="hidden" aria-hidden="true">
-                      <label>
-                        Nevyplňujte toto pole: <input name="bot-field" tabIndex={-1} autoComplete="off" />
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="stretch text-2xl font-extrabold tracking-tight">{CONTACT.formTitle}</h3>
-                      <Chip className="hidden sm:inline-flex">{CONTACT.formDuration}</Chip>
-                    </div>
-
-                    <div className="grid gap-5 sm:grid-cols-2">
-                      <label className="flex flex-col gap-2">
-                        <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-mute">
-                          {CONTACT.fields.name}
-                        </span>
-                        <input required name="jmeno" placeholder={CONTACT.fields.namePlaceholder} className={inputCls} />
-                      </label>
-                      <label className="flex flex-col gap-2">
-                        <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-mute">
-                          {CONTACT.fields.phone}
-                        </span>
-                        <input
-                          required
-                          name="telefon"
-                          type="tel"
-                          placeholder={CONTACT.fields.phonePlaceholder}
-                          className={inputCls}
-                        />
-                      </label>
-                    </div>
-
-                    <div className="grid gap-5 sm:grid-cols-2">
-                      <label className="flex flex-col gap-2">
-                        <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-mute">
-                          {CONTACT.fields.email}
-                        </span>
-                        <input name="email" type="email" placeholder={CONTACT.fields.emailPlaceholder} className={inputCls} />
-                      </label>
-                      <label className="flex flex-col gap-2">
-                        <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-mute">
-                          {CONTACT.fields.trade}
-                        </span>
-                        <select required name="obor" className={inputCls} defaultValue="">
-                          <option value="" disabled>
-                            {CONTACT.fields.tradePlaceholder}
-                          </option>
-                          {CONTACT.trades.map((t) => (
-                            <option key={t} value={t}>
-                              {t}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
-
-                    <label className="flex flex-col gap-2">
-                      <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-mute">
-                          {CONTACT.fields.message}
-                      </span>
-                      <textarea
-                        required
-                        name="zprava"
-                        rows={4}
-                        placeholder={CONTACT.fields.messagePlaceholder}
-                        className={`${inputCls} resize-none`}
-                      />
-                    </label>
-
-                    <button
-                      type="submit"
-                      disabled={state === "sending"}
-                      className="group mt-2 flex items-center justify-center gap-2.5 rounded-full bg-accent py-4.5 text-[16px] font-bold tracking-tight text-ink transition-all duration-300 hover:bg-flame hover:shadow-[0_0_44px_-8px_var(--color-accent)] disabled:opacity-70"
-                    >
-                      {state === "sending" ? (
-                        <>
-                          <Loader2 className="size-5 animate-spin" />
-                          {CONTACT.fields.sending}
-                        </>
-                      ) : (
-                        <>
-                          {CONTACT.fields.submit}
-                          <Send className="size-4.5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" strokeWidth={2.5} />
-                        </>
-                      )}
-                    </button>
-                    <p className="text-center text-xs leading-relaxed text-mute">
-                      {privacyNoteParts[0]}
-                      <a
-                        href="/ochrana-osobnich-udaju.html"
-                        target="_blank"
-                        rel="noopener"
-                        className="underline underline-offset-4 transition-colors hover:text-accent"
-                      >
-                        {privacyLinkText}
-                      </a>
-                      {privacyNoteParts[1]}
-                    </p>
-                    {state === "error" && (
-                      <p role="alert" className="text-center text-sm text-blood">
-                        Odeslání se nepodařilo. Zkuste to znovu, nebo nám zavolejte.
-                      </p>
-                    )}
-                    <p className="flex items-center justify-center gap-2 text-center font-mono text-[10.5px] uppercase tracking-[0.18em] text-mute">
-                      <ArrowRight className="size-3.5 text-accent" />
-                      {CONTACT.fields.response}
-                    </p>
-                  </form>
-                )}
-              </div>
             </Reveal>
           </div>
         </div>
+
+        <Reveal delay={0.1} className="md:col-span-7">
+          <div className="relative rounded-[32px] border border-paper/10 bg-coal p-6 shadow-[0_60px_120px_-60px_rgba(0,0,0,0.9)] md:p-11">
+            {/* two lights glowing out of the frame from opposite corners, moving on now and then */}
+            <GlowFrame radius={32} />
+            {/* a faint dot grid fading in from the top corner */}
+            <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+              <span className="absolute inset-0 bg-[radial-gradient(rgba(244,239,236,0.09)_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_70%_60%_at_100%_0%,#000,transparent)]" />
+            </span>
+            <AnimatePresence mode="wait" initial={false}>
+              {state === "sent" ? (
+                <motion.div
+                  key="sent"
+                  initial={{ opacity: 0, scale: 0.96, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                  transition={{ duration: 0.6, ease: EASE }}
+                  className="flex min-h-[560px] flex-col items-center justify-center text-center"
+                >
+                  <span className="relative grid size-20 place-items-center rounded-full bg-volt/10 text-volt">
+                    <span className="pulse-ring" />
+                    <CheckCircle2 className="size-9" />
+                  </span>
+                  <h3 className="display mt-7 text-4xl">{CONTACT.successTitle}</h3>
+                  <p className="mt-3 max-w-sm text-[16px] leading-relaxed text-mute">
+                    {CONTACT.successStart}{" "}
+                    <a href={`mailto:${SITE.email}`} className="font-semibold text-accent">
+                      {SITE.email}
+                    </a>
+                    .
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.form
+                  key="form"
+                  exit={{ opacity: 0, scale: 0.98, filter: "blur(6px)" }}
+                  transition={{ duration: 0.35 }}
+                  name="poptavka"
+                  method="POST"
+                  data-netlify="true"
+                  data-netlify-honeypot="bot-field"
+                  onSubmit={onSubmit}
+                  onInput={(e) => {
+                    const fd = new FormData(e.currentTarget);
+                    const has = (n: string) => String(fd.get(n) ?? "").trim() !== "";
+                    setFilled({ jmeno: has("jmeno"), telefon: has("telefon"), email: has("email"), zprava: has("zprava") });
+                  }}
+                  className="relative flex flex-col gap-6 text-left"
+                >
+                  <input type="hidden" name="form-name" value="poptavka" />
+                  <div className="hidden" aria-hidden="true">
+                    <label>
+                      Nevyplňujte toto pole: <input name="bot-field" tabIndex={-1} autoComplete="off" />
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+                    <h3 className="display-soft text-[clamp(1.6rem,2.2vw,2.1rem)]">{CONTACT.formTitle}</h3>
+                    {/* how far along the required fields are */}
+                    <div className="flex flex-col items-end gap-2" aria-live="polite">
+                      <span className={cn("text-[13px] tabular-nums transition-colors duration-500", ready ? "text-volt" : "text-mute")}>
+                        {CONTACT.progress(done, REQUIRED)}
+                      </span>
+                      <span className="flex gap-1.5" aria-hidden>
+                        {Array.from({ length: REQUIRED }, (_, i) => (
+                          <span key={i} className="h-1.5 w-9 overflow-hidden rounded-full bg-paper/10">
+                            <motion.span
+                              className={cn("block h-full origin-left rounded-full", ready ? "bg-volt" : "bg-accent")}
+                              initial={false}
+                              animate={{ scaleX: i < done ? 1 : 0 }}
+                              transition={{ duration: 0.5, ease: EASE }}
+                            />
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <Field label={CONTACT.fields.name} icon={UserRound} done={filled.jmeno}>
+                      <input required name="jmeno" autoComplete="name" placeholder={CONTACT.fields.namePlaceholder} className={inputCls} />
+                    </Field>
+                    <Field label={CONTACT.fields.phone} icon={Phone} done={filled.telefon}>
+                      <input required name="telefon" type="tel" autoComplete="tel" placeholder={CONTACT.fields.phonePlaceholder} className={inputCls} />
+                    </Field>
+                  </div>
+
+                  <Field label={CONTACT.fields.email} icon={AtSign} done={filled.email}>
+                    <input name="email" type="email" autoComplete="email" placeholder={CONTACT.fields.emailPlaceholder} className={inputCls} />
+                  </Field>
+
+                  {/* trade as tap-to-pick chips — one radio group, same "obor" field the form always sent */}
+                  <fieldset className="flex flex-col gap-3">
+                    <legend className={cn(labelCls, "mb-3")}>{CONTACT.fields.trade}</legend>
+                    <div className="flex flex-wrap gap-2.5">
+                      {CONTACT.trades.map((t, i) => {
+                        const on = trade === t;
+                        return (
+                          <label key={t} className="relative cursor-pointer">
+                            <input
+                              type="radio"
+                              name="obor"
+                              value={t}
+                              required={i === 0}
+                              checked={on}
+                              onChange={() => setTrade(t)}
+                              className="peer absolute inset-0 cursor-pointer opacity-0"
+                            />
+                            <span
+                              className={cn(
+                                "flex items-center gap-2 rounded-full border px-4 py-2.5 text-[14.5px] transition-[background-color,border-color,color,box-shadow] duration-300 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent",
+                                on
+                                  ? "border-signal bg-signal text-white"
+                                  : "border-paper/12 bg-ink/50 text-paper/80 hover:border-paper/30 hover:text-paper"
+                              )}
+                            >
+                              <AnimatePresence initial={false}>
+                                {on && (
+                                  <motion.span
+                                    initial={{ width: 0, opacity: 0 }}
+                                    animate={{ width: "auto", opacity: 1 }}
+                                    exit={{ width: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: EASE }}
+                                    className="overflow-hidden"
+                                  >
+                                    <Check className="size-3.5" strokeWidth={3} />
+                                  </motion.span>
+                                )}
+                              </AnimatePresence>
+                              {t}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+
+                  <Field label={CONTACT.fields.message} icon={MessageSquareText} done={filled.zprava}>
+                    <textarea required name="zprava" rows={4} placeholder={CONTACT.fields.messagePlaceholder} className={`${inputCls} block resize-none`} />
+                  </Field>
+
+                  <motion.button
+                    type="submit"
+                    disabled={state === "sending"}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={cn(
+                      "group relative mt-1 flex items-center justify-center gap-3 overflow-hidden rounded-2xl bg-signal py-5 text-[17px] font-semibold text-white transition-colors duration-300 hover:bg-accent disabled:opacity-70",
+                      ready && "bg-accent"
+                    )}
+                  >
+                    {/* once everything required is filled, a light starts running round the button */}
+                    {ready && <ShineBorder width={1.5} duration={4} />}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-[shine_0.9s_ease]"
+                    />
+                    {state === "sending" ? (
+                      <>
+                        <Loader2 className="size-5 animate-spin" />
+                        {CONTACT.fields.sending}
+                      </>
+                    ) : (
+                      <>
+                        {CONTACT.fields.submit}
+                        <Send className="size-4.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-1" strokeWidth={2.5} />
+                      </>
+                    )}
+                  </motion.button>
+                  <p className="text-center text-[13px] leading-relaxed text-mute">
+                    {privacyNoteParts[0]}
+                    <a href="/ochrana-osobnich-udaju.html" target="_blank" rel="noopener" className="underline underline-offset-4 transition-colors hover:text-accent">
+                      {privacyLinkText}
+                    </a>
+                    {privacyNoteParts[1]}
+                  </p>
+                  {state === "error" && (
+                    <p role="alert" className="text-center text-[14px] text-accent">
+                      {CONTACT.fields.error}
+                    </p>
+                  )}
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

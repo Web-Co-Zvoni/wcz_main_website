@@ -1,98 +1,66 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { Plus } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, Mail } from "lucide-react";
+import { useRef } from "react";
 import { FAQ, SITE } from "../content";
-import { cn } from "../utils/cn";
-import { EASE, Reveal, SectionHead } from "./ui";
+import { cz } from "../utils/typo";
+import ScrollStack, { ScrollStackItem } from "./fx/ScrollStack";
+import { Button, Reveal } from "./ui";
 
 export default function Faq() {
-  const [open, setOpen] = useState<number | null>(0);
-
+  const asideRef = useRef<HTMLDivElement>(null);
   return (
-    <section id="faq" className="relative py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <div className="grid gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-5">
-            <SectionHead
-              index="07"
-              eyebrow={FAQ.eyebrow}
-              titleClassName="lg:text-[clamp(2rem,3.35vw,3.2rem)]"
-              title={
-                <>
-                  {FAQ.titleLead}
-                  <br />
-                  <span className="text-accent">{FAQ.titleAccent}</span>
-                </>
-              }
-            />
-            <Reveal delay={0.2}>
-              <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-mute">
-                {FAQ.intro}
-              </p>
+    <section id="faq" className="relative py-28 md:py-40">
+      <div className="mx-auto grid max-w-[88rem] gap-14 px-4 md:grid-cols-12 md:gap-10 md:px-8">
+        {/* held level with the deck by ScrollStack, so the two let go together */}
+        <div className="md:col-span-5">
+          <div ref={asideRef} className="will-change-transform">
+            <Reveal>
+              <h2 className="display max-w-[11ch] text-[clamp(2.6rem,5vw,5.6rem)] leading-[0.98]">{cz(FAQ.title)}</h2>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="mt-10 text-[clamp(1.05rem,1.3vw,1.3rem)] text-paper/70">{FAQ.more}</p>
               <a
-                href={`tel:${SITE.phoneLink}`}
-                className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-paper/15 px-6 py-3.5 text-[14px] font-bold transition-all duration-300 hover:border-accent/60 hover:text-accent"
+                href={`mailto:${SITE.email}`}
+                className="group mt-4 inline-flex items-center gap-3.5 text-paper transition-colors hover:text-accent"
               >
-                {SITE.phone}
+                <span className="grid size-11 place-items-center rounded-full border border-paper/15 text-accent transition-colors duration-300 group-hover:border-accent/60">
+                  <Mail className="size-4.5" />
+                </span>
+                <span className="display-soft text-[clamp(1.25rem,1.7vw,1.7rem)]">{SITE.email}</span>
               </a>
+              <div className="mt-8">
+                <Button href="#kontakt" size="lg" className="xl:px-9 xl:py-5 xl:text-[17px]">
+                  {FAQ.formCta}
+                  <ArrowRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
+                </Button>
+              </div>
             </Reveal>
           </div>
-
-          <div className="lg:col-span-7">
-            <div className="flex flex-col divide-y divide-paper/10 border-y border-paper/10">
-              {FAQ.items.map((f, i) => {
-                const isOpen = open === i;
-                return (
-                  <Reveal key={f.question} delay={i * 0.05}>
-                    <div>
-                      <button
-                        onClick={() => setOpen(isOpen ? null : i)}
-                        className="group flex w-full items-center justify-between gap-6 py-6 text-left"
-                      >
-                        <span className="flex items-baseline gap-4">
-                          <span className="font-mono text-[11px] text-accent">0{i + 1}</span>
-                          <span
-                            className={cn(
-                              "stretch text-lg font-extrabold tracking-tight transition-colors duration-300 md:text-xl",
-                              isOpen ? "text-accent" : "text-paper group-hover:text-accent"
-                            )}
-                          >
-                            {f.question}
-                          </span>
-                        </span>
-                        <span
-                          className={cn(
-                            "grid size-9 shrink-0 place-items-center rounded-full border transition-all duration-400",
-                            isOpen
-                              ? "rotate-45 border-accent bg-accent text-ink"
-                              : "border-paper/15 text-mute group-hover:border-accent/50 group-hover:text-accent"
-                          )}
-                        >
-                          <Plus className="size-4.5" strokeWidth={2.5} />
-                        </span>
-                      </button>
-                      <AnimatePresence initial={false}>
-                        {isOpen && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.45, ease: EASE }}
-                            className="overflow-hidden"
-                          >
-                            <p className="max-w-2xl pb-7 pl-8 text-[15px] leading-relaxed text-mute">
-                              {f.answer}
-                            </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </Reveal>
-                );
-              })}
-            </div>
-          </div>
         </div>
+
+        {/* the answers pile up into a deck as you scroll */}
+        <ScrollStack className="md:col-span-7" itemDistance={56} itemStackDistance={26} itemScale={0.025} baseScale={0.88} stackPosition="center" lift={0.06} asideRef={asideRef} scaleEndPosition={0.09}>
+          {FAQ.items.map((f, i) => (
+            <ScrollStackItem key={f.question} className="rounded-[32px]">
+              <article className="group/card relative flex min-h-[clamp(300px,36vh,360px)] flex-col rounded-[32px] border border-paper/[0.09] bg-[linear-gradient(160deg,#25212a,#19171a_70%)] p-8 shadow-[0_-24px_60px_-28px_rgba(0,0,0,0.95)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.025] xl:p-11">
+                {/* light running round the border: full on the card being read or hovered, faint on the rest */}
+                <span aria-hidden className="orbit-glow opacity-0 transition-opacity duration-700 group-hover/card:opacity-70 group-data-[active=true]/stack:opacity-60">
+                  <span className="orbit-ring" />
+                </span>
+                <span aria-hidden className="orbit-ring opacity-20 transition-opacity duration-700 group-hover/card:opacity-100 group-data-[active=true]/stack:opacity-100" />
+                <div className="flex items-center justify-between">
+                  <span className="grid size-11 place-items-center rounded-full border border-accent/40 text-[14px] font-bold tabular-nums text-accent">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-[13px] tabular-nums text-mute">
+                    {i + 1} / {FAQ.items.length}
+                  </span>
+                </div>
+                <h3 className="display mt-auto pt-10 text-[clamp(1.6rem,2.3vw,2.4rem)] leading-[1.06]">{cz(f.question)}</h3>
+                <p className="mt-4 max-w-[54ch] text-[clamp(1.02rem,1.2vw,1.2rem)] leading-relaxed text-paper/65">{cz(f.answer)}</p>
+              </article>
+            </ScrollStackItem>
+          ))}
+        </ScrollStack>
       </div>
     </section>
   );
