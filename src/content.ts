@@ -29,8 +29,8 @@ export const SETTINGS = {
 };
 
 /**
- * Detail pages the niche cards and concept cards click through to. The pages themselves come
- * later — until then these links lead nowhere (404).
+ * Detail pages the niche cards and concept cards click through to. Niche pages are generated at
+ * build time from NICHES + NICHE_PAGES (see vite.config.ts); concept pages come later (404 until then).
  */
 export const ROUTES = {
   niche: (slug: string) => `/obory/${slug}/`,
@@ -86,6 +86,158 @@ export const NICHES = {
     { slug: "autoservisy", name: "Autoservisy", group: "Řemesla", icon: "car", src: nichePhoto(3807517), alt: "Automechanik kontroluje motor" },
     { slug: "hotely-a-penziony", name: "Hotely a penziony", group: "Ubytování", icon: "bed", src: nichePhoto(5883728), alt: "Pokoj v penzionu s manželskou postelí" },
   ],
+};
+
+/** Shared copy for the niche detail pages (/obory/<slug>/) */
+export const NICHE_PAGE = {
+  home: "Úvod",
+  section: "Pro koho pracujeme",
+  photoNote: "Fotka je ilustrační.",
+  primaryCta: "Chci návrh zdarma",
+  searchKicker: "Lokální SEO",
+  searchTitle: "Takhle vás zákazníci hledají",
+  searchNote: "Na tyhle dotazy chceme, aby Google ukázal vás — ne konkurenci.",
+  needsKicker: "Co na webu bude",
+  needsTitle: "Co na webu nesmí chybět",
+  processKicker: "Postup",
+  priceLead: "Weby od",
+  priceNote: "jednorázově, cena vždy předem",
+  priceLink: "Celý ceník",
+  othersTitle: "Pracujeme i pro",
+  /** <title> and meta description of each page, built from its heading */
+  metaTitle: (heading: string) => `${heading} — Plzeň a okolí · webcozvoni.cz`,
+  metaDescription: (heading: string) =>
+    `${heading} z Plzně a okolí. Návrh do 72 hodin zdarma, spuštění do 14 dnů, jednorázová cena předem.`,
+};
+
+/**
+ * One detail page per NICHES item, keyed by slug. `trade` preselects the matching chip in the
+ * contact form (one of CONTACT.trades).
+ */
+export const NICHE_PAGES: Record<
+  string,
+  { heading: string; lead: string; trade: string; searches: string[]; needs: { title: string; text: string }[] }
+> = {
+  elektrikari: {
+    heading: "Weby pro elektrikáře",
+    lead: "Když někomu vypadnou jističe, nehledá dlouho. Zavolá prvnímu elektrikáři, kterého najde v telefonu a kterému věří. Postavíme web, aby to byl váš.",
+    trade: "Elektroinstalace",
+    searches: ["elektrikář plzeň", "elektrikář pohotovost", "revize elektro rokycany", "výměna rozvaděče cena"],
+    needs: [
+      { title: "Telefon na prvním místě", text: "Tlačítko Zavolat vidí zákazník hned po otevření webu, i na malém displeji." },
+      { title: "Revize a oprávnění", text: "Osvědčení a typy revizí přehledně na jednom místě. Firmy a SVJ to hledají jako první." },
+      { title: "Oblast výjezdu", text: "Mapa a seznam obcí, kam jezdíte. Ať vám nevolají lidé z druhého konce kraje." },
+      { title: "Poptávka s fotkou", text: "Zákazník nafotí rozvaděč nebo závadu a pošle ji formulářem. Víte, co vézt, ještě než vyjedete." },
+    ],
+  },
+  fotovoltaika: {
+    heading: "Weby pro fotovoltaiku",
+    lead: "Elektrárna na střechu je velký nákup a lidé srovnávají nabídky týdny. Web jim musí vysvětlit, kolik to stojí, kolik ušetří a proč právě vy.",
+    trade: "Jiné řemeslo",
+    searches: ["fotovoltaika plzeň", "fotovoltaika na klíč cena", "dotace na fotovoltaiku", "baterie k fotovoltaice"],
+    needs: [
+      { title: "Kalkulačka návratnosti", text: "Spotřeba, plocha střechy a orientační cena. Zákazník si udělá obrázek sám a vám pošle hotové údaje." },
+      { title: "Dotace srozumitelně", text: "Co pokryje Nová zelená úsporám a co vyřídíte za zákazníka. Bez úředního jazyka." },
+      { title: "Realizace s čísly", text: "Fotky hotových střech s výkonem v kWp a typem střídače. Řeknou o kvalitě víc než odstavec textu." },
+      { title: "Poptávka krok za krokem", text: "Pár otázek místo dlouhého formuláře. Dostanete poptávky, se kterými se dá rovnou počítat." },
+    ],
+  },
+  "instalateri-a-topenari": {
+    heading: "Weby pro instalatéry a topenáře",
+    lead: "Teče voda, nejde topení. Zákazník chce vědět jen tři věci: kdy přijedete, kolik to zhruba bude a na jaké číslo volat.",
+    trade: "Instalatérství · voda · topení",
+    searches: ["instalatér plzeň", "havárie vody plzeň", "servis kotle", "výměna radiátorů cena"],
+    needs: [
+      { title: "Havarijní linka", text: "Velké tlačítko pro havárie a jasně napsané, kdy jezdíte. Volají ti, kdo vás opravdu potřebují." },
+      { title: "Ceník běžných prací", text: "Výjezd, výměna baterie, servis kotle. Orientační ceny ušetří vám i zákazníkovi zbytečné telefonáty." },
+      { title: "Servis kotlů na termín", text: "Pravidelné prohlídky si lidé zarezervují sami v kalendáři. Žádné domlouvání přes SMS." },
+      { title: "Značky, které servisujete", text: "Seznam výrobců kotlů a ohřívačů. Lidé často hledají přímo podle značky." },
+    ],
+  },
+  "tepelna-cerpadla-a-klimatizace": {
+    heading: "Weby pro tepelná čerpadla a klimatizace",
+    lead: "Zákazník řeší, jestli se mu čerpadlo vyplatí a jestli nebude klimatizace hlučná. Web, který na to odpoví dřív než konkurence, získá zakázku.",
+    trade: "Jiné řemeslo",
+    searches: ["tepelné čerpadlo plzeň", "klimatizace do bytu cena", "servis tepelného čerpadla", "tepelné čerpadlo dotace"],
+    needs: [
+      { title: "Srovnání řešení", text: "Vzduch–voda, země–voda, split klimatizace. Krátce a lidsky, ať zákazník ví, na co se ptát." },
+      { title: "Servisní smlouvy", text: "Pravidelný servis jako služba s cenou. Stálí zákazníci a práce i mimo sezónu." },
+      { title: "Sezónní nabídky", text: "Na jaře klimatizace, na podzim topení. Úvodní stranu přepnete jedním kliknutím." },
+      { title: "Poptávka s parametry", text: "Velikost domu, současné topení, rozpočet. Na první schůzku přijedete připravení." },
+    ],
+  },
+  "tesari-a-truhlari": {
+    heading: "Weby pro tesaře a truhláře",
+    lead: "Práce ze dřeva se prodává očima. Kuchyň, pergola nebo krov — zákazník chce vidět, co umíte, a pak se ozve s vlastní představou.",
+    trade: "Truhlářství · stolářství",
+    searches: ["truhlář plzeň", "kuchyně na míru plzeň", "pergola na zakázku", "tesař krov cena"],
+    needs: [
+      { title: "Galerie, která prodává", text: "Velké fotky hotových prací roztříděné podle typu: kuchyně, schody, pergoly, krovy." },
+      { title: "Výroba krok za krokem", text: "Od zaměření přes návrh po montáž. Zákazník ví, co ho čeká a jak dlouho to potrvá." },
+      { title: "Poptávka s nákresem", text: "Formulář, kam zákazník nahraje fotku místa nebo vlastní skicu s rozměry." },
+      { title: "Materiály a dřeviny", text: "Masiv, dýha, lamino. Krátké vysvětlení vám ušetří hodinu na schůzce." },
+    ],
+  },
+  "okna-a-dvere": {
+    heading: "Weby pro okna a dveře",
+    lead: "Okna se mění jednou za dvacet let, takže zákazník neví, na co se ptát. Web, který ho výběrem provede, si od něj vyslouží poptávku.",
+    trade: "Jiné řemeslo",
+    searches: ["plastová okna plzeň", "výměna oken cena", "vchodové dveře na míru", "seřízení oken"],
+    needs: [
+      { title: "Průvodce výběrem", text: "Plast, dřevo, hliník. Profily, skla, kování — srozumitelně a s obrázky." },
+      { title: "Poptávka podle rozměrů", text: "Počet oken a rozměry rovnou ve formuláři. Nabídku pošlete bez zbytečného volání." },
+      { title: "Vzorkovna na mapě", text: "Adresa, mapa a kdy jste na místě. Okna si lidé chtějí osahat." },
+      { title: "Servis a seřízení", text: "Samostatná stránka pro servis. Malé zakázky, ze kterých bývají velké." },
+    ],
+  },
+  "stavby-a-rekonstrukce": {
+    heading: "Weby pro stavby a rekonstrukce",
+    lead: "Rekonstrukce je pro zákazníka velký krok a velké peníze. Dřív než zavolá, chce vidět, že se na vás může spolehnout: fotky, postup, termíny.",
+    trade: "Stavebnictví · zednictví",
+    searches: ["rekonstrukce koupelny plzeň", "rekonstrukce bytu cena", "stavební firma plzeň", "zednické práce rokycany"],
+    needs: [
+      { title: "Před a po", text: "Srovnání fotek z vašich zakázek. Nejsilnější argument, který máte." },
+      { title: "Jasný postup", text: "Prohlídka, rozpočet, harmonogram, předání. Bez překvapení uprostřed práce." },
+      { title: "Stránka pro každý typ zakázky", text: "Koupelny, byty, domy, fasády. Google vás pak najde podle toho, co lidé opravdu hledají." },
+      { title: "Poptávka s fotkami", text: "Zákazník přiloží fotky a půdorys. Rozpočet uděláte rychleji a přesněji." },
+    ],
+  },
+  "strechy-a-fasady": {
+    heading: "Weby pro střechy a fasády",
+    lead: "Do střechy zatéká a zákazník potřebuje někoho, kdo přijede a nebude to šidit. Web mu má ukázat obojí: že jste rychlí a že to umíte.",
+    trade: "Stavebnictví · zednictví",
+    searches: ["pokrývač plzeň", "oprava střechy cena", "zateplení fasády plzeň", "klempíř plzeň"],
+    needs: [
+      { title: "Oprava zvlášť od nových střech", text: "Zatékání má vlastní tlačítko. Nové střechy a zateplení vlastní poptávku." },
+      { title: "Materiály a záruky", text: "Krytiny, systémy zateplení a jakou na ně dáváte záruku. Přehledně v jedné tabulce." },
+      { title: "Realizace z výšky i zblízka", text: "Fotky hotových střech i detailů. Kvalitu ukážou líp než jakýkoliv text." },
+      { title: "Dotace na zateplení", text: "Stručně, co se dá pokrýt z Nové zelené úsporám. Lidé to hledají dřív, než zavolají." },
+    ],
+  },
+  autoservisy: {
+    heading: "Weby pro autoservisy",
+    lead: "Řidič chce vědět, jestli jeho auto vezmete, kdy a za kolik. Když to najde na webu a rovnou se objedná, nemusí vám volat uprostřed práce.",
+    trade: "Autoservis",
+    searches: ["autoservis plzeň", "výměna oleje cena", "pneuservis plzeň", "příprava na stk"],
+    needs: [
+      { title: "Objednání na termín", text: "Online kalendář s volnými termíny. Zákazník si vybere sám, vy jen potvrdíte." },
+      { title: "Ceník základních úkonů", text: "Olej, brzdy, přezutí, klimatizace. Orientační ceny, které berou strach z účtu." },
+      { title: "Značky a specializace", text: "Na co jste nejlepší. Lidé hledají „servis škoda“ nebo „servis diesel“." },
+      { title: "Sezónní pneuservis", text: "Na jaře a na podzim vlastní stránka s objednáním přezutí. Fronta se rozloží sama." },
+    ],
+  },
+  "hotely-a-penziony": {
+    heading: "Weby pro hotely a penziony",
+    lead: "Z každé rezervace přes Booking platíte provizi. Vlastní web s rezervací přivede hosty napřímo — a ti se k vám vracejí.",
+    trade: "Malá firma · služby",
+    searches: ["penzion plzeň", "ubytování šumava", "hotel s parkováním plzeň", "ubytování pro firmy plzeň"],
+    needs: [
+      { title: "Rezervace bez provize", text: "Kalendář obsazenosti a rezervace přímo na webu. Dá se propojit i s Bookingem, aby se termíny nekřížily." },
+      { title: "Pokoje, které chcete vidět", text: "Velké fotky, vybavení a cena za noc. Každý pokoj přehledně na jednom místě." },
+      { title: "Okolí a výlety", text: "Co je kolem, kam na kolo, kde se najíst. Hosté to hledají a Google to má rád." },
+      { title: "Více jazyků", text: "Němčina a angličtina pro hosty z druhé strany hranice." },
+    ],
+  },
 };
 
 export const SERVICES = {

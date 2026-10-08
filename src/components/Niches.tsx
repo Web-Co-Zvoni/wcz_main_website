@@ -1,28 +1,15 @@
-import { AppWindow, BedDouble, Car, Fan, Hammer, HardHat, House, Sun, Wrench, Zap, type LucideIcon } from "lucide-react";
 import { NICHES, ROUTES } from "../content";
 import GrainyCarousel from "./fx/GrainyCarousel";
+import { NICHE_ICONS } from "./nicheIcons";
 import { Reveal } from "./ui";
 
 type Niche = (typeof NICHES.items)[number];
 
 const cards = NICHES.items.map((n) => ({ src: n.src, alt: n.alt, href: ROUTES.niche(n.slug) }));
 
-const ICONS: Record<Niche["icon"], LucideIcon> = {
-  zap: Zap,
-  wrench: Wrench,
-  hammer: Hammer,
-  hardhat: HardHat,
-  car: Car,
-  sun: Sun,
-  fan: Fan,
-  window: AppWindow,
-  house: House,
-  bed: BedDouble,
-};
-
 /** the HTML laid over each card in the canvas; data-hover comes from the carousel */
 function Caption({ n }: { n: Niche }) {
-  const Icon = ICONS[n.icon];
+  const Icon = NICHE_ICONS[n.icon];
   return (
     <div className="relative size-full">
       <span className="absolute left-3 top-3 grid size-9 place-items-center rounded-xl border border-paper/10 bg-ink/70 text-accent transition-colors duration-500 group-data-[hover=true]/cap:border-signal group-data-[hover=true]/cap:bg-signal group-data-[hover=true]/cap:text-white">
@@ -38,7 +25,7 @@ function Caption({ n }: { n: Niche }) {
 
 export default function Niches() {
   return (
-    <section aria-labelledby="niches-title" className="relative overflow-hidden pb-10 pt-20 md:pb-14 md:pt-24">
+    <section id="obory" aria-labelledby="niches-title" className="relative overflow-hidden pb-10 pt-20 md:pb-14 md:pt-24">
       <Reveal>
         <h2 id="niches-title" className="display text-center text-[clamp(1.8rem,2.8vw,3rem)] leading-none">
           {NICHES.title}

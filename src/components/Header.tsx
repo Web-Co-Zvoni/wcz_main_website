@@ -3,12 +3,13 @@ import { Menu, Phone, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { HEADER, NAV_LINKS, SITE } from "../content";
 import { cn } from "../utils/cn";
+import { homeLink } from "../utils/homeLink";
 import { BellMark, Button, EASE } from "./ui";
 
 /** `large` grows the mark on wide screens — the header's version; footer and menu keep the standard size */
 export function Logo({ className, large = false }: { className?: string; large?: boolean }) {
   return (
-    <a href="#top" className={cn("group flex items-center gap-2.5", large && "min-[1224px]:gap-3", className)} aria-label={SITE.domain}>
+    <a href={homeLink("#top")} className={cn("group flex items-center gap-2.5", large && "min-[1224px]:gap-3", className)} aria-label={SITE.domain}>
       <span
         className={cn(
           "relative grid size-11 place-items-center rounded-[0.75rem] bg-signal text-white shadow-[0_0_24px_-6px_var(--color-accent)] transition-shadow duration-500 group-hover:shadow-[0_0_32px_-2px_var(--color-accent)]",
@@ -31,7 +32,7 @@ export function Logo({ className, large = false }: { className?: string; large?:
 
 function NavLink({ href, label }: { href: string; label: string }) {
   return (
-    <a href={href} className="group relative px-1 py-2 text-[0.8438rem] font-medium text-mute transition-colors hover:text-paper lg:text-[0.9688rem] xl:text-[1.0625rem] min-[1224px]:text-[1.2188rem]">
+    <a href={homeLink(href)} className="group relative px-1 py-2 text-[0.8438rem] font-medium text-mute transition-colors hover:text-paper lg:text-[0.9688rem] xl:text-[1.0625rem] min-[1224px]:text-[1.2188rem]">
       {label}
       <span className="absolute inset-x-1 -bottom-0.5 h-px origin-center scale-x-0 bg-accent shadow-[0_0_8px_var(--color-accent)] transition-transform duration-300 group-hover:scale-x-100" />
     </a>
@@ -127,7 +128,7 @@ export default function Header() {
               {NAV_LINKS.map((l, i) => (
                 <motion.a
                   key={l.href}
-                  href={l.href}
+                  href={homeLink(l.href)}
                   onClick={() => setOpen(false)}
                   initial={{ opacity: 0, y: 28, filter: "blur(6px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}

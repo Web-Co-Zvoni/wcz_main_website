@@ -1,6 +1,7 @@
 import { ArrowUp } from "lucide-react";
 import { FOOTER, NAV_LINKS, SITE } from "../content";
 import { Logo } from "./Header";
+import { homeLink } from "../utils/homeLink";
 import { cz } from "../utils/typo";
 
 export default function Footer() {
@@ -15,7 +16,7 @@ export default function Footer() {
 
         <nav className="mt-9 flex flex-wrap justify-center gap-x-7 gap-y-3">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="text-[0.9062rem] font-medium text-paper/80 transition-colors hover:text-accent">
+            <a key={l.href} href={homeLink(l.href)} className="text-[0.9062rem] font-medium text-paper/80 transition-colors hover:text-accent">
               {l.label}
             </a>
           ))}

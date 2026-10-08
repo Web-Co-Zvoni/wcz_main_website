@@ -39,9 +39,10 @@ function Field({ label, icon: Icon, done, children }: { label: string; icon: Luc
 
 const REQUIRED = 4;
 
-export default function Contact() {
+/** `defaultTrade` preselects one of CONTACT.trades — the niche pages already know who is asking */
+export default function Contact({ defaultTrade = "" }: { defaultTrade?: string }) {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [trade, setTrade] = useState("");
+  const [trade, setTrade] = useState(defaultTrade);
   const [filled, setFilled] = useState({ jmeno: false, telefon: false, email: false, zprava: false });
   const done = [filled.jmeno, filled.telefon, trade !== "", filled.zprava].filter(Boolean).length;
   const ready = done === REQUIRED;
