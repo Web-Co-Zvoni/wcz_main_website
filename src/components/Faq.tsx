@@ -1,18 +1,21 @@
-import { ArrowRight, Mail } from "lucide-react";
-import { useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, Mail, Plus } from "lucide-react";
+import { useId, useState } from "react";
 import { FAQ, SITE } from "../content";
+import { cn } from "../utils/cn";
 import { cz } from "../utils/typo";
-import ScrollStack, { ScrollStackItem } from "./fx/ScrollStack";
-import { Button, Reveal } from "./ui";
+import { Button, EASE, Reveal } from "./ui";
 
 export default function Faq() {
-  const asideRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState<number | null>(0);
+  const uid = useId();
+
   return (
     <section id="faq" className="relative py-28 md:py-40">
       <div className="mx-auto grid max-w-[88rem] gap-14 px-4 md:grid-cols-12 md:gap-10 md:px-8">
-        {/* held level with the deck by ScrollStack, so the two let go together */}
-        <div className="md:col-span-5">
-          <div ref={asideRef} className="will-change-transform">
+        {/* the heading sits level with the middle of the questions */}
+        <div className="md:col-span-5 md:flex md:items-center">
+          <div>
             <Reveal>
               <h2 className="display max-w-[11ch] text-[clamp(2.6rem,5vw,5.6rem)] leading-[0.98]">{cz(FAQ.title)}</h2>
             </Reveal>
@@ -37,30 +40,68 @@ export default function Faq() {
           </div>
         </div>
 
-        {/* the answers pile up into a deck as you scroll */}
-        <ScrollStack className="md:col-span-7" itemDistance={56} itemStackDistance={26} itemScale={0.025} baseScale={0.88} stackPosition="center" lift={0.06} asideRef={asideRef} scaleEndPosition={0.09}>
-          {FAQ.items.map((f, i) => (
-            <ScrollStackItem key={f.question} className="rounded-[2rem]">
-              <article className="group/card relative flex min-h-[clamp(18.75rem,36vh,22.5rem)] flex-col rounded-[2rem] border border-paper/[0.09] bg-[linear-gradient(160deg,#25212a,#19171a_70%)] p-8 shadow-[0_-24px_60px_-28px_rgba(0,0,0,0.95)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.025] xl:p-11">
-                {/* light running round the border: full on the card being read or hovered, faint on the rest */}
-                <span aria-hidden className="orbit-glow opacity-0 transition-opacity duration-700 group-hover/card:opacity-70 group-data-[active=true]/stack:opacity-60">
-                  <span className="orbit-ring" />
-                </span>
-                <span aria-hidden className="orbit-ring opacity-20 transition-opacity duration-700 group-hover/card:opacity-100 group-data-[active=true]/stack:opacity-100" />
-                <div className="flex items-center justify-between">
-                  <span className="grid size-11 place-items-center rounded-full border border-accent/40 text-[0.875rem] font-bold tabular-nums text-accent">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-[0.8125rem] tabular-nums text-mute">
-                    {i + 1} / {FAQ.items.length}
-                  </span>
+        <div className="border-b border-paper/[0.09] md:col-span-7">
+          {FAQ.items.map((f, i) => {
+            const isOpen = open === i;
+            const panelId = `${uid}-a${i}`;
+            return (
+              <Reveal key={f.question} delay={i * 0.04} y={18}>
+                <div className="group relative border-t border-paper/[0.09]">
+                  {/* a red line runs out along the rule on hover, and stays while open */}
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "absolute inset-x-0 -top-px h-px origin-left bg-gradient-to-r from-accent via-accent to-transparent transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                      isOpen ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                    )}
+                  />
+                  <h3>
+                    <button
+                      onClick={() => setOpen(isOpen ? null : i)}
+                      aria-expanded={isOpen}
+                      aria-controls={panelId}
+                      className="flex w-full items-center gap-6 py-8 text-left focus-visible:outline-offset-4"
+                    >
+                      <span
+                        className={cn(
+                          "display-soft flex-1 text-[clamp(1.25rem,1.75vw,1.75rem)] leading-snug transition-[color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                          isOpen ? "translate-x-2 text-paper" : "text-paper/75 group-hover:translate-x-2 group-hover:text-paper"
+                        )}
+                      >
+                        {cz(f.question)}
+                      </span>
+                      <span
+                        className={cn(
+                          "grid size-11 shrink-0 place-items-center rounded-full border transition-[transform,background-color,border-color,color,box-shadow] duration-500",
+                          isOpen
+                            ? "rotate-45 border-signal bg-signal text-white shadow-[0_0.5rem_1.5rem_-0.375rem_rgba(255,59,71,0.8)]"
+                            : "border-paper/15 text-mute group-hover:border-accent/60 group-hover:text-accent"
+                        )}
+                      >
+                        <Plus className="size-5" strokeWidth={2.2} />
+                      </span>
+                    </button>
+                  </h3>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        id={panelId}
+                        role="region"
+                        initial={{ height: 0, opacity: 0, filter: "blur(6px)" }}
+                        animate={{ height: "auto", opacity: 1, filter: "blur(0px)" }}
+                        exit={{ height: 0, opacity: 0, filter: "blur(6px)" }}
+                        transition={{ duration: 0.55, ease: EASE }}
+                        className="overflow-hidden"
+                      >
+                        <p className="max-w-[58ch] pb-9 pl-2 text-[clamp(1.02rem,1.2vw,1.2rem)] leading-relaxed text-paper/65">{cz(f.answer)}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-                <h3 className="display mt-auto pt-10 text-[clamp(1.6rem,2.3vw,2.4rem)] leading-[1.06]">{cz(f.question)}</h3>
-                <p className="mt-4 max-w-[54ch] text-[clamp(1.02rem,1.2vw,1.2rem)] leading-relaxed text-paper/65">{cz(f.answer)}</p>
-              </article>
-            </ScrollStackItem>
-          ))}
-        </ScrollStack>
+              </Reveal>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

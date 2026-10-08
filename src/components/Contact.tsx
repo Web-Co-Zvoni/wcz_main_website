@@ -5,7 +5,6 @@ import type { FormEvent, ReactNode } from "react";
 import { CONTACT, SITE } from "../content";
 import { cn } from "../utils/cn";
 import { cz } from "../utils/typo";
-import GlowFrame from "./fx/GlowFrame";
 import { EASE, Reveal, ShineBorder } from "./ui";
 
 const inputCls =
@@ -98,7 +97,7 @@ export default function Contact() {
                 whileHover={{ y: -3 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                className="group relative mt-3 inline-flex items-center gap-5 rounded-[1.375rem] border border-paper/12 bg-coal/80 py-4 pl-4 pr-6 text-paper transition-colors duration-300 hover:border-accent/50"
+                className="group relative mt-3 inline-flex items-center gap-5 rounded-[1.375rem] border border-paper/12 bg-[#0b0a0c]/80 py-4 pl-4 pr-6 text-paper transition-colors duration-300 hover:border-accent/50"
               >
                 <span className="grid size-14 place-items-center rounded-2xl bg-signal text-white">
                   <Mail className="size-6" />
@@ -116,9 +115,10 @@ export default function Contact() {
         </div>
 
         <Reveal delay={0.1} className="md:col-span-7">
-          <div className="relative rounded-[2rem] border border-paper/10 bg-coal p-6 shadow-[0_60px_120px_-60px_rgba(0,0,0,0.9)] md:p-11">
-            {/* two lights glowing out of the frame from opposite corners, moving on now and then */}
-            <GlowFrame radius={32} />
+          <div className="relative rounded-[2rem] border border-paper/10 bg-[#0b0a0c] p-6 shadow-[0_60px_120px_-60px_rgba(0,0,0,0.9)] md:p-11">
+            {/* two lights circling the frame in opposite directions */}
+            <span className="duo-ring" aria-hidden />
+            <span className="duo-ring duo-ring--reverse" aria-hidden />
             {/* a faint dot grid fading in from the top corner */}
             <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
               <span className="absolute inset-0 bg-[radial-gradient(rgba(244,239,236,0.09)_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_70%_60%_at_100%_0%,#000,transparent)]" />

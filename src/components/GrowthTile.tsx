@@ -108,8 +108,8 @@ export default function GrowthTile({ className }: { className?: string }) {
   };
 
   return (
-    <BentoCard className={className}>
-      <div ref={ref} className="relative flex min-h-[27.5rem] flex-col">
+    <BentoCard edge="bright" className={className}>
+      <div ref={ref} className="relative flex min-h-[28.5rem] flex-col">
         {/* ---- chart, filling the right of the card behind the copy ---- */}
         <div className="absolute inset-y-0 right-0 w-[64%]">
           <div className="absolute inset-0 bg-[linear-gradient(to_left,rgba(255,59,71,0.12),transparent_75%)]" />
@@ -274,7 +274,7 @@ export default function GrowthTile({ className }: { className?: string }) {
         </div>
 
         {/* ---- footer ---- */}
-        <div className="relative z-10 flex items-center justify-between gap-4 border-t border-paper/[0.07] bg-[#19171a] px-8 py-4 text-[0.875rem] xl:px-11">
+        <div className="relative z-10 flex items-center justify-between gap-4 border-t border-paper/[0.07] bg-[#0d0c0e] px-8 py-4 text-[0.875rem] xl:px-11">
           <p>
             <span className="font-semibold text-accent">
               {s.step >= 0 ? "+" : "−"}

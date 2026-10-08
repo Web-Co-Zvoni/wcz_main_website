@@ -20,8 +20,8 @@ export default function Pricing() {
                 className={cn(
                   "relative mx-auto flex h-full max-w-md flex-col items-center rounded-[1.75rem] px-8 pb-9 pt-11 text-center lg:max-w-none xl:px-12 xl:pb-12 xl:pt-14",
                   p.featured
-                    ? "bg-gradient-to-b from-accent/[0.14] via-card to-ink shadow-[0_40px_100px_-40px_rgba(255,59,71,0.6)] lg:py-16 xl:py-20"
-                    : "border border-paper/10 bg-coal/60"
+                    ? "bg-gradient-to-b from-accent/[0.14] via-[#120e11] to-[#0a090b] shadow-[0_40px_100px_-40px_rgba(255,59,71,0.6)] lg:py-16 xl:py-20"
+                    : "border border-paper/10 bg-[#0b0a0c]/80"
                 )}
               >
                 {p.featured && (

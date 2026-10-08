@@ -104,7 +104,7 @@ const VISUALS = [CallVisual, DraftVisual, LaunchVisual, RingVisual];
 function Milestone({ s, i, lit }: { s: (typeof PROCESS.steps)[number]; i: number; lit: boolean }) {
   const Visual = VISUALS[i];
   return (
-    <BentoCard as="li" delay={0.08 * i} className={cn("transition-[border-color] duration-700", lit && "border-accent/30")}>
+    <BentoCard as="li" delay={0.08 * i} edge="bright" className={cn("transition-[border-color] duration-700", lit && "border-accent/30")}>
       <div className="flex h-full min-h-[25rem] flex-col px-7 pb-8 pt-[4.75rem] xl:px-8">
         <div className="flex h-[6rem] items-center">
           <Visual lit={lit} />
@@ -139,7 +139,7 @@ function GuaranteeTile() {
   }, [inView, reduce]);
 
   return (
-    <BentoCard tone="signal" delay={0.1} className="md:col-span-2">
+    <BentoCard tone="signal" delay={0.1} edge="bright" className="md:col-span-2">
       <ShineBorder width={1.5} duration={9} colors={["rgba(255,120,128,0.8)"]} />
       <div className="relative flex h-full flex-col justify-between gap-8 p-8 lg:flex-row lg:items-end xl:p-11">
         <div className="min-w-0">
@@ -159,7 +159,7 @@ function GuaranteeTile() {
 
 function TitleTile() {
   return (
-    <BentoCard className="md:col-span-2">
+    <BentoCard edge="bright" className="md:col-span-2">
       <div className="relative flex h-full min-h-[21.25rem] flex-col justify-end p-8 xl:p-11">
         {/* a wire with light running along it — the road from the call to the site */}
         <svg aria-hidden viewBox="0 0 600 160" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 top-6 h-[6rem] w-full">

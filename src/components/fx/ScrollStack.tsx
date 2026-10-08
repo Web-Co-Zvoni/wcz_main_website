@@ -8,7 +8,7 @@
  * their own maths. Cards further back in the deck dim instead of blurring (cheaper).
  */
 import { useReducedMotion } from "framer-motion";
-import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useLayoutEffect, useRef, useSyncExternalStore, type ReactNode, type RefObject } from "react";
 import { cn } from "../../utils/cn";
 import { remScale } from "../../utils/remScale";
 
@@ -53,7 +53,22 @@ type Props = {
   dimAmount?: number;
   /** extra scroll, as viewport heights, the finished deck stays pinned for */
   hold?: number;
+  /** only stack under this media query; otherwise the cards just sit in the flow */
+  media?: string;
 };
+
+function useMedia(query?: string) {
+  return useSyncExternalStore(
+    (cb) => {
+      if (!query) return () => {};
+      const mq = window.matchMedia(query);
+      mq.addEventListener("change", cb);
+      return () => mq.removeEventListener("change", cb);
+    },
+    () => (query ? window.matchMedia(query).matches : true),
+    () => true
+  );
+}
 
 /** document offset from layout alone — ignores transforms, unlike getBoundingClientRect */
 const docTop = (el: HTMLElement) => {
@@ -82,10 +97,11 @@ export default function ScrollStack({
   minTop = 110,
   lift = 0,
   asideRef,
+  media,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotion() || !useMedia(media);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -100,6 +116,8 @@ export default function ScrollStack({
     });
     if (reduce) {
       cards.forEach((c) => (c.style.transform = ""));
+      shades.forEach((s) => s && (s.style.opacity = "0"));
+      if (asideRef?.current) asideRef.current.style.transform = "";
       return;
     }
 

@@ -89,7 +89,7 @@ export default function Header() {
               </span>
               {SITE.phone}
             </a>
-            <Button href="#kontakt" className="hidden px-7 py-4 text-[1rem] lg:inline-flex min-[1224px]:px-9 min-[1224px]:py-5 min-[1224px]:text-[1.1562rem]">
+            <Button href="#kontakt" className="hidden px-6 py-3.5 text-[0.9375rem] lg:inline-flex min-[1224px]:px-8 min-[1224px]:py-[1.125rem] min-[1224px]:text-[1.0625rem]">
               {HEADER.offerCta}
             </Button>
             <button

@@ -1,47 +1,29 @@
 import { useInView } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import { useRef } from "react";
 import { SERVICE_DEMOS, SERVICES } from "../content";
 import { cn } from "../utils/cn";
 import { cz } from "../utils/typo";
 import { BentoCard } from "./Bento";
+import ScrollStack, { ScrollStackItem } from "./fx/ScrollStack";
 import GrowthTile from "./GrowthTile";
 import { SERVICE_DEMO_COMPONENTS } from "./ServiceDemos";
-import { Button, Reveal } from "./ui";
+import { PrimaryCta } from "./HeroCtas";
+import { Reveal } from "./ui";
 
 type Service = (typeof SERVICES.items)[number];
 
-/**
- * Two rows that swap their wide and narrow tiles, and a light falling into each from above —
- * red, with a white core here and there, so no two tiles are lit the same.
- */
-const TILES: Record<Service["demo"], { span: string; wide: boolean; light: string }> = {
-  web: {
-    span: "lg:col-span-5",
-    wide: false,
-    light:
-      "radial-gradient(ellipse 30% 38% at 50% 0%, rgba(255,255,255,0.16), transparent 70%), radial-gradient(ellipse 65% 60% at 50% 0%, rgba(255,59,71,0.34), transparent 72%)",
-  },
-  seo: {
-    span: "lg:col-span-7",
-    wide: true,
-    light:
-      "radial-gradient(ellipse 45% 60% at 50% 0%, rgba(255,59,71,0.3), transparent 72%), radial-gradient(ellipse 60% 70% at 85% 0%, rgba(255,255,255,0.07), transparent 70%)",
-  },
-  booking: {
-    span: "lg:col-span-7",
-    wide: true,
-    light:
-      "radial-gradient(ellipse 40% 55% at 30% 0%, rgba(255,59,71,0.3), transparent 72%), radial-gradient(ellipse 25% 40% at 50% 0%, rgba(255,255,255,0.12), transparent 70%)",
-  },
-  care: {
-    span: "lg:col-span-5",
-    wide: false,
-    // a ring of light behind the chat
-    light:
-      "radial-gradient(circle at 50% 42%, transparent 18%, rgba(255,59,71,0.22) 27%, rgba(255,255,255,0.06) 31%, transparent 46%), radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,59,71,0.18), transparent 70%)",
-  },
+/** two rows that swap their wide and narrow tiles */
+const TILES: Record<Service["demo"], { span: string; wide: boolean }> = {
+  web: { span: "lg:col-span-5", wide: false },
+  seo: { span: "lg:col-span-7", wide: true },
+  booking: { span: "lg:col-span-7", wide: true },
+  care: { span: "lg:col-span-5", wide: false },
 };
+
+/** the bento's two rows, each a card of the deck */
+const ROWS = [SERVICES.items.slice(0, 2), SERVICES.items.slice(2)];
+/** each card of the deck casts a shadow up onto the one it slides over */
+const DECK_SHADOW = "shadow-[0_-1.5rem_3.75rem_-1.75rem_rgba(0,0,0,0.95)]";
 
 /** a dim panel set back on either side of the demo, so the wide tiles read as a scene */
 function Ghost({ side }: { side: "left" | "right" }) {
@@ -68,10 +50,10 @@ function ServiceTile({ s, i }: { s: Service; i: number }) {
   const Demo = SERVICE_DEMO_COMPONENTS[s.demo];
   const tile = TILES[s.demo];
 
+  // near-black face, darker than the page; the caption fade below ends in its bottom colour
   return (
-    <BentoCard delay={0.08 * i} className={cn("bg-[#121013]", tile.span)}>
+    <BentoCard delay={0.08 * i} edge="bright" dots={0.12} className={cn("border-accent/15 bg-[linear-gradient(180deg,#0f0d10,#0a090b_70%)]", tile.span)}>
       <div ref={ref} className="relative h-[30rem]">
-        <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: tile.light }} />
         {tile.wide && (
           <>
             <Ghost side="left" />
@@ -88,7 +70,7 @@ function ServiceTile({ s, i }: { s: Service; i: number }) {
           <Demo active={live} />
         </div>
 
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-b from-transparent via-[#121013]/90 to-[#121013]" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-b from-transparent via-[#0a090b]/90 to-[#0a090b]" />
         <p className="absolute inset-x-7 bottom-7 z-10 max-w-[44ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-snug text-paper/60">
           <strong className="font-semibold text-paper">{s.title}</strong> {cz(s.text)}
         </p>
@@ -111,22 +93,38 @@ export default function Services() {
             </Reveal>
           </div>
           <Reveal delay={0.16}>
-            <Button href="#kontakt" size="lg" shine className="xl:px-9 xl:py-5 xl:text-[1.0625rem]">
+            <PrimaryCta href="#kontakt" className="xl:px-9 xl:py-5 xl:text-[1.0625rem]">
               {SERVICES.outroCta}
-              <ArrowRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
-            </Button>
+            </PrimaryCta>
           </Reveal>
         </div>
 
-        <div className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-12">
-          {SERVICES.items.map((s, i) => (
-            <ServiceTile key={s.demo} s={s} i={i} />
+        {/* scrolling on, the rows pile up into a deck — the second over the first, then the chart tile over both */}
+        <ScrollStack
+          className="mt-14"
+          media="(min-width: 54.4rem)"
+          itemDistance={16}
+          itemStackDistance={26}
+          itemScale={0}
+          baseScale={1}
+          stackPosition="center"
+          lift={0.05}
+          hold={0}
+        >
+          {ROWS.map((row, r) => (
+            // no backing: the row behind shows through the gap between the two tiles
+            <ScrollStackItem key={r} className={cn("rounded-[1.75rem]", r > 0 && DECK_SHADOW)}>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12">
+                {row.map((s) => (
+                  <ServiceTile key={s.demo} s={s} i={SERVICES.items.indexOf(s)} />
+                ))}
+              </div>
+            </ScrollStackItem>
           ))}
-        </div>
-
-        <div className="mt-4">
-          <GrowthTile />
-        </div>
+          <ScrollStackItem className={cn("rounded-[1.75rem]", DECK_SHADOW)}>
+            <GrowthTile />
+          </ScrollStackItem>
+        </ScrollStack>
       </div>
     </section>
   );

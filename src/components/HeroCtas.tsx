@@ -8,6 +8,7 @@ import {
 } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { cn } from "../utils/cn";
 
 /** shared press feedback — a quick dip and a springy return */
 const PRESS = { scale: 0.965 };
@@ -49,7 +50,7 @@ function LaserOutline({ on }: { on: boolean }) {
  * Primary hero CTA: light orbiting the border (speeds up on hover), a slow breath
  * every few seconds; on hover it grows a touch, glows, a laser traces a white edge and light runs through the label.
  */
-export function PrimaryCta({ href, children }: { href: string; children: ReactNode }) {
+export function PrimaryCta({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
   const reduce = useReducedMotion();
   const [hover, setHover] = useState(false);
   const angle = useMotionValue(0);
@@ -75,7 +76,7 @@ export function PrimaryCta({ href, children }: { href: string; children: ReactNo
         speed.set(64);
         setHover(false);
       }}
-      className="group relative inline-flex items-center justify-center gap-2.5 rounded-xl bg-signal px-8 py-[1.125rem] text-[1.0312rem] xl:gap-3 xl:px-10 xl:py-[clamp(1.125rem,2.6vh,1.5rem)] xl:text-[clamp(1.0312rem,2.2vh,1.25rem)] font-semibold tracking-tight text-white shadow-[0_0_0_1px_rgba(255,59,71,0.5),0_10px_40px_-12px_rgba(255,59,71,0.8)] transition-shadow duration-500 hover:shadow-[0_0_0_1px_rgba(255,59,71,0.6),0_0_34px_-2px_rgba(255,59,71,0.75),0_18px_60px_-10px_rgba(255,59,71,1)]"
+      className={cn("group relative inline-flex items-center justify-center gap-2.5 rounded-xl bg-signal px-8 py-[1.125rem] text-[1.0312rem] xl:gap-3 xl:px-10 xl:py-[clamp(1.125rem,2.6vh,1.5rem)] xl:text-[clamp(1.0312rem,2.2vh,1.25rem)] font-semibold tracking-tight text-white shadow-[0_0_0_1px_rgba(255,59,71,0.5),0_10px_40px_-12px_rgba(255,59,71,0.8)] transition-shadow duration-500 hover:shadow-[0_0_0_1px_rgba(255,59,71,0.6),0_0_34px_-2px_rgba(255,59,71,0.75),0_18px_60px_-10px_rgba(255,59,71,1)]", className)}
     >
       {/* breath: a soft halo swells out and dissolves every few seconds */}
       {!reduce && (

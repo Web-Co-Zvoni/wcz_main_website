@@ -141,7 +141,7 @@ export default function CoverFlow({
                 onClick={() => !centre && setCurrent(i)}
                 aria-hidden={!centre}
                 className={cn(
-                  "absolute h-[35rem] w-[23.125rem] overflow-hidden rounded-[1.625rem] border border-paper/12 bg-coal transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none",
+                  "absolute h-[35rem] w-[23.125rem] overflow-hidden rounded-[1.625rem] border border-paper/12 bg-[#0b0a0c] transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none",
                   centre ? "shadow-[0_25px_60px_rgba(0,0,0,0.9),0_0_40px_rgba(255,59,71,0.22)]" : "cursor-pointer shadow-[0_15px_35px_rgba(0,0,0,0.5)] hover:brightness-110"
                 )}
                 style={{ transform: pose.t, opacity: pose.o, zIndex: pose.z, filter: pose.f }}
