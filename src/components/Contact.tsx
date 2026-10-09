@@ -39,6 +39,10 @@ function Field({ label, icon: Icon, done, children }: { label: string; icon: Luc
 
 const REQUIRED = 4;
 
+// Web3Forms access keys are public by design — they only say which inbox a submission goes to
+const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
+const WEB3FORMS_ACCESS_KEY = "9008155c-c8fe-4d24-b37a-6d9dbf91870e";
+
 /** `defaultTrade` preselects one of CONTACT.trades — the niche pages already know who is asking */
 export default function Contact({ defaultTrade = "" }: { defaultTrade?: string }) {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -58,19 +62,27 @@ export default function Contact({ defaultTrade = "" }: { defaultTrade?: string }
       return;
     }
 
-    const body = new URLSearchParams();
+    const data: Record<string, string> = {};
     new FormData(form).forEach((value, name) => {
-      if (typeof value === "string") body.append(name, value);
+      if (typeof value === "string") data[name] = value;
     });
 
     setState("sending");
     try {
-      const response = await fetch("/", {
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: body.toString(),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          ...data,
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `Nová poptávka z webu — ${data.obor ?? ""}`.trim(),
+          from_name: SITE.domain,
+          // lets "reply" in the inbox go straight to the customer
+          ...(data.email ? { replyto: data.email } : {}),
+        }),
       });
-      if (!response.ok) throw new Error("Netlify form submission failed");
+      const result = (await response.json().catch(() => null)) as { success?: boolean } | null;
+      if (!response.ok || !result?.success) throw new Error("Web3Forms submission failed");
       setState("sent");
     } catch {
       setState("error");
@@ -153,8 +165,6 @@ export default function Contact({ defaultTrade = "" }: { defaultTrade?: string }
                   transition={{ duration: 0.35 }}
                   name="poptavka"
                   method="POST"
-                  data-netlify="true"
-                  data-netlify-honeypot="bot-field"
                   onSubmit={onSubmit}
                   onInput={(e) => {
                     const fd = new FormData(e.currentTarget);
@@ -163,10 +173,10 @@ export default function Contact({ defaultTrade = "" }: { defaultTrade?: string }
                   }}
                   className="relative flex flex-col gap-6 text-left"
                 >
-                  <input type="hidden" name="form-name" value="poptavka" />
+                  {/* Web3Forms honeypot: bots tick it, people never see it */}
                   <div className="hidden" aria-hidden="true">
                     <label>
-                      Nevyplňujte toto pole: <input name="bot-field" tabIndex={-1} autoComplete="off" />
+                      Nevyplňujte toto pole: <input type="checkbox" name="botcheck" tabIndex={-1} autoComplete="off" />
                     </label>
                   </div>
                   <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
