@@ -125,7 +125,7 @@ export function PrimaryCta({ href, children, className }: { href: string; childr
  * Secondary hero CTA: on hover the label warms to red, a laser traces the outline
  * and the face of the button turns into a darkened concept photo.
  */
-export function SecondaryCta({ href, children, photo }: { href: string; children: ReactNode; photo: string }) {
+export function SecondaryCta({ href, children, photo, className }: { href: string; children: ReactNode; photo: string; className?: string }) {
   const [hover, setHover] = useState(false);
 
   return (
@@ -135,7 +135,7 @@ export function SecondaryCta({ href, children, photo }: { href: string; children
       transition={SPRING}
       onHoverStart={() => setHover(true)}
       onHoverEnd={() => setHover(false)}
-      className="group relative inline-flex items-center justify-center gap-2.5 rounded-xl border border-paper/15 bg-card px-8 py-[1.125rem] text-[1.0312rem] xl:gap-3 xl:px-10 xl:py-[clamp(1.125rem,2.6vh,1.5rem)] xl:text-[clamp(1.0312rem,2.2vh,1.25rem)] font-semibold tracking-tight text-paper transition-[color,border-color] duration-700 ease-out hover:border-paper/5 hover:text-accent"
+      className={cn("group relative inline-flex items-center justify-center gap-2.5 rounded-xl border border-paper/15 bg-card px-8 py-[1.125rem] text-[1.0312rem] xl:gap-3 xl:px-10 xl:py-[clamp(1.125rem,2.6vh,1.5rem)] xl:text-[clamp(1.0312rem,2.2vh,1.25rem)] font-semibold tracking-tight text-paper transition-[color,border-color] duration-700 ease-out hover:border-paper/5 hover:text-accent", className)}
     >
       {/* the photo surfacing behind the label — dimmed so the text stays readable */}
       <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">

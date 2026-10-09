@@ -28,10 +28,7 @@ export const SETTINGS = {
   floatingCallScrollThreshold: 640,
 };
 
-/**
- * Detail pages the niche cards and concept cards click through to. The pages themselves come
- * later — until then these links lead nowhere (404).
- */
+/** Detail pages the niche cards and concept cards open (src/pages, routed in src/lib/router.ts). */
 export const ROUTES = {
   niche: (slug: string) => `/obory/${slug}/`,
   concept: (slug: string) => `/koncepty/${slug}/`,
@@ -66,6 +63,11 @@ export const HERO = {
     { value: "24 h", label: "do odpovědi" },
   ],
 };
+
+/** the same Pexels photo, large and uncropped, for the top of a detail page */
+export const heroPhoto = (src: string) => src.replace(/\?.*$/, "?auto=compress&cs=tinysrgb&w=1920");
+/** a concept photo as the cover-flow cards show it */
+export const cardPhoto = (src: string) => src.replace("h=1000&w=800", "h=1120&w=740");
 
 const nichePhoto = (id: number) =>
   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600`;
@@ -316,4 +318,354 @@ export const CONTACT = {
 export const FOOTER = {
   backToTop: "Zpět nahoru",
   privacy: "Zásady zpracování osobních údajů",
+};
+
+/* ------------------------------------------------------------------ */
+/* Detail pages                                                       */
+/* ------------------------------------------------------------------ */
+
+/** Shared copy of the trade pages (/obory/…). */
+export const NICHE_PAGE = {
+  back: "Zpět",
+  heroCta: "Ukázat koncepty",
+  heroCtaSecondary: "Nezávazná poptávka",
+  featuresKicker: "Co pro vás uděláme",
+  featuresTitle: "Web, který zná vaše řemeslo",
+  featuresLead: "Žádná šablona pro všechny. Každý obor má jiné zákazníky a jiné otázky — web na ně odpoví dřív, než zavolají.",
+  seoKicker: "Jak web optimalizujeme",
+  seoTitle: "Aby vás našli dřív než konkurenci",
+  seoLead: "Hezký web nestačí. Stavíme ho od začátku tak, aby ho Google ukázal lidem z okolí, kteří vás právě hledají.",
+  searchesLabel: "Co lidé v okolí hledají",
+  searchesNote: "Na tyhle dotazy web postavíme — nadpisy, texty i stránky služeb.",
+  seo: [
+    { title: "Rychlý i na mobilních datech", text: "Zmenšené fotky, žádné zbytečné skripty. Web se načte rychle i v terénu." },
+    { title: "Lokální SEO", text: "Stránka pro každou službu a místa, kde pracujete. Tak vás Google spojí s Plzní a okolím." },
+    { title: "Firemní profil na Googlu", text: "Založíme ho nebo vyladíme, aby vás lidé našli i v mapách." },
+    { title: "Strukturovaná data", text: "Google přesně ví, co děláte, kde a kdy máte otevřeno." },
+    { title: "Poptávka na každé stránce", text: "Formulář a kontakt jsou vždycky po ruce. Zákazník nemusí hledat." },
+    { title: "Měření a report", text: "Víte, kolik poptávek přišlo z webu. Každý měsíc report." },
+  ],
+  funnelKicker: "Koncepty",
+  funnelTitle: "Jak by mohl vypadat váš web",
+  funnelLead: "Hotové klientské weby zatím ukázat nemůžeme. Máme ale koncepty — vyberte si, co vás zajímá, a podívejte se, jak přemýšlíme.",
+  documentTitle: (title: string) => `${title} — webcozvoni.cz`,
+};
+
+export type NicheDetail = {
+  /** the page's headline */
+  title: string;
+  lead: string;
+  features: { title: string; text: string }[];
+  /** what customers around Plzeň type into Google */
+  searches: string[];
+  /** related concepts (PORTFOLIO slugs); the carousel on the page opens at the first one */
+  concepts: string[];
+  /** pre-picked chip in the enquiry form (one of CONTACT.trades) */
+  trade?: string;
+};
+
+/** Per-trade copy, keyed by NICHES slug. Plans for what the site would do — no client results. */
+export const NICHE_DETAILS: Record<string, NicheDetail> = {
+  elektrikari: {
+    title: "Weby pro elektrikáře",
+    lead: "Když vypadnou jističe, hledá se elektrikář v telefonu — a volá se prvnímu, kdo vypadá důvěryhodně. Postavíme vám web, díky kterému budete tím prvním.",
+    features: [
+      { title: "Porucha na první pohled", text: "Kontakt a informace o pohotovosti hned nahoře. Bez hledání v menu." },
+      { title: "Stránka pro každou službu", text: "Rozvody, revize, rozvaděče, wallboxy. Každá služba má svou stránku, kterou Google najde." },
+      { title: "Revize bez telefonování", text: "Formulář na revizi s typem objektu a termínem. Poptávka přijde rovnou do mailu." },
+      { title: "Ukázky práce", text: "Fotky rozvaděčů a realizací. Zákazník vidí, že děláte čistě." },
+    ],
+    searches: ["elektrikář Plzeň", "revize elektro Plzeň", "elektrikář pohotovost", "montáž wallboxu Plzeň"],
+    concepts: ["elektrikar"],
+    trade: "Elektroinstalace",
+  },
+  fotovoltaika: {
+    title: "Weby pro fotovoltaiku",
+    lead: "Fotovoltaiku si nikdo nekoupí na první dobrou. Lidé porovnávají, počítají a čtou. Web jim musí odpovědět dřív, než zavolají konkurenci.",
+    features: [
+      { title: "Srozumitelné sestavy", text: "Sestavy podle velikosti domu a spotřeby, s tím, co je v ceně. Žádné „cena na dotaz“." },
+      { title: "Poptávka s podklady", text: "Zákazník nahraje fotku střechy a vyúčtování. Nabídku chystáte s podklady, ne naslepo." },
+      { title: "Dotace lidsky", text: "Stránka o dotacích a jejich vyřízení, kterou zákazník pochopí bez úředního slovníku." },
+      { title: "Realizace s čísly", text: "Hotové instalace s výkonem a lokalitou. Důkaz, že to umíte." },
+    ],
+    searches: ["fotovoltaika Plzeň", "solární panely na dům", "fotovoltaika s baterií cena", "montáž fotovoltaiky Plzeňský kraj"],
+    concepts: ["elektrikar"],
+    trade: "Elektroinstalace",
+  },
+  "instalateri-a-topenari": {
+    title: "Weby pro instalatéry a topenáře",
+    lead: "Teče voda nebo netopí kotel? Zákazník nečte, chce pomoc hned. Web musí ukázat kontakt, oblast výjezdu a co opravujete — na první obrazovce.",
+    features: [
+      { title: "Havárie nahoře", text: "Kontakt a dostupnost havarijní služby jsou první, co zákazník uvidí." },
+      { title: "Fotka závady ve formuláři", text: "Zákazník pošle fotku kapající baterie nebo kotle. Víte, co vézt s sebou." },
+      { title: "Oblast výjezdu", text: "Mapa a seznam obcí, kam jezdíte. Ozvou se ti, ke kterým dojedete." },
+      { title: "Servis kotlů na termín", text: "Objednání pravidelného servisu online, i v neděli večer." },
+    ],
+    searches: ["instalatér Plzeň", "havárie vody Plzeň", "servis kotle Plzeň", "výměna baterie instalatér"],
+    concepts: ["instalater"],
+    trade: "Instalatérství · voda · topení",
+  },
+  "tepelna-cerpadla-a-klimatizace": {
+    title: "Weby pro tepelná čerpadla a klimatizace",
+    lead: "Tepelné čerpadlo je investice na roky. Zákazník chce vědět, s čím počítat, kolik to stojí a jestli budete k zastižení i za pět let.",
+    features: [
+      { title: "Orientační kalkulace", text: "Pár otázek o domě a zákazník ví, s čím počítat. Vy dostanete poptávku i s parametry." },
+      { title: "Servis a revize", text: "Objednání pravidelného servisu, aby se zákazník vracel k vám." },
+      { title: "Úvod podle sezóny", text: "Na jaře klimatizace, na podzim čerpadla. Úvodní stránku přepnete jedním klikem." },
+      { title: "Instalace z okolí", text: "Realizace z Plzně a okolí s fotkami venkovních jednotek." },
+    ],
+    searches: ["tepelné čerpadlo Plzeň", "klimatizace do bytu Plzeň", "servis tepelného čerpadla", "montáž klimatizace cena"],
+    concepts: ["instalater", "elektrikar"],
+  },
+  "tesari-a-truhlari": {
+    title: "Weby pro tesaře a truhláře",
+    lead: "U dřeva rozhoduje oko. Zákazník chce vidět kuchyně, schody a krovy, které jste udělali — a pak se zeptat, kolik by stála ta jeho.",
+    features: [
+      { title: "Galerie realizací", text: "Velké fotky podle typu zakázky: kuchyně, vestavěné skříně, schody, pergoly." },
+      { title: "Poptávka s rozměry", text: "Rozměry, fotka místa a představa v jednom formuláři. Hned víte, o čem je řeč." },
+      { title: "Materiály a postup", text: "Z čeho děláte a jak dlouho to trvá. Méně otázek po telefonu." },
+      { title: "Dílna a lidé", text: "Fotky z dílny a kdo v ní pracuje. Lidé si objednávají od lidí." },
+    ],
+    searches: ["truhlář Plzeň", "kuchyně na míru Plzeň", "tesař krov Plzeň", "vestavěné skříně na míru"],
+    concepts: ["truhlar"],
+    trade: "Truhlářství · stolářství",
+  },
+  "okna-a-dvere": {
+    title: "Weby pro okna a dveře",
+    lead: "Okna se mění jednou za desítky let. Zákazník si proto všechno porovná — profily, skla, ceny i montáž. Na webu musí najít odpovědi.",
+    features: [
+      { title: "Přehled profilů", text: "Plast, dřevo, hliník. Srovnání, které zákazník pochopí i bez katalogu." },
+      { title: "Poptávka podle oken", text: "Počet a rozměry oken rovnou ve formuláři. Nacenění bez kolečka telefonátů." },
+      { title: "Montáž krok za krokem", text: "Jak výměna probíhá a kolik dní trvá. Méně obav z nepořádku v bytě." },
+      { title: "Vzorkovna a zaměření", text: "Kde vás najdou, kdy máte otevřeno a jak si domluvit zaměření." },
+    ],
+    searches: ["plastová okna Plzeň", "výměna oken Plzeň", "vchodové dveře Plzeň", "zaměření oken zdarma"],
+    concepts: ["truhlar", "stavebni-prace"],
+  },
+  "stavby-a-rekonstrukce": {
+    title: "Weby pro stavby a rekonstrukce",
+    lead: "Rekonstrukce je velká zakázka a velká důvěra. Zákazník chce vidět hotové byty a koupelny, vědět, jak pracujete, a mít jistotu, že termín platí.",
+    features: [
+      { title: "Před a po", text: "Fotky stejné místnosti před rekonstrukcí a po ní. Mluví za vás." },
+      { title: "Všechno od jedné firmy", text: "Bourání, instalace, obklady, malování. Zákazník vidí, že stačí jeden telefon." },
+      { title: "Poptávka s rozsahem", text: "Typ prostoru, metry a fotky. Na prohlídku jedete připravení." },
+      { title: "Kde stavíte", text: "Oblast a typ zakázek, které berete. Ozvou se ti správní." },
+    ],
+    searches: ["rekonstrukce bytu Plzeň", "rekonstrukce koupelny Plzeň", "stavební firma Plzeň", "zednické práce Plzeň"],
+    concepts: ["stavebni-prace", "malir-pokoju"],
+    trade: "Stavebnictví · zednictví",
+  },
+  "strechy-a-fasady": {
+    title: "Weby pro střechy a fasády",
+    lead: "Když zatéká, hledá se pokrývač hned. Když se plánuje nová fasáda, porovnává se měsíce. Web musí zvládnout obojí.",
+    features: [
+      { title: "Rychlá oprava", text: "Poptávka opravy po bouřce nebo vichřici, viditelná hned nahoře." },
+      { title: "Fotky z výšky", text: "Realizace střech a fasád, klidně z dronu. Ukazují rozsah, který zvládnete." },
+      { title: "Materiály a záruky", text: "Krytiny, zateplení, záruky. Přehledně, bez katalogového žargonu." },
+      { title: "Poptávka s fotkou", text: "Zákazník pošle fotku střechy nebo domu a vy víte, do čeho jdete." },
+    ],
+    searches: ["pokrývač Plzeň", "oprava střechy Plzeň", "zateplení fasády Plzeň", "klempíř Plzeň"],
+    concepts: ["stavebni-prace"],
+    trade: "Stavebnictví · zednictví",
+  },
+  autoservisy: {
+    title: "Weby pro autoservisy",
+    lead: "Řidič potřebuje vědět tři věci: jestli opravujete jeho auto, kolik to bude stát a kdy může přijet. Web mu to řekne dřív, než zavolá.",
+    features: [
+      { title: "Objednání na termín", text: "Servis, přezutí, příprava na STK. Ráno si jen otevřete kalendář." },
+      { title: "Ceník základních úkonů", text: "Olej, brzdy, pneu. Orientační ceny, které berou strach z účtu." },
+      { title: "Značky a služby", text: "Co opravujete a na co máte vybavení. Stránky, které Google ukáže." },
+      { title: "Pneusezóna", text: "Na jaře a na podzim jde přezouvání nahoru. Úvod se mění se sezónou." },
+    ],
+    searches: ["autoservis Plzeň", "přezutí pneu Plzeň", "výměna oleje Plzeň", "servis Škoda Plzeň"],
+    concepts: ["autoservis"],
+    trade: "Autoservis",
+  },
+  "hotely-a-penziony": {
+    title: "Weby pro hotely a penziony",
+    lead: "Z každé rezervace přes portál platíte provizi. Vlastní web s rezervací přivede hosty napřímo.",
+    features: [
+      { title: "Rezervace napřímo", text: "Kalendář volných pokojů a rezervace bez provize portálům." },
+      { title: "Pokoje v plné kráse", text: "Velké fotky pokojů, vybavení a cena za noc. Host ví, co dostane." },
+      { title: "Okolí a výlety", text: "Tipy na výlety a akce v okolí. Obsah, který Google rád ukazuje." },
+      { title: "Více jazyků", text: "Čeština, němčina, angličtina. Pro hosty z Bavorska i odjinud." },
+    ],
+    searches: ["penzion Plzeň", "ubytování Šumava", "hotel Plzeň centrum", "penzion se snídaní Plzeňský kraj"],
+    concepts: [],
+  },
+};
+
+/** Shared copy of the concept pages (/koncepty/…). */
+export const CONCEPT_PAGE = {
+  back: "Zpět",
+  label: (n: number, total: number) => `Koncept ${String(n).padStart(2, "0")}/${String(total).padStart(2, "0")}`,
+  honesty: "Koncept, ne reference. Takhle bychom web pro tenhle obor postavili.",
+  previewNote: "Ilustrační obrázek — náhled webu doplníme",
+  facts: { plan: "Balíček", price: "Cena", launch: "Spuštění", scope: "Rozsah" },
+  scope: (plan: string, pages: number) => (plan === "Start" ? "Jedna stránka" : `${pages} podstránek`),
+  aboutKicker: "O konceptu",
+  aboutTitle: "Co má web umět",
+  pagesLabel: "Co na webu bude",
+  planKicker: "Cena",
+  priceTitle: "Kolik by takový web stál",
+  planCta: "Chci podobný web",
+  allPlans: "Porovnat všechny balíčky",
+  processKicker: "Postup",
+  processTitle: "Jak by takový web vznikl",
+  reviewKicker: "Recenze klienta",
+  reviewBadge: "Zatím prázdné",
+  reviewText: "Tady bude recenze klienta. Zveřejníme ji, až web poběží naostro — žádné vymyšlené.",
+  reviewAuthor: "Jméno klienta",
+  reviewRole: (title: string) => `${title} · Plzeň`,
+  nextLabel: "Další koncept",
+  documentTitle: (title: string) => `Koncept: ${title} — webcozvoni.cz`,
+};
+
+export type ConceptDetail = {
+  headline: string;
+  about: string;
+  features: { title: string; text: string }[];
+  /** PRICING plan name the site would be built on */
+  plan: "Start" | "Poctivý web";
+  pages: string[];
+  /** pre-picked chip in the enquiry form (one of CONTACT.trades) */
+  trade?: string;
+  /** a real screenshot of the concept, once there is one — until then the photo stands in */
+  preview?: string;
+};
+
+/** Per-concept copy, keyed by PORTFOLIO slug. Made-up briefs, shown as concepts — not client work. */
+export const CONCEPT_DETAILS: Record<string, ConceptDetail> = {
+  instalater: {
+    headline: "Web pro instalatéra",
+    about: "Koncept pro instalatéra, který jezdí po Plzni a okolí. Hlavní úkol webu: aby zákazník s havárií zavolal do minuty a ten s plánovanou opravou poslal poptávku i s fotkou.",
+    features: [
+      { title: "Havárie hned nahoře", text: "Kontakt a pohotovost na první obrazovce, na mobilu i počítači." },
+      { title: "Poptávka s fotkou", text: "Zákazník vyfotí závadu, vy víte, co vézt." },
+      { title: "Oblast výjezdu", text: "Mapa obcí, kam jezdíte. Žádné zbytečné hovory z druhého konce kraje." },
+    ],
+    plan: "Poctivý web",
+    pages: ["Úvod", "Služby", "Havárie", "Ceník", "Oblast výjezdu", "Kontakt"],
+    trade: "Instalatérství · voda · topení",
+  },
+  elektrikar: {
+    headline: "Web pro elektrikáře",
+    about: "Koncept pro elektrikáře, který dělá rozvody, revize i rychlé výjezdy. Web třídí zákazníky hned na vstupu: kdo má poruchu, volá; kdo plánuje, posílá poptávku.",
+    features: [
+      { title: "Dvě cesty z úvodu", text: "Porucha → telefon. Plánovaná práce → formulář. Každý ví, kam kliknout." },
+      { title: "Revize online", text: "Objednání revize s typem objektu a termínem." },
+      { title: "Wallboxy a fotovoltaika", text: "Samostatné stránky pro služby, na které se lidé ptají Googlu." },
+    ],
+    plan: "Poctivý web",
+    pages: ["Úvod", "Služby", "Revize", "Wallboxy", "Realizace", "Kontakt"],
+    trade: "Elektroinstalace",
+  },
+  truhlar: {
+    headline: "Web pro truhláře",
+    about: "Koncept pro truhlářskou dílnu, která dělá kuchyně, skříně a schody na míru. Na webu mluví hlavně fotky — text jen doplňuje, co na nich není vidět.",
+    features: [
+      { title: "Galerie podle zakázek", text: "Kuchyně, skříně, schody. Zákazník najde přesně to, co hledá." },
+      { title: "Poptávka s rozměry", text: "Rozměry, fotka místa a představa v jednom formuláři." },
+      { title: "Příběh dílny", text: "Kdo jste a jak pracujete. Lidé si objednávají od lidí." },
+    ],
+    plan: "Poctivý web",
+    pages: ["Úvod", "Realizace", "Kuchyně", "Nábytek na míru", "O dílně", "Kontakt"],
+    trade: "Truhlářství · stolářství",
+  },
+  "kosmeticky-salon": {
+    headline: "Web pro kosmetický salon",
+    about: "Koncept pro salon s několika ošetřeními a jednou kosmetičkou. Web má jediný cíl: aby si klientka vybrala ošetření a rovnou si ho zarezervovala — klidně ve 23:00.",
+    features: [
+      { title: "Online rezervace", text: "Výběr ošetření a volného termínu bez telefonování." },
+      { title: "Ceník na jednom místě", text: "Ošetření, délka a cena. Přehledně, i na mobilu." },
+      { title: "Dárkové poukazy", text: "Objednávka poukazu přes formulář. Před Vánoci se hodí." },
+    ],
+    plan: "Poctivý web",
+    pages: ["Úvod", "Ošetření", "Ceník", "Rezervace", "Poukazy", "Kontakt"],
+    trade: "Kadeřnictví · kosmetika · barber",
+  },
+  autoservis: {
+    headline: "Web pro autoservis",
+    about: "Koncept pro menší autoservis s přezouváním a servisem všech značek. Řidič si na webu zjistí cenu základních úkonů a objedná se na termín, aniž by musel volat do dílny.",
+    features: [
+      { title: "Objednání na termín", text: "Servis, přezutí, příprava na STK. Kalendář místo telefonu." },
+      { title: "Orientační ceník", text: "Olej, brzdy, pneu — ceny, které berou strach z účtu." },
+      { title: "Úvod podle sezóny", text: "Na podzim přezouvání, v létě klimatizace." },
+    ],
+    plan: "Poctivý web",
+    pages: ["Úvod", "Služby", "Ceník", "Objednání", "Pneuservis", "Kontakt"],
+    trade: "Autoservis",
+  },
+  "malir-pokoju": {
+    headline: "Web pro malíře pokojů",
+    about: "Koncept pro malíře, který pracuje sám nebo s pomocníkem. Jedna stránka, která odpoví na všechno podstatné a skončí poptávkou s metry čtverečními.",
+    features: [
+      { title: "Orientační kalkulace", text: "Zákazník zadá plochu a typ práce a uvidí rozmezí ceny." },
+      { title: "Před a po", text: "Fotky stejných pokojů před malováním a po něm." },
+      { title: "Co je v ceně", text: "Jasně napsané: zakrývání, úklid, odvoz." },
+    ],
+    plan: "Start",
+    pages: ["Úvod", "Služby", "Kalkulace", "Fotky", "Poptávka"],
+    trade: "Malířství · natěračství",
+  },
+  pekarstvi: {
+    headline: "Web pro pekařství",
+    about: "Koncept pro rodinnou pekárnu s prodejnou. Lidé na webu hledají hlavně dvě věci: co je dnes čerstvé a kdy máte otevřeno.",
+    features: [
+      { title: "Denní nabídka", text: "Pečivo dne, které upravíte z mobilu za minutu." },
+      { title: "Otevírací doba a mapa", text: "Hned na úvodu, včetně svátků." },
+      { title: "Objednávky na oslavy", text: "Chlebíčky a koláče na objednávku přes formulář." },
+    ],
+    plan: "Start",
+    pages: ["Úvod", "Dnes v nabídce", "Objednávky", "Otevírací doba", "Mapa"],
+    trade: "Gastro · pekařství",
+  },
+  kadernictvi: {
+    headline: "Web pro kadeřnictví",
+    about: "Koncept pro kadeřnictví se třemi křesly. Web ukazuje, kdo u vás stříhá, kolik co stojí a kdy je volno — a rezervace zabere minutu.",
+    features: [
+      { title: "Rezervace ke konkrétní kadeřnici", text: "Výběr služby, kadeřnice i termínu." },
+      { title: "Ceník podle délky vlasů", text: "Krátké, střední, dlouhé. Žádné překvapení u pokladny." },
+      { title: "Galerie střihů", text: "Fotky z vašeho Instagramu přímo na webu." },
+    ],
+    plan: "Poctivý web",
+    pages: ["Úvod", "Ceník", "Tým", "Rezervace", "Galerie", "Kontakt"],
+    trade: "Kadeřnictví · kosmetika · barber",
+  },
+  "uklidova-firma": {
+    headline: "Web pro úklidovou firmu",
+    about: "Koncept pro úklidovou firmu, která uklízí domácnosti i kanceláře. Web nabízí jasné balíčky, aby zákazník věděl, co dostane, a poptal ten správný.",
+    features: [
+      { title: "Balíčky služeb", text: "Běžný, generální, kanceláře. S tím, co je v ceně." },
+      { title: "Poptávka s plochou", text: "Metry, typ úklidu a frekvence. Nabídku pošlete bez obhlídky." },
+      { title: "Pravidelný úklid", text: "Objednávka opakovaného úklidu na den v týdnu." },
+    ],
+    plan: "Poctivý web",
+    pages: ["Úvod", "Balíčky", "Domácnosti", "Firmy", "Poptávka", "Kontakt"],
+    trade: "Malá firma · služby",
+  },
+  "stavebni-prace": {
+    headline: "Web pro stavební firmu",
+    about: "Koncept pro menší stavební firmu, která dělá rekonstrukce a zednické práce. Web stojí na realizacích a na jasně vymezené oblasti, kde firma pracuje.",
+    features: [
+      { title: "Realizace před a po", text: "Každá zakázka s fotkami, rozsahem a délkou prací." },
+      { title: "Oblast výjezdu", text: "Mapa, kde stavíte. Poptávky jen z míst, kam dojedete." },
+      { title: "Poptávka s rozsahem", text: "Typ práce, metry a fotky už v první zprávě." },
+    ],
+    plan: "Poctivý web",
+    pages: ["Úvod", "Služby", "Realizace", "Oblast", "O nás", "Kontakt"],
+    trade: "Stavebnictví · zednictví",
+  },
+};
+
+export const NOT_FOUND = {
+  title: "Tahle stránka nezvoní.",
+  text: "Odkaz je nejspíš starý nebo překlep. Zkuste to z úvodní stránky.",
+  cta: "Na úvodní stránku",
+};
+
+/** the large image a concept page shows: its screenshot once there is one, the photo until then */
+export const conceptPhoto = (slug: string) => {
+  const p = PORTFOLIO.items.find((x) => x.slug === slug);
+  return CONCEPT_DETAILS[slug]?.preview ?? (p ? heroPhoto(p.src) : "");
 };

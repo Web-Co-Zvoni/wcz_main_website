@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
-import type { ComponentProps, ReactNode } from "react";
+import { createContext, useContext, type ComponentProps, type ReactNode } from "react";
 import { cn } from "../utils/cn";
 import { cz } from "../utils/typo";
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** true on a page brought back with Back: everything is already in place, nothing rises in again */
+export const InstantReveal = createContext(false);
 
 /** Scroll reveal — rise + un-blur, once */
 export function Reveal({
@@ -17,10 +20,11 @@ export function Reveal({
   className?: string;
   y?: number;
 }) {
+  const instant = useContext(InstantReveal);
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y, filter: "blur(8px)" }}
+      initial={instant ? false : { opacity: 0, y, filter: "blur(8px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.9, delay, ease: EASE }}

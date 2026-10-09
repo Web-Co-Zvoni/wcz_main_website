@@ -39,9 +39,14 @@ function Field({ label, icon: Icon, done, children }: { label: string; icon: Luc
 
 const REQUIRED = 4;
 
-export default function Contact() {
+/**
+ * `trade` pre-picks the "Čím se živíte?" chip — on a trade or concept page we already know it.
+ * `pinned` keeps the heading column stuck beside the form while it scrolls (the home page);
+ * without it the column sits centred next to the form.
+ */
+export default function Contact({ trade: knownTrade, pinned = true }: { trade?: string; pinned?: boolean } = {}) {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [trade, setTrade] = useState("");
+  const [trade, setTrade] = useState(knownTrade ?? "");
   const [filled, setFilled] = useState({ jmeno: false, telefon: false, email: false, zprava: false });
   const done = [filled.jmeno, filled.telefon, trade !== "", filled.zprava].filter(Boolean).length;
   const ready = done === REQUIRED;
@@ -80,8 +85,8 @@ export default function Contact() {
     <section id="kontakt" className="relative overflow-hidden pb-28 pt-24 md:pb-40 md:pt-32">
       <div className="relative mx-auto grid max-w-[88rem] gap-16 px-4 md:grid-cols-12 md:gap-10 md:px-8">
         {/* the phone first: it's the fastest way in */}
-        <div className="md:col-span-5">
-          <div className="md:sticky md:top-[clamp(7.5rem,16vh,10rem)]">
+        <div className={cn("md:col-span-5", !pinned && "md:self-center")}>
+          <div className={cn(pinned && "md:sticky md:top-[clamp(7.5rem,16vh,10rem)]")}>
             <Reveal>
               <h2 className="display max-w-[10ch] text-[clamp(2.8rem,5.6vw,6.2rem)] leading-[0.96]">{CONTACT.title}</h2>
             </Reveal>

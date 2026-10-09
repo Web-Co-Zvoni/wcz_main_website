@@ -5,9 +5,11 @@
  * colours, Czech labels, keys only while the carousel has focus (the original listened on the
  * whole window, so arrows in the form would flip slides), autoplay that also rests off screen,
  * and the background crossfading through small thumbnails instead of a swapped full-size image.
+ * The card facing you can hand itself to `onOpen` for the page morph; the carousel remembers
+ * which card that was, so coming back shows the same one.
  */
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type TouchEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type TouchEvent } from "react";
 import { cn } from "../../utils/cn";
 
 export type CoverFlowItem = {
@@ -25,6 +27,10 @@ export type CoverFlowItem = {
 type Props = {
   items: CoverFlowItem[];
   ctaText: string;
+  /** open card i yourself (a plain left click on its link), given the card element */
+  onOpen?: (i: number, e: MouseEvent, card: HTMLElement | null) => void;
+  /** the card to face you first (otherwise the one that faced you when the carousel was last left) */
+  initialIndex?: number;
   autoplayDelay?: number;
   label?: string;
   prevLabel?: string;
@@ -43,9 +49,17 @@ const POSES: Record<number, { t: string; o: number; z: number; f: string }> = {
 };
 const HIDDEN = { t: "translateX(0px) scale(0.4) rotateY(0deg)", o: 0, z: 0, f: "brightness(0.4) blur(2px)" };
 
+/** the darkening over each card's photo, so its words read (also used by the page morph) */
+export const COVER_SHADE = "linear-gradient(180deg,rgba(0,0,0,0.4) 0%,rgba(0,0,0,0.1) 25%,rgba(0,0,0,0.68) 60%,rgba(0,0,0,0.96) 100%)";
+
+/** the card that faced you when the carousel was last left */
+let resumeIndex = 0;
+
 export default function CoverFlow({
   items,
   ctaText,
+  onOpen,
+  initialIndex,
   autoplayDelay = 5000,
   label = "Galerie",
   prevLabel = "Předchozí",
@@ -53,12 +67,19 @@ export default function CoverFlow({
   slideLabel = (n) => `Snímek ${n}`,
   className,
 }: Props) {
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(() => initialIndex ?? (resumeIndex < items.length ? resumeIndex : 0));
   const [held, setHeld] = useState(false);
   const [onScreen, setOnScreen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const touchX = useRef(0);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const total = items.length;
+
+  useEffect(() => {
+    resumeIndex = current;
+  }, [current]);
+
+  const openCard = (i: number) => (e: MouseEvent) => onOpen?.(i, e, cardRefs.current[i]);
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total]);
   const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total]);
@@ -138,6 +159,9 @@ export default function CoverFlow({
             return (
               <div
                 key={it.img}
+                ref={(el) => {
+                  cardRefs.current[i] = el;
+                }}
                 onClick={() => !centre && setCurrent(i)}
                 aria-hidden={!centre}
                 className={cn(
@@ -148,8 +172,8 @@ export default function CoverFlow({
               >
                 <img src={it.img} alt={it.alt} draggable={false} className="absolute inset-0 size-full object-cover" />
                 {/* the card facing you opens its page */}
-                {centre && <a href={it.href} aria-label={`${ctaText}: ${it.title}`} className="absolute inset-0 z-[15] rounded-[inherit]" />}
-                <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.4)_0%,rgba(0,0,0,0.1)_25%,rgba(0,0,0,0.68)_60%,rgba(0,0,0,0.96)_100%)]" />
+                {centre && <a href={it.href} onClick={openCard(i)} aria-label={`${ctaText}: ${it.title}`} className="absolute inset-0 z-[15] rounded-[inherit]" />}
+                <div className="pointer-events-none absolute inset-0 z-10" style={{ background: COVER_SHADE }} />
 
                 {/* only the card facing you carries its words */}
                 <div
@@ -167,6 +191,7 @@ export default function CoverFlow({
                     <span className="mx-auto my-3 h-0.5 w-9 rounded-full bg-accent shadow-[0_0_8px_rgba(255,59,71,0.8)]" />
                     <a
                       href={it.href}
+                      onClick={openCard(i)}
                       tabIndex={centre ? 0 : -1}
                       className="group/cta pointer-events-auto inline-flex items-center gap-2 rounded-full bg-signal px-6 py-3 text-[0.9062rem] font-bold text-white shadow-[0_4px_14px_rgba(0,0,0,0.4)] transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-accent"
                     >

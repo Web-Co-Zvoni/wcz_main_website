@@ -1,19 +1,8 @@
 import { ArrowRight, MoveHorizontal } from "lucide-react";
-import { PORTFOLIO, ROUTES } from "../content";
+import { PORTFOLIO } from "../content";
 import { cz } from "../utils/typo";
-import CoverFlow from "./fx/CoverFlow";
+import ConceptCarousel from "./ConceptCarousel";
 import { Reveal, SectionHead } from "./ui";
-
-const total = String(PORTFOLIO.items.length).padStart(2, "0");
-const cards = PORTFOLIO.items.map((p, i) => ({
-  img: p.src.replace("h=1000&w=800", "h=1120&w=740"),
-  ambient: p.src.replace("h=1000&w=800", "h=200&w=160"),
-  alt: p.alt,
-  tag: `${PORTFOLIO.sampleLabel} ${String(i + 1).padStart(2, "0")}/${total}`,
-  title: p.title,
-  subtitle: p.subtitle,
-  href: ROUTES.concept(p.slug),
-}));
 
 export default function Portfolio() {
   return (
@@ -23,14 +12,7 @@ export default function Portfolio() {
       </div>
 
       <Reveal delay={0.1} y={40} className="mt-6">
-        <CoverFlow
-          items={cards}
-          ctaText={PORTFOLIO.open}
-          label={PORTFOLIO.title}
-          prevLabel={PORTFOLIO.prev}
-          nextLabel={PORTFOLIO.next}
-          slideLabel={(n) => `${PORTFOLIO.sampleLabel} ${n}`}
-        />
+        <ConceptCarousel />
       </Reveal>
 
       <Reveal delay={0.1}>

@@ -9,10 +9,14 @@
  * from the same texture that only exist while that part of the card is crumbling. The row
  * moves a card at a time on a curve that dawdles while the cards rest and hurries through the
  * moment one leaves and the next arrives. Captions are HTML laid over the canvas and kept in
- * step every frame. A card in the clear middle opens its `href` on click. Images need CORS (Pexels sends it); without WebGL the row is a static strip.
+ * step every frame. A card in the clear middle opens its `href` on click — or hands itself to
+ * `onOpen` with its on-screen box, for the page morph. The row keeps its place across remounts
+ * and holds still while a photo is flying, so Back lands the photo on the same card.
+ * Images need CORS (Pexels sends it); without WebGL the row is a static strip.
  */
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { transition } from "../../lib/scroll";
 import { cn } from "../../utils/cn";
 import { remScale } from "../../utils/remScale";
 
@@ -25,6 +29,8 @@ export type GrainyItem = {
 
 type Props = {
   items: GrainyItem[];
+  /** open card i yourself (instead of following its href), given its box on screen and how it looks */
+  onOpen?: (i: number, rect: DOMRect, look: { radius: number; light: number; restLight: number }) => void;
   /** caption drawn over card i (HTML, follows the card) */
   renderCaption?: (i: number) => ReactNode;
   /** seconds to move one card along */
@@ -41,6 +47,11 @@ const RADIUS = 20;
 /** dust particles per card: a jittered grid */
 const DUST_COLS = 60;
 const DUST_ROWS = 58;
+/** card brightness at rest and under the pointer */
+const LIGHT_REST = 0.62;
+const LIGHT_HOVER = 0.95;
+/** where the row was when it was last left — it picks up from there */
+let resumeClock = 0;
 
 /** smaller cards, more of them on screen — and not much taller than wide */
 const cardWidth = (w: number, s: number) => Math.min(300 * s, Math.max(190 * s, w * 0.155));
@@ -180,13 +191,15 @@ const smooth = (e0: number, e1: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-export default function GrainyCarousel({ items, renderCaption, stepDuration = 3, zone = 0.6, className }: Props) {
+export default function GrainyCarousel({ items, onOpen, renderCaption, stepDuration = 3, zone = 0.6, className }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const captionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const reduce = useReducedMotion();
   const [failed, setFailed] = useState(false);
   const [size, setSize] = useState({ w: 0, cw: 0, ch: 0, pad: PAD });
+  const onOpenRef = useRef(onOpen);
+  onOpenRef.current = onOpen;
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -213,14 +226,16 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
     let pad = PAD;
     let radius = RADIUS;
     let dpr = 1;
-    let clock = 0;
+    let clock = resumeClock;
     let last = 0;
     let pace = 1;
     let hoverX = -1;
     let hoverY = -1;
     /** the card under the pointer this frame, or -1 */
     let hoveredIndex = -1;
-    const lights = items.map(() => 0.62);
+    const lights = items.map(() => LIGHT_REST);
+    /** each card's left edge in the last frame */
+    const xs = items.map(() => 0);
     const textures: (WebGLTexture | null)[] = items.map(() => null);
     const aspects = items.map(() => 1);
 
@@ -317,7 +332,7 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
       // hovering slows the row right down; it picks up again when the pointer leaves
       const hovering = hoverX >= 0;
       pace += ((hovering ? 0.18 : 1) - pace) * Math.min(1, dt * 3);
-      if (!reduce) clock += dt * pace;
+      if (!reduce && !transition.busy) clock += dt * pace;
 
       const total = pitch * items.length;
       const f = clock / stepDuration;
@@ -333,11 +348,12 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
       let underPointer = -1;
       for (let i = 0; i < items.length; i++) {
         const x = ((((i * pitch + X) % total) + total) % total) - pitch;
+        xs[i] = x;
         const cap = captionRefs.current[i];
         const centre = Math.abs(x + CW / 2 - half) / half;
         const hovered = hovering && hoverX >= x && hoverX <= x + CW && hoverY >= pad && hoverY <= pad + CH && centre < zone;
         if (hovered) underPointer = i;
-        lights[i] += ((hovered ? 0.95 : 0.62) - lights[i]) * Math.min(1, dt * 6);
+        lights[i] += ((hovered ? LIGHT_HOVER : LIGHT_REST) - lights[i]) * Math.min(1, dt * 6);
 
         if (cap) {
           cap.style.transform = `translate3d(${x.toFixed(1)}px,${pad}px,0)`;
@@ -415,8 +431,17 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
       hoverX = hoverY = -1;
     };
     const onClick = () => {
-      const href = hoveredIndex >= 0 ? items[hoveredIndex].href : undefined;
-      if (href) window.location.href = href;
+      const i = hoveredIndex;
+      const href = i >= 0 ? items[i].href : undefined;
+      if (!href || transition.busy) return;
+      resumeClock = clock;
+      const open = onOpenRef.current;
+      if (!open) {
+        window.location.href = href;
+        return;
+      }
+      const r = canvas.getBoundingClientRect();
+      open(i, new DOMRect(r.left + xs[i], r.top + pad, CW, CH), { radius, light: lights[i], restLight: LIGHT_REST });
     };
     wrap.addEventListener("pointermove", onMove);
     wrap.addEventListener("pointerleave", onLeave);
@@ -424,6 +449,7 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
 
     return () => {
       disposed = true;
+      resumeClock = clock;
       cancelAnimationFrame(raf);
       io.disconnect();
       ro.disconnect();
@@ -444,7 +470,14 @@ export default function GrainyCarousel({ items, renderCaption, stepDuration = 3,
     return (
       <div className={cn("flex justify-center gap-5 overflow-hidden py-[5.625rem] [mask-image:linear-gradient(90deg,transparent,#000_20%,#000_80%,transparent)]", className)}>
         {items.map((item, i) => (
-          <div key={item.src} className="relative h-[22.5rem] w-[17.5rem] shrink-0 overflow-hidden rounded-[1.5rem]">
+          <div
+            key={item.src}
+            onClick={(e) => {
+              const el = e.currentTarget;
+              if (item.href && onOpen) onOpen(i, el.getBoundingClientRect(), { radius: parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0, light: LIGHT_REST, restLight: LIGHT_REST });
+            }}
+            className={cn("relative h-[22.5rem] w-[17.5rem] shrink-0 overflow-hidden rounded-[1.5rem]", item.href && onOpen && "cursor-pointer")}
+          >
             <img src={item.src} alt={item.alt ?? ""} className="size-full object-cover brightness-[0.62]" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink to-transparent" />
             <div className="absolute inset-0">{renderCaption?.(i)}</div>

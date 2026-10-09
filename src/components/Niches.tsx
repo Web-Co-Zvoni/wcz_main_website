@@ -1,5 +1,6 @@
 import { AppWindow, BedDouble, Car, Fan, Hammer, HardHat, House, Sun, Wrench, Zap, type LucideIcon } from "lucide-react";
-import { NICHES, ROUTES } from "../content";
+import { heroPhoto, NICHES, ROUTES } from "../content";
+import { useMorph } from "../lib/morph";
 import GrainyCarousel from "./fx/GrainyCarousel";
 import { Reveal } from "./ui";
 
@@ -7,7 +8,10 @@ type Niche = (typeof NICHES.items)[number];
 
 const cards = NICHES.items.map((n) => ({ src: n.src, alt: n.alt, href: ROUTES.niche(n.slug) }));
 
-const ICONS: Record<Niche["icon"], LucideIcon> = {
+/** the carousel's darkening toward a card's foot (its shader), for the photo as it lifts off */
+const CARD_SHADE = "linear-gradient(180deg, rgba(20,18,21,0) 38%, rgba(20,18,21,0.5) 72%, rgba(20,18,21,0.88) 100%)";
+
+export const NICHE_ICONS: Record<Niche["icon"], LucideIcon> = {
   zap: Zap,
   wrench: Wrench,
   hammer: Hammer,
@@ -22,7 +26,7 @@ const ICONS: Record<Niche["icon"], LucideIcon> = {
 
 /** the HTML laid over each card in the canvas; data-hover comes from the carousel */
 function Caption({ n }: { n: Niche }) {
-  const Icon = ICONS[n.icon];
+  const Icon = NICHE_ICONS[n.icon];
   return (
     <div className="relative size-full">
       <span className="absolute left-3 top-3 grid size-9 place-items-center rounded-xl border border-paper/10 bg-ink/70 text-accent transition-colors duration-500 group-data-[hover=true]/cap:border-signal group-data-[hover=true]/cap:bg-signal group-data-[hover=true]/cap:text-white">
@@ -37,8 +41,10 @@ function Caption({ n }: { n: Niche }) {
 }
 
 export default function Niches() {
+  const { open } = useMorph();
+
   return (
-    <section aria-labelledby="niches-title" className="relative overflow-hidden pb-10 pt-20 md:pb-14 md:pt-24">
+    <section id="obory" aria-labelledby="niches-title" className="relative overflow-hidden pb-10 pt-20 md:pb-14 md:pt-24">
       <Reveal>
         <h2 id="niches-title" className="display text-center text-[clamp(1.8rem,2.8vw,3rem)] leading-none">
           {NICHES.title}
@@ -57,7 +63,13 @@ export default function Niches() {
       </ul>
 
       <Reveal delay={0.1} y={30} className="mt-2">
-        <GrainyCarousel items={cards} renderCaption={(i) => <Caption n={NICHES.items[i]} />} />
+        <GrainyCarousel
+          items={cards}
+          onOpen={(i, rect, look) => {
+            const n = NICHES.items[i];
+            open({ href: cards[i].href, small: n.src, large: heroPhoto(n.src), rect, shade: CARD_SHADE, ...look });
+          }}
+          renderCaption={(i) => <Caption n={NICHES.items[i]} />} />
       </Reveal>
       <p className="-mt-6 text-center text-[0.7812rem] text-mute/70">{NICHES.note}</p>
     </section>

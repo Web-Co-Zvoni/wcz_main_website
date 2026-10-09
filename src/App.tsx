@@ -3,21 +3,22 @@ import Lenis from "lenis";
 import { Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CONTACT, SETTINGS } from "./content";
-import Contact from "./components/Contact";
-import Faq from "./components/Faq";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import Hero from "./components/Hero";
-import Niches from "./components/Niches";
-import Portfolio from "./components/Portfolio";
-import Pricing from "./components/Pricing";
-import Process from "./components/Process";
-import Services from "./components/Services";
+import { InstantReveal } from "./components/ui";
+import { MorphProvider } from "./lib/morph";
+import { go, parseRoute, useEntry } from "./lib/router";
+import { setLenis } from "./lib/scroll";
+import ConceptPage from "./pages/ConceptPage";
+import Home from "./pages/Home";
+import NichePage from "./pages/NichePage";
+import NotFound from "./pages/NotFound";
 
-/** Butter-smooth scrolling + anchored navigation */
+/** Butter-smooth scrolling, anchored navigation, and links between the site's pages without reloads */
 function useSmoothScroll() {
   useEffect(() => {
     const lenis = new Lenis({ lerp: SETTINGS.smoothScrollLerp, smoothWheel: true });
+    setLenis(lenis);
     let raf = 0;
     const loop = (t: number) => {
       lenis.raf(t);
@@ -25,24 +26,39 @@ function useSmoothScroll() {
     };
     raf = requestAnimationFrame(loop);
 
+    const glide = (el: Element) =>
+      lenis.scrollTo(el as HTMLElement, {
+        offset: SETTINGS.smoothScrollOffset,
+        duration: SETTINGS.smoothScrollDuration,
+      });
+
     const onClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const a = target.closest('a[href^="#"]') as HTMLAnchorElement | null;
-      if (!a) return;
-      const id = a.getAttribute("href");
-      if (!id || id === "#") return;
-      const el = document.querySelector(id);
-      if (el) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as HTMLElement).closest("a");
+      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      const href = a.getAttribute("href");
+      if (!href || href === "#") return;
+
+      if (href.startsWith("#")) {
         e.preventDefault();
-        lenis.scrollTo(el as HTMLElement, {
-          offset: SETTINGS.smoothScrollOffset,
-          duration: SETTINGS.smoothScrollDuration,
-        });
+        const el = document.querySelector(href);
+        // not on this page: it's a section of the home page
+        if (el) glide(el);
+        else go("/" + href);
+        return;
       }
+
+      const url = new URL(a.href);
+      if (url.origin !== location.origin || parseRoute(url.pathname).page === "missing") return;
+      e.preventDefault();
+      const el = url.pathname === location.pathname && url.hash ? document.querySelector(url.hash) : null;
+      if (el) glide(el);
+      else go(url.pathname + url.hash);
     };
     document.addEventListener("click", onClick);
     return () => {
       cancelAnimationFrame(raf);
+      setLenis(null);
       lenis.destroy();
       document.removeEventListener("click", onClick);
     };
@@ -93,25 +109,33 @@ function FloatingEnquiry() {
 
 export default function App() {
   useSmoothScroll();
+  const entry = useEntry();
+  const route = parseRoute(entry.path);
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="relative min-h-screen">
-        <div className="grain" />
-        <Header />
-        <main>
-          <Hero />
-          <Niches />
-          <Services />
-          <Process />
-          <Portfolio />
-          <Pricing />
-          <Faq />
-          <Contact />
-        </main>
-        <Footer />
-        <FloatingEnquiry />
-      </div>
+      <MorphProvider>
+        <div className="relative min-h-screen">
+          <div className="grain" />
+          <Header />
+          {/* a page brought back with Back is shown as it was left, without its entrance */}
+          <InstantReveal.Provider value={entry.restored}>
+            <main key={entry.path}>
+              {route.page === "home" ? (
+                <Home />
+              ) : route.page === "niche" ? (
+                <NichePage slug={route.slug} />
+              ) : route.page === "concept" ? (
+                <ConceptPage slug={route.slug} />
+              ) : (
+                <NotFound />
+              )}
+            </main>
+          </InstantReveal.Provider>
+          <Footer />
+          <FloatingEnquiry key={entry.path} />
+        </div>
+      </MorphProvider>
     </MotionConfig>
   );
 }

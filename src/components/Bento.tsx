@@ -1,7 +1,7 @@
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import type { ReactNode } from "react";
+import { useContext, type ReactNode } from "react";
 import { cn } from "../utils/cn";
-import { EASE } from "./ui";
+import { EASE, InstantReveal } from "./ui";
 
 /**
  * One bento tile: rises into place once, and on hover a red spotlight and a lit border edge
@@ -29,6 +29,7 @@ export function BentoCard({
   dots?: number;
 }) {
   const Tile = as === "li" ? motion.li : motion.div;
+  const instant = useContext(InstantReveal);
   const mx = useMotionValue(-1000);
   const my = useMotionValue(-1000);
   const spot = useMotionTemplate`radial-gradient(28.75rem circle at ${mx}px ${my}px, rgba(255,59,71,0.13), transparent 70%)`;
@@ -38,7 +39,7 @@ export function BentoCard({
 
   return (
     <Tile
-      initial={{ opacity: 0, y: 48, scale: 0.97 }}
+      initial={instant ? false : { opacity: 0, y: 48, scale: 0.97 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.95, delay, ease: EASE }}

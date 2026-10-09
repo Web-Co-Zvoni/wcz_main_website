@@ -23,7 +23,7 @@ webcozvoni.cz is the site of a one-person web agency (Matěj Kronus, Plzeň). It
 
 ## Operating Context
 
-Visitors arrive on mobile and desktop; the primary action is the Netlify enquiry form, the secondary one e-mail (info@webcozvoni.cz). As of 2026-10-05 the phone number (608 228 124) appears only in the header and the footer — the agency does not want calls to be the main channel, so sections point to the form or e-mail instead. The site is a single-page landing page with sections: Hero, Services, Process, Concepts (morph gallery), Pricing, FAQ, Contact, Footer.
+Visitors arrive on mobile and desktop; the primary action is the Netlify enquiry form, the secondary one e-mail (info@webcozvoni.cz). As of 2026-10-05 the phone number (608 228 124) appears only in the header and the footer — the agency does not want calls to be the main channel, so sections point to the form or e-mail instead. The site is a single-page landing page with sections: Hero, Services, Process, Concepts (morph gallery), Pricing, FAQ, Contact, Footer. Since 2026-10-09 it also has detail pages: one per trade (/obory/…: what the site does for that trade, how it is optimised, a funnel to the matching concepts, the form) and one per concept (/koncepty/…: illustrative preview in a browser frame, package and price, process, an empty review slot, next concept, the form). Both open from the home-page carousels by a photo morph (src/lib/morph.tsx, src/lib/router.ts).
 
 ## Capabilities and Constraints
 
