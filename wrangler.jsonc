@@ -1,0 +1,10 @@
+{
+  "name": "wcz-main-website",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./dist",
+    // /obory/… and /koncepty/… are rendered by the app (src/lib/router.ts):
+    // any path without a file of its own gets index.html
+    "not_found_handling": "single-page-application"
+  }
+}
