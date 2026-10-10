@@ -109,9 +109,9 @@ export default function GrowthTile({ className }: { className?: string }) {
 
   return (
     <BentoCard edge="bright" className={className}>
-      <div ref={ref} className="relative flex min-h-[28.5rem] flex-col">
+      <div ref={ref} className="relative flex min-h-[32rem] flex-col lg:min-h-[28.5rem]">
         {/* ---- chart, filling the right of the card behind the copy ---- */}
-        <div className="absolute inset-y-0 right-0 w-[64%]">
+        <div className="absolute inset-y-0 right-0 w-full lg:w-[64%]">
           <div className="absolute inset-0 bg-[linear-gradient(to_left,rgba(255,59,71,0.12),transparent_75%)]" />
           <div className="absolute inset-0 text-paper/[0.12] [mask-image:linear-gradient(to_right,transparent,#000_55%)]">
             <svg className="size-full" aria-hidden>
@@ -128,7 +128,7 @@ export default function GrowthTile({ className }: { className?: string }) {
             ref={plotRef}
             onPointerMove={onMove}
             onPointerLeave={() => setHover(null)}
-            className="absolute inset-x-0 bottom-[3.75rem] top-[5.25rem] cursor-crosshair"
+            className="absolute inset-x-0 bottom-[3.75rem] top-64 cursor-crosshair lg:top-[5.25rem]"
             role="img"
             aria-label={`${G.metric} (${G.sample}): ${s.vals.join(", ")}`}
           >
@@ -254,7 +254,7 @@ export default function GrowthTile({ className }: { className?: string }) {
         </div>
 
         {/* ---- the message and the number ---- */}
-        <div className="pointer-events-none relative z-10 flex max-w-[42%] flex-1 flex-col p-8 xl:p-11">
+        <div className="pointer-events-none relative z-10 flex w-full flex-1 flex-col p-6 pt-24 lg:max-w-[42%] lg:p-8 xl:p-11">
           <h3 className="display text-[clamp(2rem,3vw,3.2rem)] leading-[1]">{cz(G.title)}</h3>
           <p className="mt-4 max-w-[34ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-paper/65">{cz(G.lead)}</p>
 
@@ -274,7 +274,7 @@ export default function GrowthTile({ className }: { className?: string }) {
         </div>
 
         {/* ---- footer ---- */}
-        <div className="relative z-10 flex items-center justify-between gap-4 border-t border-paper/[0.07] bg-[#0d0c0e] px-8 py-4 text-[0.875rem] xl:px-11">
+        <div className="relative z-10 flex flex-col items-start gap-2 border-t border-paper/[0.07] bg-[#0d0c0e] px-5 py-4 text-[0.875rem] sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-8 xl:px-11">
           <p>
             <span className="font-semibold text-accent">
               {s.step >= 0 ? "+" : "−"}
@@ -282,7 +282,7 @@ export default function GrowthTile({ className }: { className?: string }) {
             </span>{" "}
             <span className="text-mute">{G.deltaLabel}</span>
           </p>
-          <p className="flex items-center gap-2.5 text-[0.8125rem] text-mute">
+          <p className="flex flex-wrap items-center gap-2.5 text-[0.8125rem] text-mute">
             <span>
               <span className="font-semibold text-paper/85">{s.peak}</span> {G.stats.peak}
             </span>

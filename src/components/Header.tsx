@@ -63,7 +63,7 @@ export default function Header() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.9, ease: EASE, delay: 0.2 }}
         className={cn(
-          "fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-500",
+          "fixed inset-x-0 top-0 z-50 border-b pt-[env(safe-area-inset-top)] transition-[background-color,border-color,backdrop-filter] duration-500",
           scrolled ? "hairline bg-ink/80 backdrop-blur-xl" : "border-transparent bg-transparent"
         )}
       >
@@ -110,7 +110,7 @@ export default function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
-            className="fixed inset-0 z-[60] flex flex-col bg-ink/95 backdrop-blur-2xl md:hidden"
+            className="fixed inset-0 z-[60] flex flex-col bg-ink/95 pt-[env(safe-area-inset-top)] backdrop-blur-2xl md:hidden"
           >
             <div className="pointer-events-none absolute left-1/2 top-1/3 size-[26.25rem] -translate-x-1/2 rounded-full bg-accent/15 blur-[120px]" />
             <div className="relative flex h-[5.75rem] items-center justify-between px-4">
