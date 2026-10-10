@@ -12,12 +12,12 @@ export default function Faq() {
 
   return (
     <section id="faq" className="relative py-28 md:py-40">
-      <div className="mx-auto grid max-w-[88rem] gap-14 px-4 md:grid-cols-12 md:gap-10 md:px-8">
+      <div className="mx-auto grid max-w-[88rem] gap-14 px-4 md:px-8 lg:grid-cols-12 lg:gap-10">
         {/* the heading sits level with the middle of the questions */}
-        <div className="md:col-span-5 md:flex md:items-center">
+        <div className="lg:col-span-5 lg:flex lg:items-center max-lg:text-center">
           <div>
             <Reveal>
-              <h2 className="display max-w-[11ch] text-[clamp(2.6rem,5vw,5.6rem)] leading-[0.98]">{cz(FAQ.title)}</h2>
+              <h2 className="display max-w-[11ch] text-[clamp(2.6rem,5vw,5.6rem)] leading-[0.98] max-lg:mx-auto">{cz(FAQ.title)}</h2>
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-10 text-[clamp(1.05rem,1.3vw,1.3rem)] text-paper/70">{FAQ.more}</p>
@@ -40,7 +40,7 @@ export default function Faq() {
           </div>
         </div>
 
-        <div className="border-b border-paper/[0.09] md:col-span-7">
+        <div className="border-b border-paper/[0.09] lg:col-span-7">
           {FAQ.items.map((f, i) => {
             const isOpen = open === i;
             const panelId = `${uid}-a${i}`;

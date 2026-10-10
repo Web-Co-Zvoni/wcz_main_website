@@ -141,6 +141,8 @@ export default function CoverFlow({
             key={it.ambient}
             src={it.ambient}
             alt=""
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 size-full scale-[1.15] object-cover blur-[32px] brightness-[0.3] transition-opacity duration-1000"
             style={{ opacity: i === current ? 1 : 0 }}
           />
@@ -170,7 +172,7 @@ export default function CoverFlow({
                 )}
                 style={{ transform: pose.t, opacity: pose.o, zIndex: pose.z, filter: pose.f }}
               >
-                <img src={it.img} alt={it.alt} draggable={false} className="absolute inset-0 size-full object-cover" />
+                <img src={it.img} alt={it.alt} draggable={false} loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" />
                 {/* the card facing you opens its page */}
                 {centre && <a href={it.href} onClick={openCard(i)} aria-label={`${ctaText}: ${it.title}`} className="absolute inset-0 z-[15] rounded-[inherit]" />}
                 <div className="pointer-events-none absolute inset-0 z-10" style={{ background: COVER_SHADE }} />

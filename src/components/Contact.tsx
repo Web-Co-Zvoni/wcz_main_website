@@ -95,15 +95,15 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
 
   return (
     <section id="kontakt" className="relative overflow-hidden pb-28 pt-24 md:pb-40 md:pt-32">
-      <div className="relative mx-auto grid max-w-[88rem] gap-16 px-4 md:grid-cols-12 md:gap-10 md:px-8">
+      <div className="relative mx-auto grid max-w-[88rem] gap-16 px-4 md:px-8 lg:grid-cols-12 lg:gap-10">
         {/* the phone first: it's the fastest way in */}
-        <div className={cn("md:col-span-5", !pinned && "md:self-center")}>
-          <div className={cn(pinned && "md:sticky md:top-[clamp(7.5rem,16vh,10rem)]")}>
+        <div className={cn("lg:col-span-5 max-lg:text-center", !pinned && "lg:self-center")}>
+          <div className={cn(pinned && "lg:sticky lg:top-[clamp(7.5rem,16vh,10rem)]")}>
             <Reveal>
-              <h2 className="display max-w-[10ch] text-[clamp(2.8rem,5.6vw,6.2rem)] leading-[0.96]">{CONTACT.title}</h2>
+              <h2 className="display max-w-[10ch] text-[clamp(2.8rem,5.6vw,6.2rem)] leading-[0.96] max-lg:mx-auto">{CONTACT.title}</h2>
             </Reveal>
             <Reveal delay={0.08}>
-              <p className="mt-7 max-w-[32ch] text-[clamp(1.1rem,1.4vw,1.4rem)] leading-relaxed text-paper/70">{cz(CONTACT.description)}</p>
+              <p className="mt-7 max-w-[32ch] text-[clamp(1.1rem,1.4vw,1.4rem)] leading-relaxed text-paper/70 max-lg:mx-auto">{cz(CONTACT.description)}</p>
             </Reveal>
 
             <Reveal delay={0.16}>
@@ -114,7 +114,7 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
                 whileHover={{ y: -3 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                className="group relative mt-3 inline-flex items-center gap-5 rounded-[1.375rem] border border-paper/12 bg-[#0b0a0c]/80 py-4 pl-4 pr-6 text-paper transition-colors duration-300 hover:border-accent/50"
+                className="group relative mt-3 inline-flex items-center gap-5 rounded-[1.375rem] border border-paper/12 bg-[#0b0a0c]/80 py-4 pl-4 pr-6 text-paper transition-colors duration-300 hover:border-accent/50 max-md:gap-3 max-md:pr-4"
               >
                 <span className="grid size-14 place-items-center rounded-2xl bg-signal text-white">
                   <Mail className="size-6" />
@@ -123,7 +123,7 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
                 <ArrowUpRight className="size-5 text-mute transition-[transform,color] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
               </motion.a>
 
-              <p className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-volt/25 bg-volt/[0.06] px-4 py-2 text-[0.8438rem] text-volt">
+              <p className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-volt/25 bg-volt/[0.06] px-4 py-2 text-[0.8438rem] text-volt max-lg:mx-auto max-lg:flex max-lg:w-fit">
                 <span className="size-1.5 animate-signal rounded-full bg-volt" />
                 {CONTACT.availability} {nextMonth}
               </p>
@@ -131,7 +131,7 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
           </div>
         </div>
 
-        <Reveal delay={0.1} className="md:col-span-7">
+        <Reveal delay={0.1} className="lg:col-span-7">
           <div className="relative rounded-[2rem] border border-paper/10 bg-[#0b0a0c] p-6 shadow-[0_60px_120px_-60px_rgba(0,0,0,0.9)] md:p-11">
             {/* two lights circling the frame in opposite directions */}
             <span className="duo-ring" aria-hidden />
@@ -183,10 +183,10 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
                       Nevyplňujte toto pole: <input type="checkbox" name="botcheck" tabIndex={-1} autoComplete="off" />
                     </label>
                   </div>
-                  <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+                  <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 max-md:flex-col max-md:items-center max-md:text-center">
                     <h3 className="display-soft text-[clamp(1.6rem,2.2vw,2.1rem)]">{CONTACT.formTitle}</h3>
                     {/* how far along the required fields are */}
-                    <div className="flex flex-col items-end gap-2" aria-live="polite">
+                    <div className="flex flex-col items-end gap-2 max-md:items-center" aria-live="polite">
                       <span className={cn("text-[0.8125rem] tabular-nums transition-colors duration-500", ready ? "text-volt" : "text-mute")}>
                         {CONTACT.progress(done, REQUIRED)}
                       </span>

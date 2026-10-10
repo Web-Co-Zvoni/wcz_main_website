@@ -105,14 +105,14 @@ function Milestone({ s, i, lit }: { s: (typeof PROCESS.steps)[number]; i: number
   const Visual = VISUALS[i];
   return (
     <BentoCard as="li" delay={0.08 * i} edge="bright" className={cn("transition-[border-color] duration-700", lit && "border-accent/30")}>
-      <div className="flex h-full min-h-[25rem] flex-col px-7 pb-8 pt-[4.75rem] xl:px-8">
-        <div className="flex h-[6rem] items-center">
+      <div className="flex h-full min-h-[25rem] flex-col px-7 pb-8 pt-[4.75rem] xl:px-8 max-md:min-h-0 max-md:items-center max-md:pt-10 max-md:text-center">
+        <div className="flex h-[6rem] items-center max-md:justify-center">
           <Visual lit={lit} />
         </div>
         <motion.p
           animate={{ color: lit ? "#f4efec" : "rgba(244,239,236,0.18)" }}
           transition={{ duration: 0.8, ease: EASE }}
-          className="display mt-auto pt-8 text-[clamp(2.6rem,4vw,4.4rem)] leading-[0.9] tracking-[-0.04em]"
+          className="display mt-auto pt-8 text-[clamp(2.6rem,4vw,4.4rem)] max-md:pt-6 leading-[0.9] tracking-[-0.04em]"
         >
           {s.meta}
         </motion.p>
@@ -141,14 +141,14 @@ function GuaranteeTile() {
   return (
     <BentoCard tone="signal" delay={0.1} edge="bright" className="md:col-span-2">
       <ShineBorder width={1.5} duration={9} colors={["rgba(255,120,128,0.8)"]} />
-      <div className="relative flex h-full flex-col justify-between gap-8 p-8 lg:flex-row lg:items-end xl:p-11">
+      <div className="relative flex h-full flex-col justify-between gap-8 p-8 lg:flex-row lg:items-end xl:p-11 max-md:items-center max-md:text-center">
         <div className="min-w-0">
           <p ref={ref} className="display glow-text text-[clamp(5rem,9vw,9.5rem)] leading-[0.85] tracking-[-0.05em] text-accent">
             {n} %
           </p>
-          <p className="display-soft mt-6 max-w-[24ch] text-[clamp(1.3rem,1.9vw,1.9rem)] leading-tight">{cz(PROCESS.guarantee)}</p>
+          <p className="display-soft mt-6 max-w-[24ch] text-[clamp(1.3rem,1.9vw,1.9rem)] leading-tight max-md:mx-auto">{cz(PROCESS.guarantee)}</p>
         </div>
-        <Button href="#kontakt" size="lg" className="shrink-0 self-start lg:self-end xl:px-8 xl:py-5 xl:text-[1.0312rem]">
+        <Button href="#kontakt" size="lg" className="shrink-0 self-start lg:self-end xl:px-8 max-md:self-center xl:py-5 xl:text-[1.0312rem]">
           {PROCESS.guaranteeCta}
           <ArrowRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
         </Button>
@@ -160,7 +160,7 @@ function GuaranteeTile() {
 function TitleTile() {
   return (
     <BentoCard edge="bright" className="md:col-span-2">
-      <div className="relative flex h-full min-h-[21.25rem] flex-col justify-end p-8 xl:p-11">
+      <div className="relative flex h-full min-h-[21.25rem] flex-col justify-end p-8 xl:p-11 max-md:min-h-[16rem] max-md:items-center max-md:text-center">
         {/* a wire with light running along it — the road from the call to the site */}
         <svg aria-hidden viewBox="0 0 600 160" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 top-6 h-[6rem] w-full">
           <path d="M-10 120 C120 120 150 40 280 44 S470 130 610 30" fill="none" stroke="rgba(244,239,236,0.08)" strokeWidth="2" />

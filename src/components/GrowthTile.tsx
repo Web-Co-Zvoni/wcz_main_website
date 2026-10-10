@@ -111,9 +111,9 @@ export default function GrowthTile({ className }: { className?: string }) {
     <BentoCard edge="bright" className={className}>
       <div ref={ref} className="relative flex min-h-[28.5rem] flex-col">
         {/* ---- chart, filling the right of the card behind the copy ---- */}
-        <div className="absolute inset-y-0 right-0 w-[64%]">
-          <div className="absolute inset-0 bg-[linear-gradient(to_left,rgba(255,59,71,0.12),transparent_75%)]" />
-          <div className="absolute inset-0 text-paper/[0.12] [mask-image:linear-gradient(to_right,transparent,#000_55%)]">
+        <div className="absolute inset-y-0 right-0 w-[64%] max-md:relative max-md:inset-auto max-md:order-2 max-md:h-[16rem] max-md:w-full">
+          <div className="absolute inset-0 bg-[linear-gradient(to_left,rgba(255,59,71,0.12),transparent_75%)] max-md:bg-[linear-gradient(to_top,rgba(255,59,71,0.12),transparent_80%)]" />
+          <div className="absolute inset-0 text-paper/[0.12] [mask-image:linear-gradient(to_right,transparent,#000_55%)] max-md:[mask-image:linear-gradient(to_bottom,transparent,#000_60%)]">
             <svg className="size-full" aria-hidden>
               <defs>
                 <pattern id={`dots-${gid}`} width="14" height="14" patternUnits="userSpaceOnUse">
@@ -127,8 +127,10 @@ export default function GrowthTile({ className }: { className?: string }) {
           <div
             ref={plotRef}
             onPointerMove={onMove}
-            onPointerLeave={() => setHover(null)}
-            className="absolute inset-x-0 bottom-[3.75rem] top-[5.25rem] cursor-crosshair"
+            // a tap picks the month, a sideways drag runs along the line; a finger lifting off keeps the pick
+            onPointerDown={onMove}
+            onPointerLeave={(e) => e.pointerType === "mouse" && setHover(null)}
+            className="absolute inset-x-0 bottom-[3.75rem] top-[5.25rem] cursor-crosshair touch-pan-y max-md:inset-x-3 max-md:bottom-5 max-md:top-[4.25rem]"
             role="img"
             aria-label={`${G.metric} (${G.sample}): ${s.vals.join(", ")}`}
           >
@@ -188,7 +190,7 @@ export default function GrowthTile({ className }: { className?: string }) {
               <>
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute bottom-[-3.75rem] top-0 w-px bg-gradient-to-b from-paper/0 via-paper/25 to-paper/0 transition-[left] duration-300 ease-out"
+                  className="pointer-events-none absolute bottom-[-3.75rem] top-0 w-px max-md:bottom-[-1.25rem] bg-gradient-to-b from-paper/0 via-paper/25 to-paper/0 transition-[left] duration-300 ease-out"
                   style={{ left: `${ax}%` }}
                 />
                 <span
@@ -210,13 +212,17 @@ export default function GrowthTile({ className }: { className?: string }) {
           </div>
 
           {/* controls over the chart */}
-          <div className="absolute right-6 top-6 z-10 flex items-center gap-2.5 xl:right-8 xl:top-8">
+          <div className="absolute right-6 top-6 z-10 flex items-center gap-2.5 xl:right-8 xl:top-8 max-md:inset-x-0 max-md:top-3 max-md:justify-center">
             <div className="flex rounded-full border border-paper/10 bg-ink/70 p-1" role="group" aria-label="Období">
               {G.periods.map((p, i) => (
                 <button
                   key={p.label}
                   type="button"
-                  onClick={() => setPeriodIdx(i)}
+                  // a picked month (kept after a tap) may not exist in the shorter period
+                  onClick={() => {
+                    setPeriodIdx(i);
+                    setHover(null);
+                  }}
                   aria-pressed={i === periodIdx}
                   className={cn(
                     "relative rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium transition-colors duration-300",
@@ -254,16 +260,16 @@ export default function GrowthTile({ className }: { className?: string }) {
         </div>
 
         {/* ---- the message and the number ---- */}
-        <div className="pointer-events-none relative z-10 flex max-w-[42%] flex-1 flex-col p-8 xl:p-11">
+        <div className="pointer-events-none relative z-10 flex max-w-[42%] flex-1 flex-col p-8 xl:p-11 max-md:order-1 max-md:max-w-none max-md:items-center max-md:px-6 max-md:pb-4 max-md:text-center">
           <h3 className="display text-[clamp(2rem,3vw,3.2rem)] leading-[1]">{cz(G.title)}</h3>
           <p className="mt-4 max-w-[34ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-paper/65">{cz(G.lead)}</p>
 
-          <div className="mt-auto pt-10">
-            <p className="flex items-center gap-2.5 text-[0.875rem] font-medium text-paper/80">
+          <div className="mt-auto pt-10 max-md:pt-7">
+            <p className="flex items-center gap-2.5 text-[0.875rem] font-medium text-paper/80 max-md:justify-center">
               {G.metric}
               <span className="rounded-full border border-paper/10 px-2 py-0.5 text-[0.7188rem] font-normal text-mute">{G.sample}</span>
             </p>
-            <div className="mt-3 flex items-end gap-5">
+            <div className="mt-3 flex items-end gap-5 max-md:justify-center">
               <span className="display text-[clamp(4rem,6.4vw,6.6rem)] leading-[0.85] tabular-nums">{total}</span>
               <span className="mb-2 flex items-center gap-1 text-[1.0625rem] font-semibold text-accent">
                 <ArrowUp className="size-4.5" strokeWidth={2.6} />
@@ -274,7 +280,7 @@ export default function GrowthTile({ className }: { className?: string }) {
         </div>
 
         {/* ---- footer ---- */}
-        <div className="relative z-10 flex items-center justify-between gap-4 border-t border-paper/[0.07] bg-[#0d0c0e] px-8 py-4 text-[0.875rem] xl:px-11">
+        <div className="relative z-10 flex items-center justify-between gap-4 border-t border-paper/[0.07] bg-[#0d0c0e] px-8 py-4 text-[0.875rem] xl:px-11 max-md:order-3 max-md:flex-col max-md:gap-1.5 max-md:px-5 max-md:text-center">
           <p>
             <span className="font-semibold text-accent">
               {s.step >= 0 ? "+" : "−"}

@@ -71,7 +71,7 @@ function ServiceTile({ s, i }: { s: Service; i: number }) {
         </div>
 
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-b from-transparent via-[#0a090b]/90 to-[#0a090b]" />
-        <p className="absolute inset-x-7 bottom-7 z-10 max-w-[44ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-snug text-paper/60">
+        <p className="absolute inset-x-7 bottom-7 z-10 max-w-[44ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-snug text-paper/60 max-md:text-center">
           <strong className="font-semibold text-paper">{s.title}</strong> {cz(s.text)}
         </p>
       </div>
@@ -83,10 +83,10 @@ export default function Services() {
   return (
     <section id="sluzby" className="relative py-20 md:py-28">
       <div className="mx-auto max-w-[88rem] px-4 md:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
+        <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6 max-md:flex-col max-md:items-center max-md:text-center">
           <div>
             <Reveal>
-              <h2 className="display max-w-[16ch] text-[clamp(2.6rem,4.6vw,5rem)] leading-[0.98]">{cz(SERVICES.title)}</h2>
+              <h2 className="display max-w-[16ch] text-[clamp(2.6rem,4.6vw,5rem)] leading-[0.98] max-md:mx-auto">{cz(SERVICES.title)}</h2>
             </Reveal>
             <Reveal delay={0.08}>
               <p className="mt-5 text-[clamp(1.1rem,1.4vw,1.4rem)] text-paper/70">{cz(SERVICES.description)}</p>

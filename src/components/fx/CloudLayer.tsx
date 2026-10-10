@@ -168,7 +168,9 @@ export default function CloudLayer({
     const mount = mountRef.current;
     if (!mount) return;
     // clouds are soft — a reduced buffer keeps it cheap and makes the grain a touch coarser
-    const dpr = Math.min(window.devicePixelRatio || 1, 2) * 0.75;
+    // phones and tablets (no hover) get a plain 0.75× buffer — dense screens would otherwise fill 2–3× the pixels
+    const touch = window.matchMedia("(hover: none)").matches;
+    const dpr = (touch ? 1 : Math.min(window.devicePixelRatio || 1, 2)) * 0.75;
     const renderer = new Renderer({ dpr, alpha: true, premultipliedAlpha: true, antialias: false, depth: false });
     const gl = renderer.gl;
     if (!renderer.isWebgl2) return;

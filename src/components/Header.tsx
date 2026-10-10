@@ -64,7 +64,7 @@ export default function Header() {
         transition={{ duration: 0.9, ease: EASE, delay: 0.2 }}
         className={cn(
           "fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-500",
-          scrolled ? "hairline bg-ink/80 backdrop-blur-xl" : "border-transparent bg-transparent"
+          scrolled ? "hairline bg-ink/80 backdrop-blur-xl max-md:bg-ink/95 max-md:backdrop-blur-none" : "border-transparent bg-transparent"
         )}
       >
         {/* everything grows from 1224px up (1440 at the 85% desktop scale) — below that the row is already full and the beam needs its gap */}
@@ -72,7 +72,7 @@ export default function Header() {
           <Logo large />
 
           {/* nav sits left; the hero beam falls through the open space to its right */}
-          <nav className="ml-8 hidden items-center gap-4 md:flex lg:ml-10 lg:gap-6 xl:ml-12 xl:gap-7 min-[1224px]:ml-10 min-[1224px]:gap-6">
+          <nav className="ml-8 hidden items-center gap-4 lg:flex lg:ml-10 lg:gap-6 xl:ml-12 xl:gap-7 min-[1224px]:ml-10 min-[1224px]:gap-6">
             {NAV_LINKS.map((l) => (
               <NavLink key={l.href} {...l} />
             ))}
@@ -95,7 +95,7 @@ export default function Header() {
             <button
               onClick={() => setOpen(true)}
               aria-label={HEADER.openMenu}
-              className="grid size-11 place-items-center rounded-xl border border-paper/15 text-paper transition-colors hover:border-accent/60 md:hidden"
+              className="grid size-11 place-items-center rounded-xl border border-paper/15 bg-ink/60 text-paper backdrop-blur-md transition-colors hover:border-accent/60 lg:hidden"
             >
               <Menu className="size-5" />
             </button>
@@ -110,7 +110,7 @@ export default function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
-            className="fixed inset-0 z-[60] flex flex-col bg-ink/95 backdrop-blur-2xl md:hidden"
+            className="fixed inset-0 z-[60] flex flex-col bg-ink/95 backdrop-blur-2xl lg:hidden"
           >
             <div className="pointer-events-none absolute left-1/2 top-1/3 size-[26.25rem] -translate-x-1/2 rounded-full bg-accent/15 blur-[120px]" />
             <div className="relative flex h-[5.75rem] items-center justify-between px-4">

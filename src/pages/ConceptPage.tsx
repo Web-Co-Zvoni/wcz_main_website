@@ -22,7 +22,7 @@ function Ambient({ src }: { src: string }) {
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none absolute inset-x-0 top-0 h-[62rem] transition-opacity duration-700 [mask-image:linear-gradient(#000_30%,transparent)]",
+        "pointer-events-none absolute inset-x-0 top-0 h-[62rem] overflow-hidden transition-opacity duration-700 [mask-image:linear-gradient(#000_30%,transparent)]",
         holdContent ? "opacity-0" : "opacity-100"
       )}
     >
@@ -67,7 +67,7 @@ function Hero({ p, d, n, plan, launch }: { p: Item; d: Detail; n: number; plan: 
           </span>
         </Landed>
 
-        <div className="relative z-[2] mt-10 grid items-end gap-6 lg:grid-cols-12 lg:gap-10">
+        <div className="relative z-[2] mt-10 grid items-end gap-6 lg:grid-cols-12 lg:gap-10 max-md:text-center">
           <Landed i={1} className="lg:col-span-8">
             <h1 tabIndex={-1} className="display text-[clamp(3rem,5.8vw,6.6rem)] leading-[0.92] outline-none">
               {cz(d.headline)}
@@ -75,7 +75,7 @@ function Hero({ p, d, n, plan, launch }: { p: Item; d: Detail; n: number; plan: 
           </Landed>
           <Landed i={2} className="lg:col-span-4 lg:pb-2">
             <p className="text-[clamp(1.2rem,1.45vw,1.45rem)] font-medium text-paper/85">{p.subtitle}</p>
-            <p className="mt-2 max-w-[36ch] text-[1.0625rem] leading-relaxed text-mute">{cz(CONCEPT_PAGE.honesty)}</p>
+            <p className="mt-2 max-w-[36ch] text-[1.0625rem] leading-relaxed text-mute max-md:mx-auto">{cz(CONCEPT_PAGE.honesty)}</p>
           </Landed>
         </div>
 
@@ -164,18 +164,18 @@ function Price({ plan }: { plan: Plan }) {
     <section className="relative overflow-hidden py-24 md:py-32">
       <div aria-hidden className="pointer-events-none absolute right-[8%] top-1/2 size-[40rem] -translate-y-1/2 rounded-full bg-accent/[0.07] blur-[140px]" />
       <div className="relative mx-auto grid max-w-[88rem] items-center gap-16 px-4 md:px-8 lg:grid-cols-12 lg:gap-12">
-        <div className="lg:col-span-6">
+        <div className="lg:col-span-6 max-lg:text-center">
           <Reveal>
             <Kicker className="xl:text-[1rem]">{CONCEPT_PAGE.planKicker}</Kicker>
           </Reveal>
           <Reveal delay={0.08}>
-            <h2 className="display mt-5 max-w-[13ch] text-[clamp(2.6rem,4.6vw,5.2rem)] leading-[0.98]">{cz(CONCEPT_PAGE.priceTitle)}</h2>
+            <h2 className="display mt-5 max-w-[13ch] text-[clamp(2.6rem,4.6vw,5.2rem)] leading-[0.98] max-lg:mx-auto">{cz(CONCEPT_PAGE.priceTitle)}</h2>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="mt-7 max-w-[40ch] text-[clamp(1.2rem,1.5vw,1.5rem)] leading-relaxed text-paper/75">{cz(PRICING.description)}</p>
+            <p className="mt-7 max-w-[40ch] text-[clamp(1.2rem,1.5vw,1.5rem)] leading-relaxed text-paper/75 max-lg:mx-auto">{cz(PRICING.description)}</p>
           </Reveal>
           <Reveal delay={0.22}>
-            <p className="mt-5 max-w-[46ch] text-[1.0938rem] leading-relaxed text-mute">{cz(PRICING.note)}</p>
+            <p className="mt-5 max-w-[46ch] text-[1.0938rem] leading-relaxed text-mute max-lg:mx-auto">{cz(PRICING.note)}</p>
           </Reveal>
           <Reveal delay={0.28}>
             <a href="/#cenik" className="group mt-9 inline-flex items-center gap-2 text-[1.0625rem] font-semibold text-paper transition-colors hover:text-accent">
@@ -269,7 +269,7 @@ function About({ d }: { d: Detail }) {
         <div className="mt-14 flex flex-col gap-4 md:hidden">
           {d.features.map((f, i) => (
             <Reveal key={f.title} delay={i * 0.06}>
-              <article className={cn(face, "min-h-[16rem]")}>{card(f, i, false)}</article>
+              <article className={cn(face, "min-h-[16rem] items-center text-center")}>{card(f, i, false)}</article>
             </Reveal>
           ))}
         </div>

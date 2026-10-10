@@ -37,6 +37,11 @@ type Props = {
   arch?: number;
   /** stretch the glowing haze around the impact sideways (1 = original round pool) */
   fogSpread?: number;
+  /**
+   * draw the beam as if the canvas were at least this wide, CSS px (0 = off). The beam's width is a share of the
+   * canvas width, so on a phone it would shrink to a hairline and its wisps below a pixel.
+   */
+  minWidth?: number;
 };
 
 const VERT = `
@@ -81,6 +86,7 @@ uniform float uCore;
 uniform vec3 uDeep;
 uniform float uArch;
 uniform float uFogSpread;
+uniform float uMinW;
 
 // Core beam/flare shaping and dynamics
 #define PI 3.14159265359
@@ -199,7 +205,7 @@ uniform float uFogSpread;
 
 void mainImage(out vec4 fc,in vec2 frag){
     vec2 C=iResolution.xy*.5; float invW=1.0/max(C.x,1.0);
-    vec2 sc=(512.0/iResolution.xy)*.4;
+    vec2 sc=(512.0/vec2(max(iResolution.x,uMinW),iResolution.y))*.4;
     vec2 uv=(frag-C)*sc,off=vec2(uBeamXFrac*iResolution.x*sc.x,uBeamYFrac*iResolution.y*sc.y);
     vec2 uvc = uv - off;
     // follow the arched card: shift the field so y=0 traces a half-ellipse spanning the full width
@@ -317,7 +323,8 @@ export const LaserFlow: React.FC<Props> = ({
   coreStrength = 0,
   deepColor,
   arch = 0,
-  fogSpread = 1
+  fogSpread = 1,
+  minWidth = 0
 }) => {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -332,6 +339,8 @@ export const LaserFlow: React.FC<Props> = ({
   const emaDtRef = useRef<number>(16.7); // ms
   const pausedRef = useRef<boolean>(false);
   const inViewRef = useRef<boolean>(true);
+  const minWidthRef = useRef(minWidth);
+  minWidthRef.current = minWidth;
 
   const hexToRGB = (hex: string) => {
     let c = hex.trim();
@@ -422,7 +431,8 @@ export const LaserFlow: React.FC<Props> = ({
       uCore: { value: coreStrength },
       uDeep: { value: new THREE.Vector3(1, 1, 1) },
       uArch: { value: arch },
-      uFogSpread: { value: fogSpread }
+      uFogSpread: { value: fogSpread },
+      uMinW: { value: 0 }
     };
     uniformsRef.current = uniforms;
 
@@ -463,6 +473,7 @@ export const LaserFlow: React.FC<Props> = ({
       renderer.setPixelRatio(pr);
       renderer.setSize(w, h, false);
       uniforms.iResolution.value.set(w * pr, h * pr, pr);
+      uniforms.uMinW.value = minWidthRef.current * pr;
       rectRef.current = canvas.getBoundingClientRect();
 
       if (!pausedRef.current) {
@@ -646,6 +657,7 @@ export const LaserFlow: React.FC<Props> = ({
     uniforms.uDeep.value.set(deep.r, deep.g, deep.b);
     uniforms.uArch.value = arch;
     uniforms.uFogSpread.value = fogSpread;
+    uniforms.uMinW.value = minWidth * currentDprRef.current;
     const canvas = rendererRef.current?.domElement;
     if (canvas && backgroundColor === 'transparent') {
       if (mountRef.current) mountRef.current.style.backgroundColor = 'transparent';
@@ -682,7 +694,8 @@ export const LaserFlow: React.FC<Props> = ({
     coreStrength,
     deepColor,
     arch,
-    fogSpread
+    fogSpread,
+    minWidth
   ]);
 
   return <div ref={mountRef} className={`laser-flow-container ${className || ''}`} style={style} />;

@@ -430,8 +430,18 @@ export default function GrainyCarousel({ items, onOpen, renderCaption, stepDurat
     const onLeave = () => {
       hoverX = hoverY = -1;
     };
-    const onClick = () => {
-      const i = hoveredIndex;
+    /** the card in the clear middle under a point, or -1 — from the click itself, since a tap has no hover before it */
+    const cardAt = (px: number, py: number) => {
+      const half = W / 2;
+      for (let i = 0; i < items.length; i++) {
+        const x = xs[i];
+        if (px >= x && px <= x + CW && py >= pad && py <= pad + CH && Math.abs(x + CW / 2 - half) / half < zone) return i;
+      }
+      return -1;
+    };
+    const onClick = (e: MouseEvent) => {
+      const r0 = canvas.getBoundingClientRect();
+      const i = cardAt(e.clientX - r0.left, e.clientY - r0.top);
       const href = i >= 0 ? items[i].href : undefined;
       if (!href || transition.busy) return;
       resumeClock = clock;

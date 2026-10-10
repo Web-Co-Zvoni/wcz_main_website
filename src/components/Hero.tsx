@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Suspense, lazy, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, lazy, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { HERO, PORTFOLIO } from "../content";
 import { remScale } from "../utils/remScale";
 import { cz } from "../utils/typo";
@@ -15,7 +15,23 @@ const LaserFlow = lazy(() => import("./fx/LaserFlow"));
 
 /** night sky above the card; the card itself is the page colour, so it flows on */
 const SKY = "#0f0d10";
-const DPR = typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+// phones and tablets render the beam at 1× — the CSS layers on top keep its core crisp
+const TOUCH = typeof window !== "undefined" && window.matchMedia("(hover: none)").matches;
+const DPR = typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, TOUCH ? 1 : 1.5);
+
+/** the logo behind the clouds only shows from md up — phones never build it (it traces the mark on the main thread) */
+const WIDE = "(min-width: 48rem)";
+function useWide() {
+  return useSyncExternalStore(
+    (cb) => {
+      const mq = window.matchMedia(WIDE);
+      mq.addEventListener("change", cb);
+      return () => mq.removeEventListener("change", cb);
+    },
+    () => window.matchMedia(WIDE).matches,
+    () => true
+  );
+}
 
 type Layout = {
   /** beam x as a fraction of hero width */
@@ -134,7 +150,7 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.6, delay: 0.7, ease: EASE }}
-          className="absolute top-0 w-px -translate-x-1/2 mix-blend-screen"
+          className="absolute top-0 w-px -translate-x-1/2 mix-blend-screen max-md:hidden"
           style={{
             left,
             marginLeft: rem(dx),
@@ -192,6 +208,7 @@ export default function Hero() {
   const cardRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const wide = useWide();
   const [layout, setLayout] = useState<Layout>({ beamX: 0.62, beamY: -0.25, arch: 64, hitPx: 0, logoX: 0.81, logoY: 0, logoR: 0 });
 
   useLayoutEffect(() => {
@@ -302,6 +319,8 @@ export default function Hero() {
             verticalBeamOffset={layout.beamY}
             horizontalSizing={1.5}
             fogSpread={2.6}
+            // phones: draw the beam as on a laptop-wide screen, so it keeps its body and the wisps still run down it
+            minWidth={wide ? 0 : 1700}
             verticalSizing={2}
             wispDensity={1.2}
             wispIntensity={7}
@@ -332,16 +351,18 @@ export default function Hero() {
         />
 
         {/* logo sits behind the clouds: it glows faintly through and shows in full where the cursor parts them */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.4, delay: 0.9, ease: EASE }}
-          className="pointer-events-auto absolute hidden w-[clamp(18.75rem,30vw,32.5rem)] -translate-x-1/2 -translate-y-1/2 md:block"
-          // the mark sits high in its box — drop the box so the mark itself is level with the copy
-          style={{ left: bellPct, top: layout.logoY ? `calc(${layout.logoY}px + clamp(1.75rem,2.8vw,3rem))` : "50%" }}
-        >
-          <ChargedLogo src={logoWcz} scale={0.68} className="relative aspect-[5/6] w-full cursor-pointer" />
-        </motion.div>
+        {wide && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.4, delay: 0.9, ease: EASE }}
+            className="pointer-events-auto absolute hidden w-[clamp(18.75rem,30vw,32.5rem)] -translate-x-1/2 -translate-y-1/2 md:block"
+            // the mark sits high in its box — drop the box so the mark itself is level with the copy
+            style={{ left: bellPct, top: layout.logoY ? `calc(${layout.logoY}px + clamp(1.75rem,2.8vw,3rem))` : "50%" }}
+          >
+            <ChargedLogo src={logoWcz} scale={0.68} className="relative aspect-[5/6] w-full cursor-pointer" />
+          </motion.div>
+        )}
 
         {/* clouds drifting round the beam; the cursor parts them to show the grid, beam and logo behind */}
         <CloudLayer

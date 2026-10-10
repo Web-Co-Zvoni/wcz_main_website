@@ -25,6 +25,8 @@ function Hero({ n, d }: { n: Niche; d: Detail }) {
       <MorphLayer className="inset-0">
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,18,21,0.72)_0%,rgba(20,18,21,0.06)_24%,rgba(20,18,21,0.22)_66%,rgba(20,18,21,0.55)_90%,#141215_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(20,18,21,0.92)_0%,rgba(20,18,21,0.55)_38%,transparent_72%)]" />
+        {/* below desktop the copy runs the full width over the photo — darken under it so a bright photo can't swallow the words */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,18,21,0)_12%,rgba(20,18,21,0.6)_36%,rgba(20,18,21,0.78)_62%,rgba(20,18,21,0.9)_88%)] lg:hidden" />
       </MorphLayer>
 
       {/* z-[2]: above the photo while it flies in */}
@@ -33,7 +35,7 @@ function Hero({ n, d }: { n: Niche; d: Detail }) {
           <BackLink fallback="/#obory" label={NICHE_PAGE.back} />
         </Landed>
 
-        <div className="mt-auto pt-12">
+        <div className="mt-auto pt-12 max-md:text-center">
           <Landed i={1}>
             <span className="inline-flex items-center gap-3 text-[1.0625rem] font-medium text-paper/80">
               <span className="grid size-10 place-items-center rounded-xl bg-signal text-white shadow-[0_0_24px_-6px_var(--color-accent)]">
@@ -43,14 +45,14 @@ function Hero({ n, d }: { n: Niche; d: Detail }) {
             </span>
           </Landed>
           <Landed i={2}>
-            <h1 tabIndex={-1} className="display mt-6 max-w-[13ch] text-[clamp(3rem,6.2vw,7.2rem)] leading-[0.92] outline-none">
+            <h1 tabIndex={-1} className="display mt-6 max-w-[13ch] text-[clamp(3rem,6.2vw,7.2rem)] leading-[0.92] outline-none max-md:mx-auto">
               {cz(d.title)}
             </h1>
           </Landed>
           <Landed i={3}>
-            <p className="mt-7 max-w-[46ch] text-[clamp(1.2rem,1.5vw,1.55rem)] leading-relaxed text-paper/75">{cz(d.lead)}</p>
+            <p className="mt-7 max-w-[46ch] text-[clamp(1.2rem,1.5vw,1.55rem)] leading-relaxed text-paper/75 max-md:mx-auto max-lg:text-paper/90 max-lg:[text-shadow:0_1px_14px_rgba(0,0,0,0.85)]">{cz(d.lead)}</p>
           </Landed>
-          <Landed i={4} className="mt-10 flex flex-wrap gap-4">
+          <Landed i={4} className="mt-10 flex flex-wrap gap-4 max-md:flex-col max-md:items-stretch">
             <PrimaryCta href="#ukazky">{NICHE_PAGE.heroCta}</PrimaryCta>
             <SecondaryCta href="#kontakt" photo={n.src}>
               {NICHE_PAGE.heroCtaSecondary}
@@ -74,7 +76,7 @@ function Features({ d }: { d: Detail }) {
             <li key={f.title}>
               <Reveal delay={0.06 + (i % 2) * 0.1}>
                 {/* hover: the numeral lights up red, the rule under the words runs out */}
-                <div className="group grid grid-cols-[auto_1fr] items-start gap-7">
+                <div className="group grid grid-cols-[auto_1fr] items-start gap-7 max-md:grid-cols-1 max-md:justify-items-center max-md:gap-4 max-md:text-center">
                   <span aria-hidden className="relative select-none font-sans text-[clamp(4.4rem,6.6vw,7.4rem)] font-black leading-[0.8] tracking-[-0.06em] tabular-nums">
                     <span className="bg-gradient-to-b from-paper/30 to-paper/[0.04] bg-clip-text text-transparent">{String(i + 1).padStart(2, "0")}</span>
                     <span className="absolute inset-0 text-accent opacity-0 transition-opacity duration-500 [text-shadow:0_0_38px_rgba(255,59,71,0.6)] group-hover:opacity-100">
@@ -83,8 +85,8 @@ function Features({ d }: { d: Detail }) {
                   </span>
                   <div className="pt-1.5">
                     <h3 className="display-soft text-[clamp(1.55rem,2vw,2.15rem)] leading-tight">{f.title}</h3>
-                    <p className="mt-3 max-w-[40ch] text-[1.125rem] leading-relaxed text-paper/65 xl:text-[1.1875rem]">{cz(f.text)}</p>
-                    <span aria-hidden className="mt-6 block h-px origin-left scale-x-[0.18] bg-gradient-to-r from-accent via-accent/50 to-transparent shadow-[0_0_10px_rgba(255,59,71,0.6)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
+                    <p className="mt-3 max-w-[40ch] text-[1.125rem] leading-relaxed text-paper/65 xl:text-[1.1875rem] max-md:mx-auto">{cz(f.text)}</p>
+                    <span aria-hidden className="mt-6 block h-px origin-left scale-x-[0.18] max-md:mx-auto max-md:w-1/2 max-md:origin-center bg-gradient-to-r from-accent via-accent/50 to-transparent shadow-[0_0_10px_rgba(255,59,71,0.6)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
                   </div>
                 </div>
               </Reveal>
@@ -129,22 +131,22 @@ function Optimisation({ d }: { d: Detail }) {
   return (
     <section className="relative py-24 md:py-32">
       <div className="mx-auto grid max-w-[88rem] gap-14 px-4 md:px-8 lg:grid-cols-2 lg:gap-16 xl:gap-24">
-        <div>
+        <div className="max-lg:text-center">
           <Reveal>
             <Kicker>{NICHE_PAGE.seoKicker}</Kicker>
           </Reveal>
           <Reveal delay={0.08}>
-            <h2 className="display mt-5 max-w-[14ch] text-[clamp(2.4rem,4.2vw,4.6rem)] leading-[0.98]">{cz(NICHE_PAGE.seoTitle)}</h2>
+            <h2 className="display mt-5 max-w-[14ch] text-[clamp(2.4rem,4.2vw,4.6rem)] leading-[0.98] max-lg:mx-auto">{cz(NICHE_PAGE.seoTitle)}</h2>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="mt-6 max-w-[44ch] text-[clamp(1.15rem,1.4vw,1.4rem)] leading-relaxed text-mute">{cz(NICHE_PAGE.seoLead)}</p>
+            <p className="mt-6 max-w-[44ch] text-[clamp(1.15rem,1.4vw,1.4rem)] leading-relaxed text-mute max-lg:mx-auto">{cz(NICHE_PAGE.seoLead)}</p>
           </Reveal>
-          <Reveal delay={0.24} className="mt-10">
+          <Reveal delay={0.24} className="mt-10 max-lg:mx-auto max-lg:max-w-[36rem] max-lg:text-left">
             <Searches searches={d.searches} />
           </Reveal>
         </div>
 
-        <ul className="self-center border-t border-paper/[0.08]">
+        <ul className="self-center border-t border-paper/[0.08] max-lg:mx-auto max-lg:w-full max-lg:max-w-[36rem]">
           {NICHE_PAGE.seo.map((s, i) => (
             <li key={s.title} className="group relative border-b border-paper/[0.08]">
               {/* hover, as on the home page's questions: a red line runs out along the rule, the row steps forward */}
