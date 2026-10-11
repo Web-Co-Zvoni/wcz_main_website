@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Suspense, lazy, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Suspense, lazy, useLayoutEffect, useRef, useState } from "react";
 import { HERO, PORTFOLIO } from "../content";
+import { useWide } from "../lib/useWide";
 import { remScale } from "../utils/remScale";
 import { cz } from "../utils/typo";
 import ChargedLogo from "./ChargedLogo";
@@ -12,26 +13,14 @@ import { EASE, Kicker, Reveal } from "./ui";
 
 // three.js is heavy — let the page paint first, the beam fades in on its own
 const LaserFlow = lazy(() => import("./fx/LaserFlow"));
+// phones: no laser at all — a slowly turning pillar of light behind the centred copy instead
+const LightPillar = lazy(() => import("./fx/LightPillar"));
 
 /** night sky above the card; the card itself is the page colour, so it flows on */
 const SKY = "#0f0d10";
 // phones and tablets render the beam at 1× — the CSS layers on top keep its core crisp
 const TOUCH = typeof window !== "undefined" && window.matchMedia("(hover: none)").matches;
 const DPR = typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, TOUCH ? 1 : 1.5);
-
-/** the logo behind the clouds only shows from md up — phones never build it (it traces the mark on the main thread) */
-const WIDE = "(min-width: 48rem)";
-function useWide() {
-  return useSyncExternalStore(
-    (cb) => {
-      const mq = window.matchMedia(WIDE);
-      mq.addEventListener("change", cb);
-      return () => mq.removeEventListener("change", cb);
-    },
-    () => window.matchMedia(WIDE).matches,
-    () => true
-  );
-}
 
 type Layout = {
   /** beam x as a fraction of hero width */
@@ -97,24 +86,7 @@ const masks = (...layers: string[]): React.CSSProperties => ({
   WebkitMaskComposite: "source-in",
 });
 
-/**
- * Phones: the CSS beam stands alone — no WebGL fog, clouds or sparks. This haze stands in for the
- * fog LaserFlow throws round the beam: brightest at the foot, thinning up and away from the beam.
- */
-function PhoneHaze({ left, height }: { left: string; height: number }) {
-  return (
-    <div
-      className="absolute inset-x-0 top-0"
-      style={{
-        height: height + 40,
-        background: `radial-gradient(ellipse 85% 42% at ${left} 100%, rgba(214,32,54,0.5), rgba(150,16,36,0.22) 55%, transparent 100%), radial-gradient(ellipse 60% 85% at ${left} 55%, rgba(150,18,40,0.38), rgba(110,12,30,0.16) 60%, transparent 100%)`,
-      }}
-    />
-  );
-}
-
-/** `still`: no moving light in the beam (phones — a background-position loop repaints every frame) */
-function BeamLayers({ left, height, still = false }: { left: string; height: number; still?: boolean }) {
+function BeamLayers({ left, height }: { left: string; height: number }) {
   return (
     <>
       {BEAM_LAYERS.map((l, i) => {
@@ -141,25 +113,24 @@ function BeamLayers({ left, height, still = false }: { left: string; height: num
       })}
 
       {/* flow: bands sliding down inside the beam, each colour at its own pace */}
-      {!still &&
-        FLOW_LAYERS.map((f) => (
-          <span
-            key={f.w}
-            className="absolute top-0 -translate-x-1/2 mix-blend-screen motion-safe:animate-[beam-flow_var(--flow-dur)_linear_infinite]"
-            style={
-              {
-                left,
-                width: rem(f.w),
-                height,
-                "--flow-len": rem(f.len),
-                "--flow-dur": `${f.dur}s`,
-                backgroundImage: `linear-gradient(to bottom, rgba(${f.rgb},0) 0%, rgba(${f.rgb},${f.a}) 38%, rgba(${f.rgb},${f.a * 0.25}) 62%, rgba(${f.rgb},0) 100%)`,
-                backgroundSize: `100% ${rem(f.len)}`,
-                ...masks(SOFT_MASK, "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 30%, #000 85%, #000 100%)"),
-              } as React.CSSProperties
-            }
-          />
-        ))}
+      {FLOW_LAYERS.map((f) => (
+        <span
+          key={f.w}
+          className="absolute top-0 -translate-x-1/2 mix-blend-screen motion-safe:animate-[beam-flow_var(--flow-dur)_linear_infinite]"
+          style={
+            {
+              left,
+              width: rem(f.w),
+              height,
+              "--flow-len": rem(f.len),
+              "--flow-dur": `${f.dur}s`,
+              backgroundImage: `linear-gradient(to bottom, rgba(${f.rgb},0) 0%, rgba(${f.rgb},${f.a}) 38%, rgba(${f.rgb},${f.a * 0.25}) 62%, rgba(${f.rgb},0) 100%)`,
+              backgroundSize: `100% ${rem(f.len)}`,
+              ...masks(SOFT_MASK, "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 30%, #000 85%, #000 100%)"),
+            } as React.CSSProperties
+          }
+        />
+      ))}
 
       {/* edge highlights of the cylinder, strongest near the impact */}
       {[-24, 24].map((dx) => (
@@ -195,29 +166,28 @@ function BeamLayers({ left, height, still = false }: { left: string; height: num
       />
 
       {/* light running off the impact along the card edge, both ways */}
-      {!still &&
-        (["left", "right"] as const).map((side) => (
-          <span
-            key={side}
-            className={`absolute mix-blend-screen ${side === "left" ? "-translate-x-full motion-safe:animate-[edge-flow-left_var(--flow-dur)_linear_infinite]" : "motion-safe:animate-[edge-flow-right_var(--flow-dur)_linear_infinite]"}`}
-            style={
-              {
-                left,
-                top: `calc(${height}px - ${rem(44)})`,
-                width: rem(620),
-                height: rem(50),
-                "--flow-len": rem(220),
-                "--flow-dur": "2.2s",
-                backgroundImage: `linear-gradient(to ${side === "left" ? "left" : "right"}, rgba(255,90,100,0) 0%, rgba(255,120,128,0.55) 30%, rgba(200,20,40,0.3) 60%, rgba(255,90,100,0) 100%)`,
-                backgroundSize: `${rem(220)} 100%`,
-                ...masks(
-                  `linear-gradient(to ${side}, #000 0%, rgba(0,0,0,0.6) 35%, transparent 100%)`,
-                  "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 85%, rgba(0,0,0,0.4) 100%)"
-                ),
-              } as React.CSSProperties
-            }
-          />
-        ))}
+      {(["left", "right"] as const).map((side) => (
+        <span
+          key={side}
+          className={`absolute mix-blend-screen ${side === "left" ? "-translate-x-full motion-safe:animate-[edge-flow-left_var(--flow-dur)_linear_infinite]" : "motion-safe:animate-[edge-flow-right_var(--flow-dur)_linear_infinite]"}`}
+          style={
+            {
+              left,
+              top: `calc(${height}px - ${rem(44)})`,
+              width: rem(620),
+              height: rem(50),
+              "--flow-len": rem(220),
+              "--flow-dur": "2.2s",
+              backgroundImage: `linear-gradient(to ${side === "left" ? "left" : "right"}, rgba(255,90,100,0) 0%, rgba(255,120,128,0.55) 30%, rgba(200,20,40,0.3) 60%, rgba(255,90,100,0) 100%)`,
+              backgroundSize: `${rem(220)} 100%`,
+              ...masks(
+                `linear-gradient(to ${side}, #000 0%, rgba(0,0,0,0.6) 35%, transparent 100%)`,
+                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 85%, rgba(0,0,0,0.4) 100%)"
+              ),
+            } as React.CSSProperties
+          }
+        />
+      ))}
     </>
   );
 }
@@ -326,8 +296,28 @@ export default function Hero() {
           }
         />
 
-        {/* phones never load three.js: the CSS beam and a static haze stand in */}
-        {!wide && layout.hitPx > 0 && <PhoneHaze left={beamPct} height={layout.hitPx} />}
+        {/* phones never load three.js — no laser at all, a pillar of light in the site's reds instead */}
+        {!wide && (
+          <Suspense fallback={null}>
+            <LightPillar
+              topColor="#FF3B47"
+              bottomColor="#9E0F1E"
+              intensity={0.6}
+              glowAmount={0.0016}
+              bloom={0.45}
+              pillarWidth={2.1}
+              pillarHeight={0.4}
+              pillarRotation={22}
+              rotationSpeed={0.25}
+              detail={3}
+              noiseIntensity={0.35}
+              interactive={false}
+              clickPulse={false}
+              quality="low"
+              maxDpr={1}
+            />
+          </Suspense>
+        )}
         {wide && (
           <Suspense fallback={null}>
             <LaserFlow
@@ -360,7 +350,7 @@ export default function Hero() {
             Spares the beam and its glow, and the wide flare where it lands on the card. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 max-md:hidden"
           style={{
             backgroundColor: SKY,
             opacity: 0.4,
@@ -396,7 +386,7 @@ export default function Hero() {
         )}
 
         {/* layered beam in front of the clouds: crimson haze → red glow → pink halo → white core, plus a flared skirt */}
-        {layout.hitPx > 0 && <BeamLayers left={beamPct} height={layout.hitPx} still={!wide} />}
+        {wide && layout.hitPx > 0 && <BeamLayers left={beamPct} height={layout.hitPx} />}
         {/* sparks riding the beam down into the card */}
         {wide && layout.hitPx > 0 && <BeamParticles left={beamPct} height={layout.hitPx} />}
       </motion.div>
@@ -404,7 +394,7 @@ export default function Hero() {
       {/* stage: copy left of the beam (the bell lives behind the clouds) — lets the cursor through to the logo */}
       <div className="pointer-events-none relative z-10">
         <div className="mx-auto flex min-h-[clamp(40rem,82svh,57.5rem)] max-w-[88rem] flex-col justify-center px-4 pb-28 pt-[8.75rem] [@media(max-width:400px)_and_(max-height:650px)]:pt-[6.25rem] md:min-h-[max(30rem,calc(100svh-16.625rem))] md:px-8 md:pb-[clamp(1.5rem,4vh,3.5rem)] min-[1224px]:pb-[clamp(1.25rem,3.4vh,3.5rem)] md:pt-[clamp(6.25rem,13vh,7.75rem)] min-[1224px]:pt-[clamp(7.625rem,13vh,8.25rem)]">
-          <div ref={copyRef} className="pointer-events-auto max-w-[80%] md:max-w-[min(48rem,52vw)]">
+          <div ref={copyRef} className="pointer-events-auto max-w-[80%] md:max-w-[min(48rem,52vw)] max-md:mx-auto max-md:max-w-full max-md:text-center">
             <Reveal delay={0.45}>
               <Kicker className="xl:text-[clamp(0.9375rem,2vh,1.0938rem)]">{HERO.kicker}</Kicker>
             </Reveal>
@@ -428,13 +418,13 @@ export default function Hero() {
             </h1>
 
             <Reveal delay={0.75}>
-              <p className="mt-6 max-w-[40rem] text-[1.0625rem] leading-relaxed text-paper/70 md:text-[1.3125rem] xl:max-w-[44rem] xl:text-[clamp(1.3125rem,2.9vh,1.625rem)]">
+              <p className="mt-6 max-w-[40rem] text-[1.0625rem] max-md:mx-auto max-md:max-w-[22rem] leading-relaxed text-paper/70 md:text-[1.3125rem] xl:max-w-[44rem] xl:text-[clamp(1.3125rem,2.9vh,1.625rem)]">
                 {cz(HERO.description)}
               </p>
             </Reveal>
 
             <Reveal delay={0.85}>
-              <div className="mt-10 flex flex-wrap items-center gap-3">
+              <div className="mt-10 flex flex-wrap items-center gap-3 max-md:justify-center">
                 <PrimaryCta href="#kontakt">{HERO.primaryCta}</PrimaryCta>
                 <SecondaryCta href="#koncepty" photo={CTA_PHOTO}>
                   {HERO.secondaryCta}

@@ -13,6 +13,7 @@
  * `onOpen` with its on-screen box, for the page morph. The row keeps its place across remounts
  * and holds still while a photo is flying, so Back lands the photo on the same card.
  * Images need CORS (Pexels sends it); without WebGL the row is a static strip.
+ * With `blur` (phones) the ends just go soft and fade instead of crumbling, and there is no dust.
  */
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -37,6 +38,8 @@ type Props = {
   stepDuration?: number;
   /** where the crumbling starts, as a share of the half-width out from the centre */
   zone?: number;
+  /** blur and fade the ends instead of crumbling them to dust (cheaper — for phones) */
+  blur?: boolean;
   className?: string;
 };
 
@@ -44,6 +47,8 @@ type Props = {
 const PAD = 70;
 const GAP = 16;
 const RADIUS = 20;
+/** how soft a card gets at the very edge of the row in blur mode, design px */
+const BLUR_MAX = 14;
 /** dust particles per card: a jittered grid */
 const DUST_COLS = 60;
 const DUST_ROWS = 58;
@@ -93,6 +98,7 @@ uniform float u_radius;
 uniform float u_grain;
 uniform float u_light;
 uniform float u_seed;
+uniform float u_blur;
 varying vec2 v_uv;
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -111,8 +117,26 @@ void main() {
   vec2 px = v_uv * u_rect.zw;
   if (rbox(px - u_rect.zw * 0.5, u_rect.zw * 0.5, u_radius) > 0.0) discard;
 
-  // each grain drops out once the edge amount passes its threshold: fine sand over soft patches
   float a = amount(u_rect.x + px.x) * 1.08;
+
+  // blur mode: the photo goes soft toward the sides and fades out — a disc of taps on a golden-angle spiral
+  if (u_blur > 0.0) {
+    float k = min(a, 1.0);
+    vec3 sum = vec3(0.0);
+    for (int i = 0; i < 20; i++) {
+      float fi = float(i);
+      float r = sqrt((fi + 0.5) / 20.0) * k * u_blur;
+      float th = fi * 2.39996;
+      sum += texture2D(u_tex, cover(v_uv + vec2(cos(th), sin(th)) * r / u_rect.zw)).rgb;
+    }
+    vec3 soft = sum / 20.0 * u_light;
+    soft = mix(soft, vec3(0.078, 0.071, 0.082), smoothstep(0.38, 1.0, v_uv.y) * 0.88);
+    float keep = 1.0 - smoothstep(0.45, 1.0, k);
+    gl_FragColor = vec4(soft * keep, keep);
+    return;
+  }
+
+  // each grain drops out once the edge amount passes its threshold: fine sand over soft patches
   vec2 cell = floor(gl_FragCoord.xy / u_grain);
   float n = 0.55 * hash(cell + u_seed) + 0.45 * vnoise(v_uv * vec2(5.0, 6.5) + u_seed);
   if (n < a) discard;
@@ -191,7 +215,7 @@ const smooth = (e0: number, e1: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-export default function GrainyCarousel({ items, onOpen, renderCaption, stepDuration = 3, zone = 0.6, className }: Props) {
+export default function GrainyCarousel({ items, onOpen, renderCaption, stepDuration = 3, zone = 0.6, blur = false, className }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const captionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -256,7 +280,7 @@ export default function GrainyCarousel({ items, onOpen, renderCaption, stepDurat
       return;
     }
     const shared = ["rect", "res", "zone", "aspect", "tex", "light"];
-    cardU = uniformsOf(gl, cardP, [...shared, "radius", "grain", "seed"]);
+    cardU = uniformsOf(gl, cardP, [...shared, "radius", "grain", "seed", "blur"]);
     dustU = uniformsOf(gl, dustP, [...shared, "dpr"]);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
@@ -370,6 +394,7 @@ export default function GrainyCarousel({ items, onOpen, renderCaption, stepDurat
         gl.uniform1f(cardU.radius, radius);
         gl.uniform1f(cardU.grain, Math.max(1, 2 * dpr));
         gl.uniform1f(cardU.seed, i * 17.3);
+        gl.uniform1f(cardU.blur, blur ? BLUR_MAX * remScale() : 0);
         gl.bindBuffer(gl.ARRAY_BUFFER, quad);
         const cl = gl.getAttribLocation(cardP, "a_uv");
         gl.enableVertexAttribArray(cl);
@@ -377,9 +402,9 @@ export default function GrainyCarousel({ items, onOpen, renderCaption, stepDurat
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         gl.disableVertexAttribArray(cl);
 
-        // dust only for cards reaching into the crumbling zone
+        // dust only for cards reaching into the crumbling zone (and never in blur mode)
         const reach = Math.max(Math.abs(x - half), Math.abs(x + CW - half)) / half;
-        if (reach <= zone) continue;
+        if (blur || reach <= zone) continue;
         gl.useProgram(dustP);
         setShared(dustU, x, i);
         gl.uniform1f(dustU.dpr, dpr);
@@ -471,7 +496,7 @@ export default function GrainyCarousel({ items, onOpen, renderCaption, stepDurat
       gl.deleteProgram(cardP);
       gl.deleteProgram(dustP);
     };
-  }, [items, stepDuration, zone, reduce]);
+  }, [items, stepDuration, zone, blur, reduce]);
 
   const height = size.ch ? size.ch + size.pad * 2 : undefined;
 
