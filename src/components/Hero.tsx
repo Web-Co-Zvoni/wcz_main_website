@@ -97,7 +97,24 @@ const masks = (...layers: string[]): React.CSSProperties => ({
   WebkitMaskComposite: "source-in",
 });
 
-function BeamLayers({ left, height }: { left: string; height: number }) {
+/**
+ * Phones: the CSS beam stands alone — no WebGL fog, clouds or sparks. This haze stands in for the
+ * fog LaserFlow throws round the beam: brightest at the foot, thinning up and away from the beam.
+ */
+function PhoneHaze({ left, height }: { left: string; height: number }) {
+  return (
+    <div
+      className="absolute inset-x-0 top-0"
+      style={{
+        height: height + 40,
+        background: `radial-gradient(ellipse 85% 42% at ${left} 100%, rgba(214,32,54,0.5), rgba(150,16,36,0.22) 55%, transparent 100%), radial-gradient(ellipse 60% 85% at ${left} 55%, rgba(150,18,40,0.38), rgba(110,12,30,0.16) 60%, transparent 100%)`,
+      }}
+    />
+  );
+}
+
+/** `still`: no moving light in the beam (phones — a background-position loop repaints every frame) */
+function BeamLayers({ left, height, still = false }: { left: string; height: number; still?: boolean }) {
   return (
     <>
       {BEAM_LAYERS.map((l, i) => {
@@ -124,24 +141,25 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
       })}
 
       {/* flow: bands sliding down inside the beam, each colour at its own pace */}
-      {FLOW_LAYERS.map((f) => (
-        <span
-          key={f.w}
-          className="absolute top-0 -translate-x-1/2 mix-blend-screen motion-safe:animate-[beam-flow_var(--flow-dur)_linear_infinite]"
-          style={
-            {
-              left,
-              width: rem(f.w),
-              height,
-              "--flow-len": rem(f.len),
-              "--flow-dur": `${f.dur}s`,
-              backgroundImage: `linear-gradient(to bottom, rgba(${f.rgb},0) 0%, rgba(${f.rgb},${f.a}) 38%, rgba(${f.rgb},${f.a * 0.25}) 62%, rgba(${f.rgb},0) 100%)`,
-              backgroundSize: `100% ${rem(f.len)}`,
-              ...masks(SOFT_MASK, "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 30%, #000 85%, #000 100%)"),
-            } as React.CSSProperties
-          }
-        />
-      ))}
+      {!still &&
+        FLOW_LAYERS.map((f) => (
+          <span
+            key={f.w}
+            className="absolute top-0 -translate-x-1/2 mix-blend-screen motion-safe:animate-[beam-flow_var(--flow-dur)_linear_infinite]"
+            style={
+              {
+                left,
+                width: rem(f.w),
+                height,
+                "--flow-len": rem(f.len),
+                "--flow-dur": `${f.dur}s`,
+                backgroundImage: `linear-gradient(to bottom, rgba(${f.rgb},0) 0%, rgba(${f.rgb},${f.a}) 38%, rgba(${f.rgb},${f.a * 0.25}) 62%, rgba(${f.rgb},0) 100%)`,
+                backgroundSize: `100% ${rem(f.len)}`,
+                ...masks(SOFT_MASK, "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 30%, #000 85%, #000 100%)"),
+              } as React.CSSProperties
+            }
+          />
+        ))}
 
       {/* edge highlights of the cylinder, strongest near the impact */}
       {[-24, 24].map((dx) => (
@@ -177,28 +195,29 @@ function BeamLayers({ left, height }: { left: string; height: number }) {
       />
 
       {/* light running off the impact along the card edge, both ways */}
-      {(["left", "right"] as const).map((side) => (
-        <span
-          key={side}
-          className={`absolute mix-blend-screen ${side === "left" ? "-translate-x-full motion-safe:animate-[edge-flow-left_var(--flow-dur)_linear_infinite]" : "motion-safe:animate-[edge-flow-right_var(--flow-dur)_linear_infinite]"}`}
-          style={
-            {
-              left,
-              top: `calc(${height}px - ${rem(44)})`,
-              width: rem(620),
-              height: rem(50),
-              "--flow-len": rem(220),
-              "--flow-dur": "2.2s",
-              backgroundImage: `linear-gradient(to ${side === "left" ? "left" : "right"}, rgba(255,90,100,0) 0%, rgba(255,120,128,0.55) 30%, rgba(200,20,40,0.3) 60%, rgba(255,90,100,0) 100%)`,
-              backgroundSize: `${rem(220)} 100%`,
-              ...masks(
-                `linear-gradient(to ${side}, #000 0%, rgba(0,0,0,0.6) 35%, transparent 100%)`,
-                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 85%, rgba(0,0,0,0.4) 100%)"
-              ),
-            } as React.CSSProperties
-          }
-        />
-      ))}
+      {!still &&
+        (["left", "right"] as const).map((side) => (
+          <span
+            key={side}
+            className={`absolute mix-blend-screen ${side === "left" ? "-translate-x-full motion-safe:animate-[edge-flow-left_var(--flow-dur)_linear_infinite]" : "motion-safe:animate-[edge-flow-right_var(--flow-dur)_linear_infinite]"}`}
+            style={
+              {
+                left,
+                top: `calc(${height}px - ${rem(44)})`,
+                width: rem(620),
+                height: rem(50),
+                "--flow-len": rem(220),
+                "--flow-dur": "2.2s",
+                backgroundImage: `linear-gradient(to ${side === "left" ? "left" : "right"}, rgba(255,90,100,0) 0%, rgba(255,120,128,0.55) 30%, rgba(200,20,40,0.3) 60%, rgba(255,90,100,0) 100%)`,
+                backgroundSize: `${rem(220)} 100%`,
+                ...masks(
+                  `linear-gradient(to ${side}, #000 0%, rgba(0,0,0,0.6) 35%, transparent 100%)`,
+                  "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, #000 85%, rgba(0,0,0,0.4) 100%)"
+                ),
+              } as React.CSSProperties
+            }
+          />
+        ))}
     </>
   );
 }
@@ -307,33 +326,35 @@ export default function Hero() {
           }
         />
 
-        <Suspense fallback={null}>
-          <LaserFlow
-            color="#FF3B47"
-            deepColor="#9E0F1E"
-            coreColor="#FFF1E8"
-            coreStrength={0.9}
-            arch={layout.arch}
-            backgroundColor="transparent"
-            horizontalBeamOffset={layout.beamX - 0.5}
-            verticalBeamOffset={layout.beamY}
-            horizontalSizing={1.5}
-            fogSpread={2.6}
-            // phones: draw the beam as on a laptop-wide screen, so it keeps its body and the wisps still run down it
-            minWidth={wide ? 0 : 1700}
-            verticalSizing={2}
-            wispDensity={1.2}
-            wispIntensity={7}
-            wispSpeed={14}
-            flowSpeed={0.35}
-            flowStrength={0.3}
-            fogIntensity={0.9}
-            fogScale={0.24}
-            fogFallSpeed={0.5}
-            decay={1.15}
-            dpr={DPR}
-          />
-        </Suspense>
+        {/* phones never load three.js: the CSS beam and a static haze stand in */}
+        {!wide && layout.hitPx > 0 && <PhoneHaze left={beamPct} height={layout.hitPx} />}
+        {wide && (
+          <Suspense fallback={null}>
+            <LaserFlow
+              color="#FF3B47"
+              deepColor="#9E0F1E"
+              coreColor="#FFF1E8"
+              coreStrength={0.9}
+              arch={layout.arch}
+              backgroundColor="transparent"
+              horizontalBeamOffset={layout.beamX - 0.5}
+              verticalBeamOffset={layout.beamY}
+              horizontalSizing={1.5}
+              fogSpread={2.6}
+              verticalSizing={2}
+              wispDensity={1.2}
+              wispIntensity={7}
+              wispSpeed={14}
+              flowSpeed={0.35}
+              flowStrength={0.3}
+              fogIntensity={0.9}
+              fogScale={0.24}
+              fogFallSpeed={0.5}
+              decay={1.15}
+              dpr={DPR}
+            />
+          </Suspense>
+        )}
 
         {/* dims the sky behind the clouds, so it stays dark even where the cursor has parted them.
             Spares the beam and its glow, and the wide flare where it lands on the card. */}
@@ -365,17 +386,19 @@ export default function Hero() {
         )}
 
         {/* clouds drifting round the beam; the cursor parts them to show the grid, beam and logo behind */}
-        <CloudLayer
-          beamX={layout.beamX}
-          floorPx={layout.hitPx}
-          logo={layout.logoR > 0 ? { x: layout.logoX, y: layout.logoY, r: layout.logoR } : undefined}
-          className="absolute inset-0"
-        />
+        {wide && (
+          <CloudLayer
+            beamX={layout.beamX}
+            floorPx={layout.hitPx}
+            logo={layout.logoR > 0 ? { x: layout.logoX, y: layout.logoY, r: layout.logoR } : undefined}
+            className="absolute inset-0"
+          />
+        )}
 
         {/* layered beam in front of the clouds: crimson haze → red glow → pink halo → white core, plus a flared skirt */}
-        {layout.hitPx > 0 && <BeamLayers left={beamPct} height={layout.hitPx} />}
+        {layout.hitPx > 0 && <BeamLayers left={beamPct} height={layout.hitPx} still={!wide} />}
         {/* sparks riding the beam down into the card */}
-        {layout.hitPx > 0 && <BeamParticles left={beamPct} height={layout.hitPx} />}
+        {wide && layout.hitPx > 0 && <BeamParticles left={beamPct} height={layout.hitPx} />}
       </motion.div>
 
       {/* stage: copy left of the beam (the bell lives behind the clouds) — lets the cursor through to the logo */}
