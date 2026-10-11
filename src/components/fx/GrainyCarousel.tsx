@@ -40,6 +40,8 @@ type Props = {
   zone?: number;
   /** blur and fade the ends instead of crumbling them to dust (cheaper — for phones) */
   blur?: boolean;
+  /** hold off WebGL and the photos until the visitor first scrolls (or the row shows) — phones, where it sits below the fold */
+  deferred?: boolean;
   className?: string;
 };
 
@@ -215,7 +217,7 @@ const smooth = (e0: number, e1: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-export default function GrainyCarousel({ items, onOpen, renderCaption, stepDuration = 3, zone = 0.6, blur = false, className }: Props) {
+export default function GrainyCarousel({ items, onOpen, renderCaption, stepDuration = 3, zone = 0.6, blur = false, deferred = false, className }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const captionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -224,11 +226,38 @@ export default function GrainyCarousel({ items, onOpen, renderCaption, stepDurat
   const [size, setSize] = useState({ w: 0, cw: 0, ch: 0, pad: PAD });
   const onOpenRef = useRef(onOpen);
   onOpenRef.current = onOpen;
+  const [near, setNear] = useState(false);
+  const live = !deferred || near;
+
+  // deferred: the row already takes its full height (nothing shifts when it starts) and starts on the first
+  // scroll — it is then still about a screen away, time enough for its photos — or as soon as it shows
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (live || !wrap) return;
+    const measure = () => {
+      const W = wrap.clientWidth;
+      const s = remScale();
+      const cw = Math.round(cardWidth(W, s));
+      setSize({ w: W, cw, ch: cardHeight(cw), pad: Math.round(PAD * s) });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(wrap);
+    const start = () => setNear(true);
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && start());
+    io.observe(wrap);
+    window.addEventListener("scroll", start, { once: true, passive: true });
+    return () => {
+      ro.disconnect();
+      io.disconnect();
+      window.removeEventListener("scroll", start);
+    };
+  }, [live]);
 
   useEffect(() => {
     const wrap = wrapRef.current;
     const canvas = canvasRef.current;
-    if (!wrap || !canvas) return;
+    if (!live || !wrap || !canvas) return;
     // a const the hoisted draw() can use without null checks
     const stage: HTMLDivElement = wrap;
     const ctx = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: true });
@@ -496,7 +525,7 @@ export default function GrainyCarousel({ items, onOpen, renderCaption, stepDurat
       gl.deleteProgram(cardP);
       gl.deleteProgram(dustP);
     };
-  }, [items, stepDuration, zone, blur, reduce]);
+  }, [items, stepDuration, zone, blur, reduce, live]);
 
   const height = size.ch ? size.ch + size.pad * 2 : undefined;
 

@@ -1,4 +1,4 @@
-import{r as k,j as I}from"./index-C9hU_oKZ.js";import{R as j,M as G,P as H,T as O}from"./Triangle-DfWMHKQ0.js";const m=8,Z=`#version 300 es
+import{r as k,j as I}from"./index-Dt8tnnuE.js";import{R as j,M as G,P as H,T as O}from"./Triangle-DfWMHKQ0.js";const m=8,Z=`#version 300 es
 in vec2 position;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);

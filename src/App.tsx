@@ -16,20 +16,27 @@ import NotFound from "./pages/NotFound";
 /** Butter-smooth scrolling, anchored navigation, and links between the site's pages without reloads */
 function useSmoothScroll() {
   useEffect(() => {
-    const lenis = new Lenis({ lerp: SETTINGS.smoothScrollLerp, smoothWheel: true });
+    // touch screens scroll natively — Lenis only smooths the wheel, and its loop would run every frame for nothing
+    const touch = window.matchMedia("(hover: none)").matches;
+    const lenis = touch ? null : new Lenis({ lerp: SETTINGS.smoothScrollLerp, smoothWheel: true });
     setLenis(lenis);
     let raf = 0;
-    const loop = (t: number) => {
-      lenis.raf(t);
+    if (lenis) {
+      const loop = (t: number) => {
+        lenis.raf(t);
+        raf = requestAnimationFrame(loop);
+      };
       raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+    }
 
-    const glide = (el: Element) =>
-      lenis.scrollTo(el as HTMLElement, {
-        offset: SETTINGS.smoothScrollOffset,
-        duration: SETTINGS.smoothScrollDuration,
-      });
+    const glide = (el: Element) => {
+      if (lenis)
+        lenis.scrollTo(el as HTMLElement, {
+          offset: SETTINGS.smoothScrollOffset,
+          duration: SETTINGS.smoothScrollDuration,
+        });
+      else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + SETTINGS.smoothScrollOffset, behavior: "smooth" });
+    };
 
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -58,7 +65,7 @@ function useSmoothScroll() {
     return () => {
       cancelAnimationFrame(raf);
       setLenis(null);
-      lenis.destroy();
+      lenis?.destroy();
       document.removeEventListener("click", onClick);
     };
   }, []);
