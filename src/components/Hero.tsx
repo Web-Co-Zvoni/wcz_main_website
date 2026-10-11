@@ -1,13 +1,12 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Suspense, lazy, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { HERO, PORTFOLIO } from "../content";
-import { useWide } from "../lib/useWide";
+import { isWide, useWide } from "../lib/useWide";
+import { afterLoadIdle } from "../utils/idle";
 import { remScale } from "../utils/remScale";
 import { cz } from "../utils/typo";
-import ChargedLogo from "./ChargedLogo";
 import { PrimaryCta, SecondaryCta } from "./HeroCtas";
 import BeamParticles from "./fx/BeamParticles";
-import CloudLayer from "./fx/CloudLayer";
 import logoWcz from "../assets/brand/logo-wcz.svg";
 import { EASE, Kicker, Reveal } from "./ui";
 
@@ -15,6 +14,16 @@ import { EASE, Kicker, Reveal } from "./ui";
 const LaserFlow = lazy(() => import("./fx/LaserFlow"));
 // phones: no laser at all — a slowly turning pillar of light behind the centred copy instead
 const LightPillar = lazy(() => import("./fx/LightPillar"));
+// the clouds and the charged logo (ogl) are desktop-only: their own chunk, which phones never fetch
+// and wide screens start fetching as soon as this module runs, alongside the first render
+const loadClouds = () => import("./fx/CloudLayer");
+const loadLogo = () => import("./ChargedLogo");
+if (isWide()) {
+  void loadClouds();
+  void loadLogo();
+}
+const CloudLayer = lazy(loadClouds);
+const ChargedLogo = lazy(loadLogo);
 
 /** night sky above the card; the card itself is the page colour, so it flows on */
 const SKY = "#0f0d10";
@@ -198,6 +207,9 @@ export default function Hero() {
   const copyRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const wide = useWide();
+  // phones: the pillar starts once the page has loaded and gone quiet, so its GPU setup stays out of the first paint
+  const [pillar, setPillar] = useState(false);
+  useEffect(() => (wide ? undefined : afterLoadIdle(() => setPillar(true))), [wide]);
   const [layout, setLayout] = useState<Layout>({ beamX: 0.62, beamY: -0.25, arch: 64, hitPx: 0, logoX: 0.81, logoY: 0, logoR: 0 });
 
   useLayoutEffect(() => {
@@ -297,7 +309,7 @@ export default function Hero() {
         />
 
         {/* phones never load three.js — no laser at all, a pillar of light in the site's reds instead */}
-        {!wide && (
+        {!wide && pillar && (
           <Suspense fallback={null}>
             <LightPillar
               topColor="#FF3B47"
@@ -371,18 +383,22 @@ export default function Hero() {
             // the mark sits high in its box — drop the box so the mark itself is level with the copy
             style={{ left: bellPct, top: layout.logoY ? `calc(${layout.logoY}px + clamp(1.75rem,2.8vw,3rem))` : "50%" }}
           >
-            <ChargedLogo src={logoWcz} scale={0.68} className="relative aspect-[5/6] w-full cursor-pointer" />
+            <Suspense fallback={null}>
+              <ChargedLogo src={logoWcz} scale={0.68} className="relative aspect-[5/6] w-full cursor-pointer" />
+            </Suspense>
           </motion.div>
         )}
 
         {/* clouds drifting round the beam; the cursor parts them to show the grid, beam and logo behind */}
         {wide && (
-          <CloudLayer
-            beamX={layout.beamX}
-            floorPx={layout.hitPx}
-            logo={layout.logoR > 0 ? { x: layout.logoX, y: layout.logoY, r: layout.logoR } : undefined}
-            className="absolute inset-0"
-          />
+          <Suspense fallback={null}>
+            <CloudLayer
+              beamX={layout.beamX}
+              floorPx={layout.hitPx}
+              logo={layout.logoR > 0 ? { x: layout.logoX, y: layout.logoY, r: layout.logoR } : undefined}
+              className="absolute inset-0"
+            />
+          </Suspense>
         )}
 
         {/* layered beam in front of the clouds: crimson haze → red glow → pink halo → white core, plus a flared skirt */}
@@ -395,7 +411,7 @@ export default function Hero() {
       <div className="pointer-events-none relative z-10">
         <div className="mx-auto flex min-h-[clamp(40rem,82svh,57.5rem)] max-w-[88rem] flex-col justify-center px-4 pb-28 pt-[8.75rem] [@media(max-width:400px)_and_(max-height:650px)]:pt-[6.25rem] md:min-h-[max(30rem,calc(100svh-16.625rem))] md:px-8 md:pb-[clamp(1.5rem,4vh,3.5rem)] min-[1224px]:pb-[clamp(1.25rem,3.4vh,3.5rem)] md:pt-[clamp(6.25rem,13vh,7.75rem)] min-[1224px]:pt-[clamp(7.625rem,13vh,8.25rem)]">
           <div ref={copyRef} className="pointer-events-auto max-w-[80%] md:max-w-[min(48rem,52vw)] max-md:mx-auto max-md:max-w-full max-md:text-center">
-            <Reveal delay={0.45}>
+            <Reveal delay={wide ? 0.45 : 0}>
               <Kicker className="xl:text-[clamp(0.9375rem,2vh,1.0938rem)]">{HERO.kicker}</Kicker>
             </Reveal>
 
@@ -405,7 +421,8 @@ export default function Hero() {
                 // down to cover them, and a negative margin keeps the lines exactly where they were
                 <span key={line} className="-mb-[0.18em] block overflow-hidden pb-[0.24em]">
                   <motion.span
-                    initial={{ y: "110%" }}
+                    // phones: the headline is there from the first paint — it's what Lighthouse times as LCP
+                    initial={wide ? { y: "110%" } : false}
                     animate={{ y: 0 }}
                     transition={{ duration: 1.1, delay: 0.45 + i * 0.12, ease: EASE }}
                     // white on top shading to grey at the foot of the letters, for a little depth
@@ -417,13 +434,13 @@ export default function Hero() {
               ))}
             </h1>
 
-            <Reveal delay={0.75}>
+            <Reveal delay={wide ? 0.75 : 0.05}>
               <p className="mt-6 max-w-[40rem] text-[1.0625rem] max-md:mx-auto max-md:max-w-[22rem] leading-relaxed text-paper/70 md:text-[1.3125rem] xl:max-w-[44rem] xl:text-[clamp(1.3125rem,2.9vh,1.625rem)]">
                 {cz(HERO.description)}
               </p>
             </Reveal>
 
-            <Reveal delay={0.85}>
+            <Reveal delay={wide ? 0.85 : 0.1}>
               <div className="mt-10 flex flex-wrap items-center gap-3 max-md:justify-center">
                 <PrimaryCta href="#kontakt">{HERO.primaryCta}</PrimaryCta>
                 <SecondaryCta href="#koncepty" photo={CTA_PHOTO}>

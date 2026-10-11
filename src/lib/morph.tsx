@@ -14,6 +14,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { flushSync } from "react-dom";
 import { cn } from "../utils/cn";
 import { remScale } from "../utils/remScale";
+import { preloadPage } from "./pages";
 import { applyPop, commit, currentEntry, go, onPop, parseRoute, type Entry, type MorphRecord } from "./router";
 import { jumpTo, lockScroll, transition } from "./scroll";
 
@@ -167,7 +168,8 @@ export function MorphProvider({ children }: { children: ReactNode }) {
     const flight = fly(box, from, to);
     if (shadeRef.current) animate(shadeRef.current, { opacity: 0 }, { duration: 0.6, ease: "easeOut" });
     animate(box, { filter: "brightness(1)" }, { duration: 0.6 });
-    await animate(backdrop, { opacity: 1 }, { duration: COVER_TIME, ease: "easeOut" });
+    // the new page's chunk is normally fetched already; if not, the photo keeps flying while it comes
+    await Promise.all([animate(backdrop, { opacity: 1 }, { duration: COVER_TIME, ease: "easeOut" }), preloadPage(kind)]);
 
     // 2 — swap the page underneath; the course bends to where the photo really lives there
     commit(o.href, { morph: record });

@@ -1,17 +1,16 @@
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import Lenis from "lenis";
 import { Send } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { CONTACT, SETTINGS } from "./content";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { InstantReveal } from "./components/ui";
 import { MorphProvider } from "./lib/morph";
+import { ConceptPage, NichePage, preloadPages } from "./lib/pages";
 import { go, parseRoute, useEntry } from "./lib/router";
 import { setLenis } from "./lib/scroll";
-import ConceptPage from "./pages/ConceptPage";
 import Home from "./pages/Home";
-import NichePage from "./pages/NichePage";
 import NotFound from "./pages/NotFound";
 
 /** Butter-smooth scrolling, anchored navigation, and links between the site's pages without reloads */
@@ -111,6 +110,8 @@ function FloatingEnquiry() {
 
 export default function App() {
   useSmoothScroll();
+  // the sub-pages are separate chunks: fetch them in the background once this page has settled
+  useEffect(preloadPages, []);
   const entry = useEntry();
   const route = parseRoute(entry.path);
 
@@ -123,15 +124,17 @@ export default function App() {
           {/* a page brought back with Back is shown as it was left, without its entrance */}
           <InstantReveal.Provider value={entry.restored}>
             <main key={entry.path}>
-              {route.page === "home" ? (
-                <Home />
-              ) : route.page === "niche" ? (
-                <NichePage slug={route.slug} />
-              ) : route.page === "concept" ? (
-                <ConceptPage slug={route.slug} />
-              ) : (
-                <NotFound />
-              )}
+              <Suspense fallback={null}>
+                {route.page === "home" ? (
+                  <Home />
+                ) : route.page === "niche" ? (
+                  <NichePage slug={route.slug} />
+                ) : route.page === "concept" ? (
+                  <ConceptPage slug={route.slug} />
+                ) : (
+                  <NotFound />
+                )}
+              </Suspense>
             </main>
           </InstantReveal.Provider>
           <Footer />

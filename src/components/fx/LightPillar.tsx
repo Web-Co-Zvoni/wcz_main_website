@@ -1,8 +1,9 @@
 /**
  * Light Pillar — a ray-marched column of light strands that slowly turns, from React Bits
- * (reactbits.dev, JS + CSS variant). Ported to TypeScript as is, with two changes: `maxDpr`
- * caps the canvas resolution (the pillar is soft, so phones can draw it at 1×), and the GPU
- * context is only released once the canvas has left the page (StrictMode-safe).
+ * (reactbits.dev, JS + CSS variant). Ported to TypeScript as is, with three changes: `maxDpr`
+ * caps the canvas resolution (the pillar is soft, so phones can draw it at 1×), the shaders are
+ * built in the background where the driver allows it, and the GPU context is only released
+ * once the canvas has left the page (StrictMode-safe).
  * The light is ray-marched into a small off-screen field (`quality`), then upscaled with
  * bicubic filtering and a mipmap bloom. It rests off screen and in hidden tabs, and a governor
  * lowers the field resolution when frames run slow.
@@ -202,25 +203,27 @@ const ease = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
 
 type Program = { program: WebGLProgram; uniforms: Record<string, WebGLUniformLocation | null> };
 
-const compile = (gl: WebGL2RenderingContext, type: number, source: string) => {
-  const shader = gl.createShader(type);
-  if (!shader) return null;
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
-  gl.deleteShader(shader);
-  return null;
-};
+type Pending = { program: WebGLProgram; vertex: WebGLShader; fragment: WebGLShader };
 
-const link = (gl: WebGL2RenderingContext, fragmentSource: string): Program | null => {
-  const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX);
-  const fragment = compile(gl, gl.FRAGMENT_SHADER, fragmentSource);
+/** compile and link without asking how it went — asking blocks until the driver is done */
+const begin = (gl: WebGL2RenderingContext, fragmentSource: string): Pending | null => {
+  const vertex = gl.createShader(gl.VERTEX_SHADER);
+  const fragment = gl.createShader(gl.FRAGMENT_SHADER);
   const program = gl.createProgram();
   if (!vertex || !fragment || !program) return null;
+  gl.shaderSource(vertex, VERTEX);
+  gl.compileShader(vertex);
+  gl.shaderSource(fragment, fragmentSource);
+  gl.compileShader(fragment);
   gl.attachShader(program, vertex);
   gl.attachShader(program, fragment);
   gl.bindAttribLocation(program, 0, "aPosition");
   gl.linkProgram(program);
+  return { program, vertex, fragment };
+};
+
+/** once it is built: check it linked and look up its uniforms */
+const finish = (gl: WebGL2RenderingContext, { program, vertex, fragment }: Pending): Program | null => {
   gl.deleteShader(vertex);
   gl.deleteShader(fragment);
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
@@ -342,302 +345,329 @@ export default function LightPillar({
     const box: HTMLDivElement = container;
 
     const floatTargets = !!gl.getExtension("EXT_color_buffer_float");
-    const marchProgram = link(gl, MARCH);
-    const compositeProgram = link(gl, COMPOSITE);
-    if (!marchProgram || !compositeProgram) return undefined;
+    // build the shaders in the background where the driver can (KHR_parallel_shader_compile), so the
+    // pillar's first frame doesn't hold up the main thread while they compile
+    const parallel = gl.getExtension("KHR_parallel_shader_compile");
+    const pendingMarch = begin(gl, MARCH);
+    const pendingComposite = begin(gl, COMPOSITE);
+    if (!pendingMarch || !pendingComposite) return undefined;
 
-    const onContextLost = (event: Event) => {
-      event.preventDefault();
-    };
-    const onContextRestored = () => setGeneration((value) => value + 1);
-    cv.addEventListener("webglcontextlost", onContextLost);
-    cv.addEventListener("webglcontextrestored", onContextRestored);
+    const setup = (marchProgram: Program, compositeProgram: Program) => {
+      const onContextLost = (event: Event) => {
+        event.preventDefault();
+      };
+      const onContextRestored = () => setGeneration((value) => value + 1);
+      cv.addEventListener("webglcontextlost", onContextLost);
+      cv.addEventListener("webglcontextrestored", onContextRestored);
 
-    const buffer = gl.createBuffer();
-    const vao = gl.createVertexArray();
-    gl.bindVertexArray(vao);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-
-    let texture: WebGLTexture | null = null;
-    const framebuffer = gl.createFramebuffer();
-    const target = { width: 0, height: 0 };
-    const sizeTarget = (width: number, height: number) => {
-      if (target.width === width && target.height === height) return;
-      target.width = width;
-      target.height = height;
-      if (texture) gl.deleteTexture(texture);
-      texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      const levels = Math.floor(Math.log2(Math.max(width, height))) + 1;
-      gl.texStorage2D(gl.TEXTURE_2D, levels, floatTargets ? gl.RGBA16F : gl.RGBA8, width, height);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-    };
-
-    const probe = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
-    const colorCache = new Map<string, number[]>();
-    const toRgb = (value: string) => {
-      const cached = colorCache.get(value);
-      if (cached) return cached;
-      let rgb = [1, 1, 1];
-      if (probe) {
-        probe.clearRect(0, 0, 1, 1);
-        probe.fillStyle = "#ffffff";
-        probe.fillStyle = value;
-        probe.fillRect(0, 0, 1, 1);
-        const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
-        rgb = [r / 255, g / 255, b / 255];
-      }
-      colorCache.set(value, rgb);
-      return rgb;
-    };
-
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-    const view = { width: 1, height: 1, ratio: 1 };
-    const pointer = { x: 0, y: 0, inside: false };
-    const pulses: { axis: number; age: number }[] = [];
-    const pulseData = new Float32Array(12);
-    const state = {
-      clock: 0,
-      intro: settingsRef.current.intro && !reduce ? 0 : 1,
-      touch: 0,
-      spin: 0,
-      lean: 0,
-      shift: 0,
-      governor: 1,
-      slow: 0,
-      quick: 0,
-    };
-    let raf = 0;
-    let last = 0;
-    let visible = true;
-
-    const axisAt = (x: number, y: number, angle: number) => {
-      const aspect = view.width / view.height;
-      const px = ((x / view.width) * 2 - 1) * aspect - state.shift;
-      const py = 1 - (y / view.height) * 2;
-      return Math.sin(angle) * px + Math.cos(angle) * py;
-    };
-
-    function render() {
-      const s = settingsRef.current;
-      const scale = Math.max(MIN_SCALE, s.scale * state.governor);
-      const fieldWidth = Math.max(1, Math.round(view.width * scale));
-      const fieldHeight = Math.max(1, Math.round(view.height * scale));
-      sizeTarget(fieldWidth, fieldHeight);
-
-      const grow = ease(state.intro);
-      const rise = easeOut(state.intro);
-      const tilt = ((s.pillarRotation + state.lean) * Math.PI) / 180;
-      const angle = state.clock * 0.3 + state.spin;
-      const width = s.pillarWidth * (0.3 + 0.7 * grow);
-
+      const buffer = gl.createBuffer();
+      const vao = gl.createVertexArray();
       gl.bindVertexArray(vao);
-      const m = marchProgram!.uniforms;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-      gl.viewport(0, 0, target.width, target.height);
-      gl.useProgram(marchProgram!.program);
-      gl.uniform1f(m.uTime, state.clock * s.flow);
-      gl.uniform2f(m.uResolution, view.width, view.height);
-      gl.uniform2f(m.uTarget, target.width, target.height);
-      gl.uniform2f(m.uRot, Math.cos(angle), Math.sin(angle));
-      gl.uniform2f(m.uPillarRot, Math.cos(tilt), Math.sin(tilt));
-      gl.uniform2f(m.uWave, Math.sin(s.twist), Math.cos(s.twist));
-      gl.uniform1f(m.uShift, state.shift);
-      gl.uniform1f(m.uPillarWidth, width);
-      gl.uniform1f(m.uPillarHeight, s.pillarHeight);
-      gl.uniform1i(m.uDetail, s.detail);
-      gl.uniform3fv(m.uTopColor, toRgb(s.topColor));
-      gl.uniform3fv(m.uBottomColor, toRgb(s.bottomColor));
-      gl.uniform1f(m.uGlowAmount, s.glowAmount);
-      gl.uniform1f(m.uWidthNorm, width / 3);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      if (s.bloom > 0) gl.generateMipmap(gl.TEXTURE_2D);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
-      pulseData.fill(0);
-      pulses.forEach((pulse, index) => {
-        pulseData.set([pulse.axis + pulse.age * 1.7, Math.exp(-pulse.age / (PULSE_LIFE * 0.45)), 0, 0], index * 4);
-      });
+      let texture: WebGLTexture | null = null;
+      const framebuffer = gl.createFramebuffer();
+      const target = { width: 0, height: 0 };
+      const sizeTarget = (width: number, height: number) => {
+        if (target.width === width && target.height === height) return;
+        target.width = width;
+        target.height = height;
+        if (texture) gl.deleteTexture(texture);
+        texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        const levels = Math.floor(Math.log2(Math.max(width, height))) + 1;
+        gl.texStorage2D(gl.TEXTURE_2D, levels, floatTargets ? gl.RGBA16F : gl.RGBA8, width, height);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      };
 
-      const c = compositeProgram!.uniforms;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      gl.viewport(0, 0, cv.width, cv.height);
-      gl.useProgram(compositeProgram!.program);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.uniform1i(c.uField, 0);
-      gl.uniform2f(c.uFieldSize, target.width, target.height);
-      gl.uniform2f(c.uView, cv.width, cv.height);
-      gl.uniform2f(c.uAspect, view.width / view.height, 1);
-      gl.uniform2f(c.uPillarRot, Math.cos(tilt), Math.sin(tilt));
-      gl.uniform1f(c.uShift, state.shift);
-      gl.uniform1f(c.uIntensity, s.intensity * (0.15 + 0.85 * rise) * (1 + 0.12 * state.touch));
-      gl.uniform1f(c.uNoiseIntensity, s.noiseIntensity);
-      gl.uniform1f(c.uLightMode, s.lightMode ? 1 : 0);
-      const chroma = (rgb: number[]) => Math.max(...rgb) - Math.min(...rgb);
-      const vivid = Math.max(chroma(toRgb(s.topColor)), chroma(toRgb(s.bottomColor)));
-      gl.uniform1f(c.uNeutral, 1 - clamp((vivid - 0.08) / 0.12, 0, 1));
-      gl.uniform1f(c.uBloom, s.bloom);
-      gl.uniform1f(c.uFade, s.fade);
-      const span = view.width / view.height + 1.2;
-      gl.uniform1f(c.uReveal, state.intro >= 1 ? 1e4 : -span + rise * (span * 2 + 1.2));
-      gl.uniform1f(c.uFlare, state.intro >= 1 ? 0 : (1 - rise) * 1.3 * Math.min(1, state.intro * 8));
-      gl.uniform4fv(c.uPulses, pulseData);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    }
+      const probe = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+      const colorCache = new Map<string, number[]>();
+      const toRgb = (value: string) => {
+        const cached = colorCache.get(value);
+        if (cached) return cached;
+        let rgb = [1, 1, 1];
+        if (probe) {
+          probe.clearRect(0, 0, 1, 1);
+          probe.fillStyle = "#ffffff";
+          probe.fillStyle = value;
+          probe.fillRect(0, 0, 1, 1);
+          const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
+          rgb = [r / 255, g / 255, b / 255];
+        }
+        colorCache.set(value, rgb);
+        return rgb;
+      };
 
-    const tune = (dt: number) => {
-      if (dt > 1 / 40) {
-        state.slow += 1;
-        state.quick = 0;
-      } else if (dt < 1 / 55) {
-        state.quick += 1;
-        state.slow = 0;
+      const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+      const view = { width: 1, height: 1, ratio: 1 };
+      const pointer = { x: 0, y: 0, inside: false };
+      const pulses: { axis: number; age: number }[] = [];
+      const pulseData = new Float32Array(12);
+      const state = {
+        clock: 0,
+        intro: settingsRef.current.intro && !reduce ? 0 : 1,
+        touch: 0,
+        spin: 0,
+        lean: 0,
+        shift: 0,
+        governor: 1,
+        slow: 0,
+        quick: 0,
+      };
+      let raf = 0;
+      let last = 0;
+      let visible = true;
+
+      const axisAt = (x: number, y: number, angle: number) => {
+        const aspect = view.width / view.height;
+        const px = ((x / view.width) * 2 - 1) * aspect - state.shift;
+        const py = 1 - (y / view.height) * 2;
+        return Math.sin(angle) * px + Math.cos(angle) * py;
+      };
+
+      function render() {
+        const s = settingsRef.current;
+        const scale = Math.max(MIN_SCALE, s.scale * state.governor);
+        const fieldWidth = Math.max(1, Math.round(view.width * scale));
+        const fieldHeight = Math.max(1, Math.round(view.height * scale));
+        sizeTarget(fieldWidth, fieldHeight);
+
+        const grow = ease(state.intro);
+        const rise = easeOut(state.intro);
+        const tilt = ((s.pillarRotation + state.lean) * Math.PI) / 180;
+        const angle = state.clock * 0.3 + state.spin;
+        const width = s.pillarWidth * (0.3 + 0.7 * grow);
+
+        gl.bindVertexArray(vao);
+        const m = marchProgram.uniforms;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+        gl.viewport(0, 0, target.width, target.height);
+        gl.useProgram(marchProgram.program);
+        gl.uniform1f(m.uTime, state.clock * s.flow);
+        gl.uniform2f(m.uResolution, view.width, view.height);
+        gl.uniform2f(m.uTarget, target.width, target.height);
+        gl.uniform2f(m.uRot, Math.cos(angle), Math.sin(angle));
+        gl.uniform2f(m.uPillarRot, Math.cos(tilt), Math.sin(tilt));
+        gl.uniform2f(m.uWave, Math.sin(s.twist), Math.cos(s.twist));
+        gl.uniform1f(m.uShift, state.shift);
+        gl.uniform1f(m.uPillarWidth, width);
+        gl.uniform1f(m.uPillarHeight, s.pillarHeight);
+        gl.uniform1i(m.uDetail, s.detail);
+        gl.uniform3fv(m.uTopColor, toRgb(s.topColor));
+        gl.uniform3fv(m.uBottomColor, toRgb(s.bottomColor));
+        gl.uniform1f(m.uGlowAmount, s.glowAmount);
+        gl.uniform1f(m.uWidthNorm, width / 3);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        if (s.bloom > 0) gl.generateMipmap(gl.TEXTURE_2D);
+
+        pulseData.fill(0);
+        pulses.forEach((pulse, index) => {
+          pulseData.set([pulse.axis + pulse.age * 1.7, Math.exp(-pulse.age / (PULSE_LIFE * 0.45)), 0, 0], index * 4);
+        });
+
+        const c = compositeProgram.uniforms;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, cv.width, cv.height);
+        gl.useProgram(compositeProgram.program);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.uniform1i(c.uField, 0);
+        gl.uniform2f(c.uFieldSize, target.width, target.height);
+        gl.uniform2f(c.uView, cv.width, cv.height);
+        gl.uniform2f(c.uAspect, view.width / view.height, 1);
+        gl.uniform2f(c.uPillarRot, Math.cos(tilt), Math.sin(tilt));
+        gl.uniform1f(c.uShift, state.shift);
+        gl.uniform1f(c.uIntensity, s.intensity * (0.15 + 0.85 * rise) * (1 + 0.12 * state.touch));
+        gl.uniform1f(c.uNoiseIntensity, s.noiseIntensity);
+        gl.uniform1f(c.uLightMode, s.lightMode ? 1 : 0);
+        const chroma = (rgb: number[]) => Math.max(...rgb) - Math.min(...rgb);
+        const vivid = Math.max(chroma(toRgb(s.topColor)), chroma(toRgb(s.bottomColor)));
+        gl.uniform1f(c.uNeutral, 1 - clamp((vivid - 0.08) / 0.12, 0, 1));
+        gl.uniform1f(c.uBloom, s.bloom);
+        gl.uniform1f(c.uFade, s.fade);
+        const span = view.width / view.height + 1.2;
+        gl.uniform1f(c.uReveal, state.intro >= 1 ? 1e4 : -span + rise * (span * 2 + 1.2));
+        gl.uniform1f(c.uFlare, state.intro >= 1 ? 0 : (1 - rise) * 1.3 * Math.min(1, state.intro * 8));
+        gl.uniform4fv(c.uPulses, pulseData);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
       }
-      if (state.slow > 20) {
-        state.governor = Math.max(0.5, state.governor * 0.85);
-        state.slow = 0;
-      } else if (state.quick > 180 && state.governor < 1) {
-        state.governor = Math.min(1, state.governor * 1.1);
-        state.quick = 0;
-      }
-    };
 
-    const frame = (now: number) => {
-      raf = 0;
-      if (!visible || document.hidden) return;
-      const s = settingsRef.current;
-      const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
-      if (last) tune((now - last) / 1000);
-      last = now;
-      const running = !s.paused && !reduce && s.rotationSpeed !== 0;
-      if (running) state.clock += dt * 0.96 * s.rotationSpeed;
-      if (!s.intro || reduce) state.intro = 1;
-      else if (state.intro < 1) state.intro = Math.min(1, state.intro + dt / INTRO_SECONDS);
+      const tune = (dt: number) => {
+        if (dt > 1 / 40) {
+          state.slow += 1;
+          state.quick = 0;
+        } else if (dt < 1 / 55) {
+          state.quick += 1;
+          state.slow = 0;
+        }
+        if (state.slow > 20) {
+          state.governor = Math.max(0.5, state.governor * 0.85);
+          state.slow = 0;
+        } else if (state.quick > 180 && state.governor < 1) {
+          state.governor = Math.min(1, state.governor * 1.1);
+          state.quick = 0;
+        }
+      };
 
-      const engaged = s.interactive && pointer.inside && !reduce;
-      const aim = engaged ? pointer.x / view.width - 0.5 : 0;
-      const follow = 1 - Math.exp(-dt * 2.4);
-      state.spin += (aim * 1.4 - state.spin) * follow;
-      state.lean += (aim * 9 - state.lean) * follow;
-      state.shift += (aim * 0.35 * (view.width / view.height) - state.shift) * follow;
-      state.touch += ((engaged ? 1 : 0) - state.touch) * (1 - Math.exp(-dt * 3));
+      const frame = (now: number) => {
+        raf = 0;
+        if (!visible || document.hidden) return;
+        const s = settingsRef.current;
+        const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
+        if (last) tune((now - last) / 1000);
+        last = now;
+        const running = !s.paused && !reduce && s.rotationSpeed !== 0;
+        if (running) state.clock += dt * 0.96 * s.rotationSpeed;
+        if (!s.intro || reduce) state.intro = 1;
+        else if (state.intro < 1) state.intro = Math.min(1, state.intro + dt / INTRO_SECONDS);
 
-      for (let i = pulses.length - 1; i >= 0; i--) {
-        pulses[i].age += dt;
-        if (pulses[i].age > PULSE_LIFE * 2.2) pulses.splice(i, 1);
-      }
+        const engaged = s.interactive && pointer.inside && !reduce;
+        const aim = engaged ? pointer.x / view.width - 0.5 : 0;
+        const follow = 1 - Math.exp(-dt * 2.4);
+        state.spin += (aim * 1.4 - state.spin) * follow;
+        state.lean += (aim * 9 - state.lean) * follow;
+        state.shift += (aim * 0.35 * (view.width / view.height) - state.shift) * follow;
+        state.touch += ((engaged ? 1 : 0) - state.touch) * (1 - Math.exp(-dt * 3));
 
-      render();
+        for (let i = pulses.length - 1; i >= 0; i--) {
+          pulses[i].age += dt;
+          if (pulses[i].age > PULSE_LIFE * 2.2) pulses.splice(i, 1);
+        }
 
-      const settling =
-        state.intro < 1 ||
-        pulses.length > 0 ||
-        Math.abs(aim * 1.4 - state.spin) > 0.0005 ||
-        Math.abs((engaged ? 1 : 0) - state.touch) > 0.002;
-      if (running || settling) raf = requestAnimationFrame(frame);
-      else last = 0;
-    };
+        render();
 
-    const wake = () => {
-      if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame);
-    };
+        const settling =
+          state.intro < 1 ||
+          pulses.length > 0 ||
+          Math.abs(aim * 1.4 - state.spin) > 0.0005 ||
+          Math.abs((engaged ? 1 : 0) - state.touch) > 0.002;
+        if (running || settling) raf = requestAnimationFrame(frame);
+        else last = 0;
+      };
 
-    const resize = () => {
-      const width = Math.max(1, box.clientWidth);
-      const height = Math.max(1, box.clientHeight);
-      const ratio = Math.min(window.devicePixelRatio || 1, settingsRef.current.maxDpr);
-      view.width = width;
-      view.height = height;
-      view.ratio = ratio;
-      cv.width = Math.max(1, Math.round(width * ratio));
-      cv.height = Math.max(1, Math.round(height * ratio));
-      if (!raf) render();
-      wake();
-    };
+      const wake = () => {
+        if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame);
+      };
 
-    const locate = (event: PointerEvent) => {
-      const rect = box.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      return { x, y, inside: x >= 0 && y >= 0 && x <= rect.width && y <= rect.height };
-    };
+      const resize = () => {
+        const width = Math.max(1, box.clientWidth);
+        const height = Math.max(1, box.clientHeight);
+        const ratio = Math.min(window.devicePixelRatio || 1, settingsRef.current.maxDpr);
+        view.width = width;
+        view.height = height;
+        view.ratio = ratio;
+        cv.width = Math.max(1, Math.round(width * ratio));
+        cv.height = Math.max(1, Math.round(height * ratio));
+        if (!raf) render();
+        wake();
+      };
 
-    const onPointerMove = (event: PointerEvent) => {
-      const point = locate(event);
-      pointer.x = point.x;
-      pointer.y = point.y;
-      pointer.inside = point.inside;
-      wake();
-    };
+      const locate = (event: PointerEvent) => {
+        const rect = box.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        return { x, y, inside: x >= 0 && y >= 0 && x <= rect.width && y <= rect.height };
+      };
 
-    const onPointerDown = (event: PointerEvent) => {
-      const s = settingsRef.current;
-      if (!s.clickPulse || reduce) return;
-      const point = locate(event);
-      if (!point.inside) return;
-      const tilt = ((s.pillarRotation + state.lean) * Math.PI) / 180;
-      pulses.push({ axis: axisAt(point.x, point.y, tilt), age: 0 });
-      if (pulses.length > 3) pulses.shift();
-      wake();
-    };
+      const onPointerMove = (event: PointerEvent) => {
+        const point = locate(event);
+        pointer.x = point.x;
+        pointer.y = point.y;
+        pointer.inside = point.inside;
+        wake();
+      };
 
-    const onPointerLeave = () => {
-      pointer.inside = false;
-      wake();
-    };
+      const onPointerDown = (event: PointerEvent) => {
+        const s = settingsRef.current;
+        if (!s.clickPulse || reduce) return;
+        const point = locate(event);
+        if (!point.inside) return;
+        const tilt = ((s.pillarRotation + state.lean) * Math.PI) / 180;
+        pulses.push({ axis: axisAt(point.x, point.y, tilt), age: 0 });
+        if (pulses.length > 3) pulses.shift();
+        wake();
+      };
 
-    const onVisibility = () => {
-      last = 0;
-      wake();
-    };
+      const onPointerLeave = () => {
+        pointer.inside = false;
+        wake();
+      };
 
-    const resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(box);
-    const intersection = new IntersectionObserver((entries) => {
-      visible = entries.some((entry) => entry.isIntersecting);
-      if (visible) {
+      const onVisibility = () => {
         last = 0;
         wake();
-      }
-    });
-    intersection.observe(box);
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("pointerdown", onPointerDown, { passive: true });
-    document.documentElement.addEventListener("pointerleave", onPointerLeave);
-    document.addEventListener("visibilitychange", onVisibility);
-    resize();
+      };
 
-    wakeRef.current = () => {
-      if (!raf) render();
-      wake();
+      const resizeObserver = new ResizeObserver(resize);
+      resizeObserver.observe(box);
+      const intersection = new IntersectionObserver((entries) => {
+        visible = entries.some((entry) => entry.isIntersecting);
+        if (visible) {
+          last = 0;
+          wake();
+        }
+      });
+      intersection.observe(box);
+      window.addEventListener("pointermove", onPointerMove, { passive: true });
+      window.addEventListener("pointerdown", onPointerDown, { passive: true });
+      document.documentElement.addEventListener("pointerleave", onPointerLeave);
+      document.addEventListener("visibilitychange", onVisibility);
+      resize();
+
+      wakeRef.current = () => {
+        if (!raf) render();
+        wake();
+      };
+
+      return () => {
+        cancelAnimationFrame(raf);
+        wakeRef.current = null;
+        cv.removeEventListener("webglcontextlost", onContextLost);
+        cv.removeEventListener("webglcontextrestored", onContextRestored);
+        resizeObserver.disconnect();
+        intersection.disconnect();
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerdown", onPointerDown);
+        document.documentElement.removeEventListener("pointerleave", onPointerLeave);
+        document.removeEventListener("visibilitychange", onVisibility);
+        if (texture) gl.deleteTexture(texture);
+        gl.deleteFramebuffer(framebuffer);
+        gl.deleteProgram(marchProgram.program);
+        gl.deleteProgram(compositeProgram.program);
+        gl.deleteBuffer(buffer);
+        gl.deleteVertexArray(vao);
+      };
     };
 
+    let teardown: (() => void) | undefined;
+    let poll = 0;
+    const built = () =>
+      !parallel || [pendingMarch, pendingComposite].every((p) => gl.getProgramParameter(p.program, parallel.COMPLETION_STATUS_KHR));
+    const check = () => {
+      poll = 0;
+      if (!built()) {
+        poll = requestAnimationFrame(check);
+        return;
+      }
+      const marchProgram = finish(gl, pendingMarch);
+      const compositeProgram = finish(gl, pendingComposite);
+      if (marchProgram && compositeProgram) teardown = setup(marchProgram, compositeProgram);
+    };
+    check();
+
     return () => {
-      cancelAnimationFrame(raf);
-      wakeRef.current = null;
-      cv.removeEventListener("webglcontextlost", onContextLost);
-      cv.removeEventListener("webglcontextrestored", onContextRestored);
-      resizeObserver.disconnect();
-      intersection.disconnect();
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerdown", onPointerDown);
-      document.documentElement.removeEventListener("pointerleave", onPointerLeave);
-      document.removeEventListener("visibilitychange", onVisibility);
-      if (texture) gl.deleteTexture(texture);
-      gl.deleteFramebuffer(framebuffer);
-      gl.deleteProgram(marchProgram.program);
-      gl.deleteProgram(compositeProgram.program);
-      gl.deleteBuffer(buffer);
-      gl.deleteVertexArray(vao);
+      cancelAnimationFrame(poll);
+      if (teardown) teardown();
+      else [pendingMarch, pendingComposite].forEach((p) => gl.deleteProgram(p.program));
       // free the GPU context only once the canvas has really left the page: React's StrictMode runs
       // this cleanup and the effect again on the same canvas, which a lost context would leave blank
       setTimeout(() => {
