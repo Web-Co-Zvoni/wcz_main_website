@@ -1,5 +1,5 @@
 import { motion, useInView } from "framer-motion";
-import { ArrowRight, Check, Lock, Quote, Star, UserRound } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Lock, Quote, Star, UserRound } from "lucide-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import Contact from "../components/Contact";
 import CurvedSteps from "../components/CurvedSteps";
@@ -58,7 +58,7 @@ function Hero({ p, d, n, plan, launch }: { p: Item; d: Detail; n: number; plan: 
   // the words sit at z-[2], above the photo while it flies in
   return (
     <section className="relative pb-10 pt-[7.5rem] min-[1224px]:pt-[8.75rem]">
-      <Ambient src={cardPhoto(p.src)} />
+      <Ambient src={d.preview ?? cardPhoto(p.src)} />
       <div className="relative mx-auto max-w-[88rem] px-4 md:px-8">
         <Landed className="relative z-[2] flex items-center justify-between gap-4">
           <BackLink fallback="/#koncepty" label={CONCEPT_PAGE.back} onlyFrom="/" />
@@ -75,7 +75,7 @@ function Hero({ p, d, n, plan, launch }: { p: Item; d: Detail; n: number; plan: 
           </Landed>
           <Landed i={2} className="lg:col-span-4 lg:pb-2">
             <p className="text-[clamp(1.2rem,1.45vw,1.45rem)] font-medium text-paper/85">{p.subtitle}</p>
-            <p className="mt-2 max-w-[36ch] text-[1.0625rem] leading-relaxed text-mute max-md:mx-auto">{cz(CONCEPT_PAGE.honesty)}</p>
+            <p className="mt-2 max-w-[36ch] text-[1.0625rem] leading-relaxed text-mute max-md:mx-auto">{cz(d.live ? CONCEPT_PAGE.honestyLive : CONCEPT_PAGE.honesty)}</p>
           </Landed>
         </div>
 
@@ -99,7 +99,21 @@ function Hero({ p, d, n, plan, launch }: { p: Item; d: Detail; n: number; plan: 
               <span aria-hidden className="w-[3.25rem]" />
             </div>
           </Landed>
-          <MorphImage small={cardPhoto(p.src)} large={conceptPhoto(p.slug)} alt={p.alt} className="aspect-[16/9] w-full rounded-[1.25rem]" />
+          <MorphImage small={cardPhoto(p.src)} large={conceptPhoto(p.slug)} alt={d.preview ? `Náhled webu: ${p.title}` : p.alt} className="aspect-[16/9] w-full rounded-[1.25rem]" />
+          {d.live && (
+            <a
+              href={d.live}
+              target="_blank"
+              rel="noopener"
+              aria-label={`${CONCEPT_PAGE.openLive}: ${p.title}`}
+              className="group/live absolute inset-2.5 top-auto z-[3] flex aspect-[16/9] items-end justify-end rounded-[1.25rem] p-4 transition-[background-color] duration-500 hover:bg-black/25 max-md:p-2.5 md:p-6"
+            >
+              <span className="inline-flex items-center gap-2 rounded-full bg-signal px-5 py-3 text-[0.9375rem] font-bold max-md:gap-1.5 max-md:px-3.5 max-md:py-2 max-md:text-[0.8125rem] text-white shadow-[0_8px_30px_-6px_rgba(255,59,71,0.8)] transition-[transform,background-color] duration-300 group-hover/live:-translate-y-0.5 group-hover/live:bg-accent">
+                {CONCEPT_PAGE.openLive}
+                <ArrowUpRight className="size-4.5 transition-transform duration-300 group-hover/live:-translate-y-0.5 group-hover/live:translate-x-0.5" strokeWidth={2.6} />
+              </span>
+            </a>
+          )}
           {!d.preview && (
             <MorphLayer className="bottom-[1.625rem] right-[1.625rem]">
               <span className="block rounded-full bg-black/60 px-3.5 py-1.5 text-[0.8125rem] text-paper/80 backdrop-blur-md">{CONCEPT_PAGE.previewNote}</span>
@@ -113,7 +127,7 @@ function Hero({ p, d, n, plan, launch }: { p: Item; d: Detail; n: number; plan: 
               { label: CONCEPT_PAGE.facts.plan, value: plan.name },
               { label: CONCEPT_PAGE.facts.price, value: plan.price, sub: plan.per },
               { label: CONCEPT_PAGE.facts.launch, value: launch },
-              { label: CONCEPT_PAGE.facts.scope, value: CONCEPT_PAGE.scope(plan.name, d.pages.length) },
+              { label: CONCEPT_PAGE.facts.scope, value: CONCEPT_PAGE.scope(plan.name, d.pages.length), ...d.scope },
             ]}
           />
         </Landed>
@@ -159,7 +173,7 @@ function PlanCard({ plan }: { plan: Plan }) {
 }
 
 /** the price: the words on the left, the price card from the home page on the right */
-function Price({ plan }: { plan: Plan }) {
+function Price({ plan, note }: { plan: Plan; note?: string }) {
   return (
     <section className="relative overflow-hidden py-24 md:py-32">
       <div aria-hidden className="pointer-events-none absolute right-[8%] top-1/2 size-[40rem] -translate-y-1/2 rounded-full bg-accent/[0.07] blur-[140px]" />
@@ -172,7 +186,7 @@ function Price({ plan }: { plan: Plan }) {
             <h2 className="display mt-5 max-w-[13ch] text-[clamp(2.6rem,4.6vw,5.2rem)] leading-[0.98] max-lg:mx-auto">{cz(CONCEPT_PAGE.priceTitle)}</h2>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="mt-7 max-w-[40ch] text-[clamp(1.2rem,1.5vw,1.5rem)] leading-relaxed text-paper/75 max-lg:mx-auto">{cz(PRICING.description)}</p>
+            <p className="mt-7 max-w-[40ch] text-[clamp(1.2rem,1.5vw,1.5rem)] leading-relaxed text-paper/75 max-lg:mx-auto">{cz(note ?? PRICING.description)}</p>
           </Reveal>
           <Reveal delay={0.22}>
             <p className="mt-5 max-w-[46ch] text-[1.0938rem] leading-relaxed text-mute max-lg:mx-auto">{cz(PRICING.note)}</p>
@@ -349,7 +363,7 @@ export default function ConceptPage({ slug }: { slug: string }) {
   const plan = d && PRICING.plans.find((x) => x.name === d.plan);
   if (!p || !d || !plan) return <NotFound />;
 
-  const launch = plan.features.find((f) => f.startsWith("Spuštění"))?.replace(/^Spuštění\s*/, "") ?? "";
+  const launch = d.launch ?? plan.features.find((f) => f.startsWith("Spuštění"))?.replace(/^Spuštění\s*/, "") ?? "";
   const next = PORTFOLIO.items[(i + 1) % PORTFOLIO.items.length];
 
   return (
@@ -357,7 +371,7 @@ export default function ConceptPage({ slug }: { slug: string }) {
       <Hero p={p} d={d} n={i + 1} plan={plan} launch={launch} />
       <About d={d} />
       <Steps />
-      <Price plan={plan} />
+      <Price plan={plan} note={d.priceNote} />
       <Review p={p} />
       <section className="relative pb-6 pt-10">
         <div className="mx-auto max-w-[88rem] px-4 md:px-8">

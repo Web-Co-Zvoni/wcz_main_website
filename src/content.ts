@@ -191,11 +191,15 @@ export const PORTFOLIO = {
   reviewsNote: "Recenze zveřejníme, až je budeme mít od skutečných klientů. Žádné vymyšlené.",
   closingLink: "Probrat váš web",
   items: [
+    { src: pexels(3807517), alt: "Automechanik kontroluje motor", slug: "autoservis", title: "Autoservis", subtitle: "Objednání na termín" },
+    { src: pexels(15456627), alt: "Nový dřevěný krov proti modré obloze", slug: "tesar", title: "Tesař", subtitle: "Realizace a poptávka" },
+    { src: "/nahledy/penzion-foto.webp", alt: "Dům s červenou střechou na louce u lesa", slug: "penzion", title: "Penzion", subtitle: "Rezervace ve třech jazycích" },
+    { src: pexels(18316988), alt: "Solární panely na střeše při západu slunce", slug: "fotovoltaika", title: "Fotovoltaika", subtitle: "Kalkulačka a e-shop" },
+    { src: pexels(8550826), alt: "Instruktor autoškoly se žákem za volantem", slug: "autoskola", title: "Autoškola", subtitle: "Kurzy, test a přihláška" },
     { src: pexels(6419128), alt: "Instalatér montuje rozvody vody v koupelně", slug: "instalater", title: "Instalatér", subtitle: "Služby a poptávkový formulář" },
     { src: pexels(257736), alt: "Elektrikář zapojuje rozvaděč", slug: "elektrikar", title: "Elektrikář", subtitle: "Výjezdy a rychlý kontakt" },
     { src: pexels(32357250), alt: "Truhlář opracovává dřevo v dílně", slug: "truhlar", title: "Truhlář", subtitle: "Realizace a fotogalerie" },
     { src: pexels(3985360), alt: "Kosmetické ošetření pleti", slug: "kosmeticky-salon", title: "Kosmetický salon", subtitle: "Ceník a online rezervace" },
-    { src: pexels(3807517), alt: "Automechanik kontroluje motor", slug: "autoservis", title: "Autoservis", subtitle: "Objednání na termín" },
     { src: pexels(6474471), alt: "Malíř natírá stěnu válečkem", slug: "malir-pokoju", title: "Malíř pokojů", subtitle: "Kalkulace a reference" },
     { src: pexels(1855214), alt: "Vitrína pekárny s pečivem", slug: "pekarstvi", title: "Pekařství", subtitle: "Denní nabídka a mapa" },
     { src: pexels(39559306), alt: "Kadeřník stříhá vlasy v salonu", slug: "kadernictvi", title: "Kadeřnictví", subtitle: "Rezervace a ceník" },
@@ -389,7 +393,7 @@ export const NICHE_DETAILS: Record<string, NicheDetail> = {
       { title: "Realizace s čísly", text: "Hotové instalace s výkonem a lokalitou. Důkaz, že to umíte." },
     ],
     searches: ["fotovoltaika Plzeň", "solární panely na dům", "fotovoltaika s baterií cena", "montáž fotovoltaiky Plzeňský kraj"],
-    concepts: ["elektrikar"],
+    concepts: ["fotovoltaika", "elektrikar"],
     trade: "Elektroinstalace",
   },
   "instalateri-a-topenari": {
@@ -427,7 +431,7 @@ export const NICHE_DETAILS: Record<string, NicheDetail> = {
       { title: "Dílna a lidé", text: "Fotky z dílny a kdo v ní pracuje. Lidé si objednávají od lidí." },
     ],
     searches: ["truhlář Plzeň", "kuchyně na míru Plzeň", "tesař krov Plzeň", "vestavěné skříně na míru"],
-    concepts: ["truhlar"],
+    concepts: ["tesar", "truhlar"],
     trade: "Truhlářství · stolářství",
   },
   "okna-a-dvere": {
@@ -491,7 +495,7 @@ export const NICHE_DETAILS: Record<string, NicheDetail> = {
       { title: "Více jazyků", text: "Čeština, němčina, angličtina. Pro hosty z Bavorska i odjinud." },
     ],
     searches: ["penzion Plzeň", "ubytování Šumava", "hotel Plzeň centrum", "penzion se snídaní Plzeňský kraj"],
-    concepts: [],
+    concepts: ["penzion"],
   },
 };
 
@@ -501,6 +505,9 @@ export const CONCEPT_PAGE = {
   label: (n: number, total: number) => `Koncept ${String(n).padStart(2, "0")}/${String(total).padStart(2, "0")}`,
   honesty: "Koncept, ne reference. Takhle bychom web pro tenhle obor postavili.",
   previewNote: "Ilustrační obrázek — náhled webu doplníme",
+  honestyLive: "Koncept, ne reference. Firma je vymyšlená, web je hotový — proklikejte si ho.",
+  openLive: "Otevřít celý web",
+  liveLabel: "živý web",
   facts: { plan: "Balíček", price: "Cena", launch: "Spuštění", scope: "Rozsah" },
   scope: (plan: string, pages: number) => (plan === "Start" ? "Jedna stránka" : `${pages} podstránek`),
   aboutKicker: "O konceptu",
@@ -526,12 +533,20 @@ export type ConceptDetail = {
   about: string;
   features: { title: string; text: string }[];
   /** PRICING plan name the site would be built on */
-  plan: "Start" | "Poctivý web";
+  plan: "Start" | "Poctivý web" | "Na míru";
   pages: string[];
   /** pre-picked chip in the enquiry form (one of CONTACT.trades) */
   trade?: string;
   /** a real screenshot of the concept, once there is one — until then the photo stands in */
   preview?: string;
+  /** the finished concept site, once it is online — the preview then opens it */
+  live?: string;
+  /** "Spuštění" fact, when the plan doesn't name one */
+  launch?: string;
+  /** "Rozsah" fact, when the plan's default doesn't fit */
+  scope?: { value: string; sub?: string };
+  /** why this concept costs what it costs — replaces the general pricing line */
+  priceNote?: string;
 };
 
 /** Per-concept copy, keyed by PORTFOLIO slug. Made-up briefs, shown as concepts — not client work. */
@@ -586,15 +601,19 @@ export const CONCEPT_DETAILS: Record<string, ConceptDetail> = {
   },
   autoservis: {
     headline: "Web pro autoservis",
-    about: "Koncept pro menší autoservis s přezouváním a servisem všech značek. Řidič si na webu zjistí cenu základních úkonů a objedná se na termín, aniž by musel volat do dílny.",
+    about: "Autoservis Kovář z Plzně si vymysleli, web pro něj je ale hotový a funguje — klidně si ho proklikejte. Jedna stránka, která řidiči odpoví na všechno: co opravujete, kolik to stojí a kdy máte otevřeno. A nakonec ho objedná na termín, aniž by musel volat do dílny.",
     features: [
-      { title: "Objednání na termín", text: "Servis, přezutí, příprava na STK. Kalendář místo telefonu." },
-      { title: "Orientační ceník", text: "Olej, brzdy, pneu — ceny, které berou strach z účtu." },
-      { title: "Úvod podle sezóny", text: "Na podzim přezouvání, v létě klimatizace." },
+      { title: "Objednávka na pár kliknutí", text: "Služba, SPZ, auto, den a čas. Do dílny přijde hotová objednávka, ne „zavolejte mi“." },
+      { title: "Ceník bez hvězdiček", text: "22 úkonů v pěti záložkách, ceny včetně DPH a práce. Řidič ví, do čeho jde, dřív než přijede." },
+      { title: "Web, co ví, kolik je hodin", text: "Otevřeno, nebo zavřeno podle otevírací doby, nejbližší volný termín a nabídka podle sezóny — na podzim přezouvání, v létě klimatizace." },
     ],
-    plan: "Poctivý web",
-    pages: ["Úvod", "Služby", "Ceník", "Objednání", "Pneuservis", "Kontakt"],
+    plan: "Start",
+    pages: ["Úvod s volným termínem", "Sezónní nabídka", "Služby", "Značky", "Ceník", "Jak to probíhá", "O dílně", "Časté dotazy", "Objednávka", "Kontakt a mapa"],
     trade: "Autoservis",
+    preview: "/nahledy/autoservis.webp",
+    live: "https://autoservis-template.matej-kronus.workers.dev/",
+    scope: { value: "Jedna stránka", sub: "10 sekcí" },
+    priceNote: "Všechno podstatné na jedné stránce: služby, ceník, otevírací doba, objednávka na termín a mapa. Přesně na to je balíček Start.",
   },
   "malir-pokoju": {
     headline: "Web pro malíře pokojů",
@@ -655,6 +674,72 @@ export const CONCEPT_DETAILS: Record<string, ConceptDetail> = {
     plan: "Poctivý web",
     pages: ["Úvod", "Služby", "Realizace", "Oblast", "O nás", "Kontakt"],
     trade: "Stavebnictví · zednictví",
+  },
+  tesar: {
+    headline: "Web pro tesaře",
+    about: "Tesařství Krokev z Plzně si vymysleli, web pro něj je ale hotový — klidně si ho proklikejte. Jedna stránka, na které mluví hlavně fotky krovů a pergol. Zákazník si vybere stavbu, jakou chce, a poptávka už ví, o jaký typ práce jde.",
+    features: [
+      { title: "Realizace s místem a rokem", text: "Hotové stavby v posuvné galerii. U každé obec, rok a co se dělalo — třeba 14 m³ smrku na krov." },
+      { title: "„Chci podobnou“", text: "Tlačítko u služby i u realizace skočí na formulář a rovnou vybere typ práce." },
+      { title: "Zaměření zdarma nahoře", text: "Nejbližší volný termín zaměření a nabídka do 3 dnů hned na první obrazovce." },
+    ],
+    plan: "Start",
+    pages: ["Úvod", "Co stavíme", "Realizace", "Jak to probíhá", "O nás", "Časté dotazy", "Poptávka"],
+    trade: "Truhlářství · stolářství",
+    preview: "/nahledy/tesar.webp",
+    live: "https://tesar-template.matej-kronus.workers.dev/",
+    scope: { value: "Jedna stránka", sub: "7 sekcí" },
+    priceNote: "Jedna stránka s galerií realizací a poptávkovým formulářem. Nic víc tesař na webu nepotřebuje — a přesně to obsahuje balíček Start.",
+  },
+  penzion: {
+    headline: "Web pro penzion",
+    about: "Penzion Pod Javorem na Šumavě si vymysleli, web pro něj je ale hotový — proklikejte si ho. Jedna stránka ve třech jazycích, kde host uvidí pokoje, spočítá si cenu pobytu a rovnou si ho zarezervuje. Napřímo, bez provize portálům.",
+    features: [
+      { title: "Rezervace s kalendářem", text: "Host vidí volné noci, vybere pokoj a počet hostů. Cena se spočítá hned — i s přistýlkou, psem a slevou za delší pobyt." },
+      { title: "Česky, německy, anglicky", text: "Celý web včetně rezervace ve třech jazycích. Pro hosty z Bavorska i odjinud." },
+      { title: "Nabídka podle sezóny", text: "Na podzim 4 noci za cenu 3, v zimě běžky od dveří, na jaře děti zdarma. Přepíná se sama podle měsíce." },
+    ],
+    plan: "Na míru",
+    pages: ["Úvod s ověřením volna", "Sezónní nabídka", "Pokoje", "Co u nás najdete", "O nás", "Okolí a výlety", "Ceník", "Jak rezervace probíhá", "Rezervace", "Časté dotazy", "Jak k nám"],
+    trade: "Malá firma · služby",
+    preview: "/nahledy/penzion.webp",
+    live: "https://penzion-template.matej-kronus.workers.dev/",
+    launch: "do 3 týdnů",
+    scope: { value: "Jedna stránka", sub: "3 jazyky" },
+    priceNote: "Rezervace s kalendářem obsazenosti a výpočtem ceny je víc než formulář a tři jazyky znamenají tři verze všech textů. Proto balíček Na míru — pevnou cenu dostanete předem podle počtu pokojů a jazyků.",
+  },
+  fotovoltaika: {
+    headline: "Web pro fotovoltaiku",
+    about: "Firma Zenitra Energie neexistuje, web pro ni je ale hotový a funguje — včetně e-shopu. Zákazník si spočítá, kolik mu střecha ušetří, vybere hotovou sestavu a komponenty si rovnou objedná.",
+    features: [
+      { title: "Kalkulačka úspory", text: "Spotřeba, cena elektřiny, orientace střechy a baterie. Hned je vidět výkon, úspora, dotace i návratnost." },
+      { title: "E-shop s košíkem", text: "24 produktů v sedmi kategoriích — panely, střídače, baterie i wallboxy. Košík, doprava a objednávka." },
+      { title: "Kam teče elektřina", text: "Posuvník času dne ukáže, jak střídač dělí energii mezi dům, baterii, auto a síť." },
+    ],
+    plan: "Na míru",
+    pages: ["Úvod", "Kalkulačka", "Služby", "Sestavy a ceny", "Realizace", "E-shop", "Detail produktu", "Košík", "Kontakt"],
+    trade: "Elektroinstalace",
+    preview: "/nahledy/fotovoltaika.webp",
+    live: "https://fotovoltaika-template.matej-kronus.workers.dev/",
+    launch: "do 3 týdnů",
+    scope: { value: "Web a e-shop", sub: "24 produktů" },
+    priceNote: "Úvodní stránka s kalkulačkou, realizace a k tomu celý e-shop s košíkem a objednávkou. To je balíček Na míru — pevnou cenu řekneme předem podle počtu produktů a napojení na sklad.",
+  },
+  autoskola: {
+    headline: "Web pro autoškolu",
+    about: "Autoškola Zelená vlna z Olomouce je vymyšlená, web pro ni je ale hotový — proklikejte si ho. Jedna dlouhá stránka, která uchazeče provede od výběru kurzu přes cenu a instruktory až k přihlášce. A cestou si zkusí test nanečisto.",
+    features: [
+      { title: "Cena podle vás", text: "Vyberete kurz a co k němu chcete, cena se přepočítá hned. Žádné „od“ a hvězdičky." },
+      { title: "Test nanečisto", text: "Pět otázek jako ve skutečném testu. Bez registrace, výsledek hned." },
+      { title: "Odpočet do dalšího kurzu", text: "Kdy začíná další kurz a kolik zbývá volných míst. Termíny se posouvají samy." },
+    ],
+    plan: "Poctivý web",
+    pages: ["Úvod s odpočtem", "O autoškole", "Kurzy", "Ceník a kalkulačka", "Instruktoři", "Cesta k řidičáku", "Test nanečisto", "Recenze", "Časté dotazy", "Přihláška"],
+    trade: "Malá firma · služby",
+    preview: "/nahledy/autoskola.webp",
+    live: "https://autoskola-template.matej-kronus.workers.dev/",
+    scope: { value: "Jedna stránka", sub: "10 sekcí" },
+    priceNote: "Je to jedna stránka, ale s kalkulačkou ceny, testem z teorie, odpočtem kurzů a přihláškou. To už je víc než Start — proto Poctivý web.",
   },
 };
 

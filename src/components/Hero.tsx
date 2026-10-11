@@ -52,8 +52,8 @@ type Layout = {
 
 const HEADER_H = 92;
 
-// photo the secondary CTA turns into on hover — a wide crop of the first concept
-const CTA_PHOTO = PORTFOLIO.items[0].src.replace("h=1000&w=800", "h=160&w=520");
+// photo the secondary CTA turns into on hover — a wide crop of the plumber concept
+const CTA_PHOTO = PORTFOLIO.items.find((p) => p.slug === "instalater")!.src.replace("h=1000&w=800", "h=160&w=520");
 
 /** each layer: width px, rgb, peak alpha, alpha it already has at the very top (0–1), x offset */
 const BEAM_LAYERS = [
