@@ -1,4 +1,4 @@
-import { cardPhoto, conceptPhoto, PORTFOLIO, ROUTES } from "../content";
+import { cardPhoto, CONCEPT_DETAILS, CONCEPT_PAGE, conceptPhoto, PORTFOLIO, ROUTES } from "../content";
 import { morphClick, useMorph } from "../lib/morph";
 import { useEntry } from "../lib/router";
 import CoverFlow, { COVER_SHADE } from "./fx/CoverFlow";
@@ -8,7 +8,7 @@ const cards = PORTFOLIO.items.map((p, i) => ({
   img: cardPhoto(p.src),
   ambient: p.src.replace("h=1000&w=800", "h=200&w=160"),
   alt: p.alt,
-  tag: `${PORTFOLIO.sampleLabel} ${String(i + 1).padStart(2, "0")}/${total}`,
+  tag: `${PORTFOLIO.sampleLabel} ${String(i + 1).padStart(2, "0")}/${total}${CONCEPT_DETAILS[p.slug]?.live ? ` · ${CONCEPT_PAGE.liveLabel}` : ""}`,
   title: p.title,
   subtitle: p.subtitle,
   href: ROUTES.concept(p.slug),

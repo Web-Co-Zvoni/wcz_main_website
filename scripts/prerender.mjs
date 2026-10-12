@@ -13,7 +13,8 @@ const dist = join(root, "dist");
 const server = join(root, "dist-server");
 const ORIGIN = "https://webcozvoni.cz";
 
-const { render, pages, notFound } = await import(pathToFileURL(join(server, "entry-server.js")).href);
+const { ready, render, pages, notFound } = await import(pathToFileURL(join(server, "entry-server.js")).href);
+await ready();
 const template = readFileSync(join(dist, "index.html"), "utf8");
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

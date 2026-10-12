@@ -1,6 +1,7 @@
 import { AppWindow, BedDouble, Car, Fan, Hammer, HardHat, House, Sun, Wrench, Zap, type LucideIcon } from "lucide-react";
 import { heroPhoto, NICHES, ROUTES } from "../content";
 import { useMorph } from "../lib/morph";
+import { useWide } from "../lib/useWide";
 import GrainyCarousel from "./fx/GrainyCarousel";
 import { Reveal } from "./ui";
 
@@ -42,6 +43,8 @@ function Caption({ n }: { n: Niche }) {
 
 export default function Niches() {
   const { open } = useMorph();
+  // phones: the ends of the row blur away instead of crumbling to dust, and it starts only when it's close
+  const wide = useWide();
 
   return (
     <section id="obory" aria-labelledby="niches-title" className="relative overflow-hidden pb-10 pt-20 md:pb-14 md:pt-24">
@@ -69,7 +72,9 @@ export default function Niches() {
             const n = NICHES.items[i];
             open({ href: cards[i].href, small: n.src, large: heroPhoto(n.src), rect, shade: CARD_SHADE, ...look });
           }}
-          renderCaption={(i) => <Caption n={NICHES.items[i]} />} />
+          renderCaption={(i) => <Caption n={NICHES.items[i]} />}
+          blur={!wide}
+          deferred={!wide} />
       </Reveal>
       <p className="-mt-6 text-center text-[0.7812rem] text-mute/70">{NICHES.note}</p>
     </section>

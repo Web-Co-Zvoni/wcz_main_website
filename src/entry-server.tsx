@@ -7,6 +7,7 @@ import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
 import App from "./App";
 import { CONCEPT_DETAILS, CONCEPT_PAGE, META, NICHE_DETAILS, NICHE_PAGE, NICHES, PORTFOLIO, ROUTES } from "./content";
+import { preloadPage } from "./lib/pages";
 import { setServerPath } from "./lib/router";
 
 export type PageMeta = { path: string; title: string; description: string };
@@ -35,6 +36,11 @@ export function pages(): PageMeta[] {
 
 /** rendered as dist/404.html — any path that isn't a page shows the "not found" page */
 export const notFound = { path: "/404", title: META.notFoundTitle };
+
+/** the sub-pages are lazy chunks (lib/pages.tsx) — load them first, so they render in full instead of suspending */
+export async function ready() {
+  await Promise.all([preloadPage("niche"), preloadPage("concept")]);
+}
 
 export function render(path: string) {
   setServerPath(path);
