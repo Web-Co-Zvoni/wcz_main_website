@@ -13,6 +13,10 @@ const dist = join(root, "dist");
 const server = join(root, "dist-server");
 const ORIGIN = "https://webcozvoni.cz";
 
+// React's production server build: the dev build writes error messages and stack traces
+// (with the build machine's paths) into the HTML wherever a lazy part of the page is skipped
+process.env.NODE_ENV = "production";
+
 const { ready, render, pages, notFound } = await import(pathToFileURL(join(server, "entry-server.js")).href);
 await ready();
 const template = readFileSync(join(dist, "index.html"), "utf8");

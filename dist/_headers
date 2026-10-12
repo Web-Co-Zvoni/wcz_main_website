@@ -8,7 +8,6 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
-  Cross-Origin-Opener-Policy: same-origin
 
 # file names carry a content hash (or never change), so they can be cached for good
 /fonts/*

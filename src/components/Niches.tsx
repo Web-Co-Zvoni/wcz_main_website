@@ -76,7 +76,7 @@ export default function Niches() {
           blur={!wide}
           deferred={!wide} />
       </Reveal>
-      <p className="-mt-6 text-center text-[0.7812rem] text-mute/70">{NICHES.note}</p>
+      <p className="-mt-6 text-center text-[0.7812rem] text-mute/85">{NICHES.note}</p>
     </section>
   );
 }
