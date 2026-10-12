@@ -4,10 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>webcozvoni.cz — Weby, co zvoní · Webová agentura Plzeň</title>
-    <meta
-      name="description"
-      content="Stavíme poctivé weby pro živnostníky a malé firmy z Plzně a okolí. Návrh do 72 hodin zdarma, spuštění do 14 dnů. Web, díky kterému vám zákazníci volají."
-    />
+    <!-- title, description, canonical and og:/twitter: are rewritten per page by scripts/prerender.mjs -->
+    <meta name="description" content="Stavíme poctivé weby pro živnostníky a malé firmy z Plzně a okolí. Návrh do 72 hodin zdarma, spuštění do 14 dnů. Web, díky kterému vám zákazníci volají." />
     <link rel="canonical" href="https://webcozvoni.cz/" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://webcozvoni.cz/" />
@@ -32,10 +30,30 @@
 {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
+  "@id": "https://webcozvoni.cz/#firma",
   "name": "Weby, co zvoní",
+  "legalName": "Matěj Kronus",
+  "identifier": {
+    "@type": "PropertyValue",
+    "propertyID": "IČO",
+    "value": "29860873"
+  },
   "url": "https://webcozvoni.cz/",
+  "logo": "https://webcozvoni.cz/icon-512.png",
+  "image": "https://webcozvoni.cz/og.png",
   "telephone": "+420608228124",
   "email": "info@webcozvoni.cz",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Klatovská třída 1562/106",
+    "postalCode": "301 00",
+    "addressLocality": "Plzeň",
+    "addressCountry": "CZ"
+  },
+  "founder": {
+    "@type": "Person",
+    "name": "Matěj Kronus"
+  },
   "areaServed": [
     {
       "@type": "City",

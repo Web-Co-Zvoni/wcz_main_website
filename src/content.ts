@@ -34,6 +34,16 @@ export const ROUTES = {
   concept: (slug: string) => `/koncepty/${slug}/`,
 };
 
+/** Tab titles and search descriptions — the app sets the title, scripts/prerender.mjs writes both into each page's HTML. */
+export const META = {
+  homeTitle: "webcozvoni.cz — Weby, co zvoní · Webová agentura Plzeň",
+  homeDescription:
+    "Stavíme poctivé weby pro živnostníky a malé firmy z Plzně a okolí. Návrh do 72 hodin zdarma, spuštění do 14 dnů. Web, díky kterému vám zákazníci volají.",
+  nicheDescription: (title: string) =>
+    `${title} z Plzně a okolí. Návrh do 72 hodin zdarma, spuštění do 14 dnů, jednorázová cena předem.`,
+  notFoundTitle: "Stránka nenalezena — webcozvoni.cz",
+};
+
 export const NAV_LINKS = [
   { label: "Služby", href: "#sluzby" },
   { label: "Postup", href: "#postup" },
@@ -348,7 +358,7 @@ export const NICHE_PAGE = {
   funnelKicker: "Koncepty",
   funnelTitle: "Jak by mohl vypadat váš web",
   funnelLead: "Hotové klientské weby zatím ukázat nemůžeme. Máme ale koncepty — vyberte si, co vás zajímá, a podívejte se, jak přemýšlíme.",
-  documentTitle: (title: string) => `${title} — webcozvoni.cz`,
+  documentTitle: (title: string) => `${title} — Plzeň a okolí · webcozvoni.cz`,
 };
 
 export type NicheDetail = {

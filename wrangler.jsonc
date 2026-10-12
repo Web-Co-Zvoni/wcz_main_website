@@ -3,8 +3,8 @@
   "compatibility_date": "2025-09-01",
   "assets": {
     "directory": "./dist",
-    // /obory/… and /koncepty/… are rendered by the app (src/lib/router.ts):
-    // any path without a file of its own gets index.html
-    "not_found_handling": "single-page-application"
+    // every page is prerendered into its own index.html (scripts/prerender.mjs);
+    // any other path gets 404.html with status 404
+    "not_found_handling": "404-page"
   }
 }

@@ -58,7 +58,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-paper/[0.08]">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-7 text-center text-[0.7812rem] text-mute/70">
+        <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-7 text-center text-[0.7812rem] text-mute/85">
           <p className="flex flex-wrap justify-center gap-x-3 gap-y-1">
             {legalDetails.map((detail) => (
               <span key={detail}>{detail}</span>

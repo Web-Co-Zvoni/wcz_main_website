@@ -42,10 +42,20 @@ export type Entry = {
 
 const read = (restored: boolean): Entry => ({ path: location.pathname, state: (history.state ?? {}) as HistState, restored });
 
-history.scrollRestoration = "manual";
-history.replaceState({ ...(history.state ?? {}), idx: (history.state as HistState | null)?.idx ?? 0 }, "");
+/** false while the pages are prerendered to static HTML at build time (scripts/prerender.mjs) */
+const inBrowser = typeof window !== "undefined";
 
-let current = read(false);
+if (inBrowser) {
+  history.scrollRestoration = "manual";
+  history.replaceState({ ...(history.state ?? {}), idx: (history.state as HistState | null)?.idx ?? 0 }, "");
+}
+
+let current: Entry = inBrowser ? read(false) : { path: "/", state: {}, restored: false };
+
+/** prerendering: the page to render next */
+export function setServerPath(path: string) {
+  current = { path, state: {}, restored: false };
+}
 const subs = new Set<() => void>();
 const subscribe = (cb: () => void) => {
   subs.add(cb);
@@ -53,7 +63,7 @@ const subscribe = (cb: () => void) => {
 };
 const emit = () => subs.forEach((cb) => cb());
 
-export const useEntry = () => useSyncExternalStore(subscribe, () => current);
+export const useEntry = () => useSyncExternalStore(subscribe, () => current, () => current);
 export const currentEntry = () => current;
 
 /** was this page reached by a link inside the site (so Back stays on the site)? */
@@ -92,17 +102,18 @@ export function onPop(h: PopHandler | null) {
   popHandler = h;
 }
 
-window.addEventListener("popstate", () => {
-  const from = current;
-  const to = read(true);
-  if (to.path === from.path) {
-    current = to;
-    return;
-  }
-  if (popHandler?.(from, to)) return;
-  applyPop();
-  const y = to.state.scrollY ?? 0;
-  jumpTo(y);
-  // once more after the page has settled its height
-  requestAnimationFrame(() => jumpTo(y));
-});
+if (inBrowser)
+  window.addEventListener("popstate", () => {
+    const from = current;
+    const to = read(true);
+    if (to.path === from.path) {
+      current = to;
+      return;
+    }
+    if (popHandler?.(from, to)) return;
+    applyPop();
+    const y = to.state.scrollY ?? 0;
+    jumpTo(y);
+    // once more after the page has settled its height
+    requestAnimationFrame(() => jumpTo(y));
+  });

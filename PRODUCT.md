@@ -27,7 +27,7 @@ Visitors arrive on mobile and desktop; the primary action is the enquiry form (s
 
 ## Capabilities and Constraints
 
-- React 19 + Vite + Tailwind CSS v4 + framer-motion + Lenis smooth scroll; WebGL effects via three/ogl. Hosted on Cloudflare (Workers static assets, `wrangler.jsonc` serving `dist/`, unknown paths fall back to index.html for the app's routes).
+- React 19 + Vite + Tailwind CSS v4 + framer-motion + Lenis smooth scroll; WebGL effects via three/ogl. Hosted on Cloudflare (Workers static assets, `wrangler.jsonc` serving `dist/`). `npm run build` also prerenders every page to static HTML (src/entry-server.tsx + scripts/prerender.mjs) so crawlers without JavaScript see the text, and writes `dist/404.html` (served with status 404) and the sitemap. Security headers (CSP, HSTS, …) live in `public/_headers` — a new outside service needs its origin added to the CSP there.
 - Contact form posts to Web3Forms (access key in src/components/Contact.tsx, honeypot `botcheck`, fields jmeno, telefon, email, obor, zprava).
 - All copy lives in `src/content.ts`; Czech typography helper `cz()` in `src/utils/typo.ts`.
 - Legal details (IČO, address) are verified against ARES — do not edit without checking.

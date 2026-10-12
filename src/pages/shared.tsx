@@ -1,17 +1,15 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect, useRef, type Ref } from "react";
-import { cardPhoto, conceptPhoto, PORTFOLIO, ROUTES } from "../content";
+import { cardPhoto, conceptPhoto, META, PORTFOLIO, ROUTES } from "../content";
 import { COVER_SHADE } from "../components/fx/CoverFlow";
 import { morphClick, useMorph } from "../lib/morph";
 import { canGoBack, currentEntry } from "../lib/router";
 import { cn } from "../utils/cn";
 
-const HOME_TITLE = document.title;
-
 /** the tab title for a page; null puts the home page's back */
 export function useDocumentTitle(title: string | null) {
   useEffect(() => {
-    document.title = title ?? HOME_TITLE;
+    document.title = title ?? META.homeTitle;
   }, [title]);
 }
 
