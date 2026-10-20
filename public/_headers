@@ -1,8 +1,9 @@
 # Response headers for Cloudflare static assets (copied into dist/ by Vite).
 # CSP: the app loads its own scripts and fonts only; photos come from Pexels and the enquiry form
-# posts to Web3Forms. Adding a new outside service means adding its origin here.
+# posts to Web3Forms. The booking system (Konzultace) is an iframe, and the page first asks its API
+# whether it's up. Adding a new outside service means adding its origin here.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://images.pexels.com; connect-src 'self' https://api.web3forms.com; form-action 'self' https://api.web3forms.com; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://images.pexels.com; connect-src 'self' https://api.web3forms.com https://rezervace.webcozvoni.cz; frame-src https://rezervace.webcozvoni.cz; form-action 'self' https://api.web3forms.com; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff

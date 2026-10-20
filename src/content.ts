@@ -329,6 +329,19 @@ export const CONTACT = {
   ],
 };
 
+/**
+ * Booking a consultation — the form comes from our own booking system (rezervacni-system),
+ * shown in an iframe. Its address comes from VITE_REZERVACE_URL (.env.production).
+ */
+export const BOOKING = {
+  /** the business in the booking system (its slug, set in /admin → Klienti) */
+  tenant: "webcozvoni",
+  kicker: "Konzultace",
+  title: "Radši to probereme?",
+  description: "Vyberte si volný termín. Potvrdíme vám ho e-mailem.",
+  frameTitle: "Rezervace konzultace",
+};
+
 export const FOOTER = {
   backToTop: "Zpět nahoru",
   privacy: "Zásady zpracování osobních údajů",

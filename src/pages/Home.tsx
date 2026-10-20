@@ -1,3 +1,4 @@
+import Booking from "../components/Booking";
 import Contact from "../components/Contact";
 import Faq from "../components/Faq";
 import Hero from "../components/Hero";
@@ -19,6 +20,7 @@ export default function Home() {
       <Portfolio />
       <Pricing />
       <Faq />
+      <Booking />
       <Contact />
     </>
   );
