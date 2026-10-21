@@ -58,6 +58,30 @@ export default function Pricing() {
           ))}
         </div>
 
+        {/* monthly care after launch: quieter than the plans, two to a row */}
+        <div className="mx-auto mt-20 max-w-5xl">
+          <Reveal>
+            <h3 className="text-center text-[1.0625rem] font-semibold text-paper xl:text-[1.1875rem]">{cz(PRICING.retainers.title)}</h3>
+            <p className="mt-2 text-center text-[0.9375rem] text-mute xl:text-[1.0312rem]">{cz(PRICING.retainers.note)}</p>
+          </Reveal>
+          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:gap-6">
+            {PRICING.retainers.items.map((r, i) => (
+              <Reveal key={r.name} delay={i * 0.1} className="h-full">
+                <div className="flex h-full items-center justify-between gap-6 rounded-[1.25rem] border border-paper/10 bg-[#0b0a0c]/80 px-6 py-6 xl:px-8 xl:py-7">
+                  <div className="min-w-0">
+                    <h4 className="text-[1.0625rem] font-semibold text-paper xl:text-[1.1875rem]">{r.name}</h4>
+                    <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-mute xl:text-[1.0312rem]">{cz(r.desc)}</p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="display whitespace-nowrap text-[clamp(1.6rem,2.4vw,2.2rem)] leading-none">{r.price}</p>
+                    <p className="mt-1.5 text-[0.8125rem] text-mute xl:text-[0.9062rem]">{r.per}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
         <Reveal delay={0.15}>
           <p className="mx-auto mt-16 max-w-2xl text-center text-[0.9375rem] leading-relaxed text-mute xl:text-[1.0312rem]">{cz(PRICING.note)}</p>
         </Reveal>

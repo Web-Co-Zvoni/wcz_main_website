@@ -253,6 +253,15 @@ export const PRICING = {
       featured: false,
     },
   ],
+  /** monthly care after launch — optional, the site belongs to the client either way */
+  retainers: {
+    title: "Po spuštění, jen když chcete",
+    note: "Nepovinné. Web je váš i bez toho.",
+    items: [
+      { name: "Hosting", price: "500 Kč", per: "měsíčně", desc: "Jenom hosting webu." },
+      { name: "Technická podpora", price: "1 500 Kč", per: "měsíčně", desc: "Lehké úpravy designu a obsahu webu." },
+    ],
+  },
 };
 
 export const FAQ = {
