@@ -8,10 +8,8 @@ export const EASE = [0.22, 1, 0.36, 1] as const;
 /** true on a page brought back with Back: everything is already in place, nothing rises in again */
 export const InstantReveal = createContext(false);
 
-/** phones skip the blur — animating a filter on every reveal is what makes scrolling stutter there */
-const NO_BLUR = typeof window !== "undefined" && window.matchMedia("(max-width: 47.99rem)").matches;
-
-/** Scroll reveal — rise + un-blur, once */
+/** Scroll reveal — rise + un-blur, once. Phones skip the blur ([data-reveal] in index.css): animating a
+ *  filter on every reveal is what makes scrolling stutter there */
 export function Reveal({
   children,
   delay = 0,
@@ -26,9 +24,10 @@ export function Reveal({
   const instant = useContext(InstantReveal);
   return (
     <motion.div
+      data-reveal
       className={className}
-      initial={instant ? false : NO_BLUR ? { opacity: 0, y } : { opacity: 0, y, filter: "blur(8px)" }}
-      whileInView={NO_BLUR ? { opacity: 1, y: 0 } : { opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={instant ? false : { opacity: 0, y, filter: "blur(8px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.9, delay, ease: EASE }}
     >

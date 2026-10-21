@@ -5,7 +5,7 @@ import Contact from "../components/Contact";
 import CurvedSteps from "../components/CurvedSteps";
 import { Button, InstantReveal, Kicker, Reveal, SectionHead } from "../components/ui";
 import { CONCEPT_DETAILS, CONCEPT_PAGE, cardPhoto, conceptPhoto, PORTFOLIO, PRICING, PROCESS, SITE } from "../content";
-import { Landed, MorphImage, MorphLayer, useMorph } from "../lib/morph";
+import { Landed, MorphImage, MorphLayer, useFromPrerender, useMorph } from "../lib/morph";
 import { cn } from "../utils/cn";
 import { cz } from "../utils/typo";
 import NotFound from "./NotFound";
@@ -55,6 +55,8 @@ function Facts({ items }: { items: { label: string; value: string; sub?: string 
 /** headline, then the site itself in a browser window — the spot the card's photo flies to */
 function Hero({ p, d, n, plan, launch }: { p: Item; d: Detail; n: number; plan: Plan; launch: string }) {
   const { holdContent } = useMorph();
+  // opened directly: the browser window fades in by CSS from the first paint (see Landed)
+  const css = useFromPrerender();
   // the words sit at z-[2], above the photo while it flies in
   return (
     <section className="relative pb-10 pt-[7.5rem] min-[1224px]:pt-[8.75rem]">
@@ -80,10 +82,11 @@ function Hero({ p, d, n, plan, launch }: { p: Item; d: Detail; n: number; plan: 
         </div>
 
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={css ? false : { opacity: 0 }}
           animate={{ opacity: holdContent ? 0 : 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative mt-12 rounded-[1.75rem] border border-paper/12 bg-[#0b0a0c]/90 p-2.5 shadow-[0_60px_140px_-50px_rgba(0,0,0,0.95),0_0_90px_-34px_rgba(255,59,71,0.35)]"
+          style={css ? { animationDuration: "0.5s" } : undefined}
+          className={`${css ? "enter-fade " : ""}relative mt-12 rounded-[1.75rem] border border-paper/12 bg-[#0b0a0c]/90 p-2.5 shadow-[0_60px_140px_-50px_rgba(0,0,0,0.95),0_0_90px_-34px_rgba(255,59,71,0.35)]`}
         >
           <Landed i={1}>
             <div className="flex items-center gap-4 px-3 pb-3 pt-1.5">

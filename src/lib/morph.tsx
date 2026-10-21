@@ -10,13 +10,14 @@
  * the card it came from.
  */
 import { animate, motion } from "framer-motion";
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "../utils/cn";
 import { remScale } from "../utils/remScale";
 import { preloadPage } from "./pages";
 import { applyPop, commit, currentEntry, go, onPop, parseRoute, type Entry, type MorphRecord } from "./router";
 import { jumpTo, lockScroll, transition } from "./scroll";
+import { useHydrated } from "./useHydrated";
 
 type Box = MorphRecord["box"];
 
@@ -276,10 +277,14 @@ export function MorphProvider({ children }: { children: ReactNode }) {
  * once and the large one over it when loaded — the same pair the flight crossfaded. Shading or
  * labels over it go in a <MorphLayer>, so they lie over the photo while it is still flying.
  */
+/** the width parameter of a Pexels photo URL (content.ts heroPhoto) */
+const PEXELS_W = /(?<=images\.pexels\.com\/.*[?&])w=\d+/;
+
 export function MorphImage({ small, large, alt, className }: { small: string; large: string; alt: string; className?: string }) {
   const { flying } = useMorph();
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
+  const sized = useFromPrerender() && PEXELS_W.test(large);
 
   useEffect(() => {
     if (imgRef.current?.complete && imgRef.current.naturalWidth) setLoaded(true);
@@ -287,10 +292,16 @@ export function MorphImage({ small, large, alt, className }: { small: string; la
 
   return (
     <div data-morph-target className={cn("relative overflow-hidden bg-coal", className)} style={{ visibility: flying ? "hidden" : "visible" }}>
-      <img src={small} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+      {/* the small photo is what shows first (and what Lighthouse times as LCP) — it goes ahead of the large one */}
+      <img src={small} alt="" aria-hidden fetchPriority="high" className="absolute inset-0 size-full object-cover" />
       <img
         ref={imgRef}
         src={large}
+        // opened directly, phones take a narrower file than the 1920 px desktop one (Pexels scales on request);
+        // after a morph it stays on `large` — the very file the flying photo has already loaded
+        srcSet={sized ? [800, 1280, 1920].map((w) => `${large.replace(PEXELS_W, `w=${w}`)} ${w}w`).join(", ") : undefined}
+        sizes={sized ? "100vw" : undefined}
+        fetchPriority="low"
         alt={alt}
         onLoad={() => setLoaded(true)}
         className={cn("absolute inset-0 size-full object-cover transition-opacity duration-500", loaded ? "opacity-100" : "opacity-0")}
@@ -305,10 +316,13 @@ export function MorphImage({ small, large, alt, className }: { small: string; la
  */
 export function MorphLayer({ children, className }: { children: ReactNode; className?: string }) {
   const { holdContent } = useMorph();
+  // opened directly: fades in by CSS from the first paint (see Landed)
+  const css = useFromPrerender();
   return (
     <motion.div
-      className={cn("pointer-events-none absolute z-[2]", className)}
-      initial={{ opacity: 0 }}
+      className={cn("pointer-events-none absolute z-[2]", css && "enter-fade", className)}
+      style={css ? { animationDuration: "0.55s" } : undefined}
+      initial={css ? false : { opacity: 0 }}
       animate={{ opacity: holdContent ? 0 : 1 }}
       transition={{ duration: 0.55, ease: "easeOut" }}
     >
@@ -317,13 +331,26 @@ export function MorphLayer({ children, className }: { children: ReactNode; class
   );
 }
 
+/**
+ * true for an element that was in the prerendered HTML the browser took over (the page was opened
+ * directly), false for one mounted later (a page opened by a link or a flying photo). Fixed for the
+ * element's life, so its entrance isn't swapped halfway.
+ */
+export function useFromPrerender() {
+  const hydrated = useHydrated();
+  return useState(!hydrated)[0];
+}
+
 /** content that rises in as soon as its page is in place — while the photo is still flying in */
 export function Landed({ children, i = 0, className }: { children: ReactNode; i?: number; className?: string }) {
   const { holdContent } = useMorph();
+  // opened directly: the same rise runs in CSS (.enter-rise) from the first paint, before the scripts arrive
+  const css = useFromPrerender();
   return (
     <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 26, filter: "blur(8px)" }}
+      className={cn(className, css && "enter-rise")}
+      style={css ? ({ "--enter-delay": `${0.03 + i * 0.05}s`, "--enter-dur": "0.6s", "--enter-y": "26px", "--enter-blur": "8px" } as CSSProperties) : undefined}
+      initial={css ? false : { opacity: 0, y: 26, filter: "blur(8px)" }}
       animate={holdContent ? { opacity: 0, y: 20, filter: "blur(6px)" } : { opacity: 1, y: 0, filter: "blur(0px)" }}
       transition={{ duration: 0.6, delay: holdContent ? 0 : 0.03 + i * 0.05, ease: LIFT_EASE }}
     >

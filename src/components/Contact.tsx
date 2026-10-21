@@ -3,6 +3,7 @@ import { ArrowUpRight, AtSign, Check, CheckCircle2, Loader2, Mail, MessageSquare
 import { useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { CONTACT, SITE } from "../content";
+import { useHydrated } from "../lib/useHydrated";
 import { cn } from "../utils/cn";
 import { cz } from "../utils/typo";
 import { EASE, Reveal, ShineBorder } from "./ui";
@@ -54,7 +55,9 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
   const [filled, setFilled] = useState({ jmeno: false, telefon: false, email: false, zprava: false });
   const done = [filled.jmeno, filled.telefon, trade !== "", filled.zprava].filter(Boolean).length;
   const ready = done === REQUIRED;
-  const nextMonth = CONTACT.monthsGenitive[(new Date().getMonth() + 1) % 12];
+  // the prerendered HTML carries the build date; the browser swaps in today once it has taken the page over
+  const today = useHydrated() ? new Date() : new Date(__BUILD_TIME__);
+  const nextMonth = CONTACT.monthsGenitive[(today.getMonth() + 1) % 12];
   const privacyLinkText = "jak nakládáme s vašimi údaji";
   const privacyNoteParts = CONTACT.fields.privacyNote.split(privacyLinkText);
 

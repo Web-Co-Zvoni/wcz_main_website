@@ -144,7 +144,10 @@ export default function App() {
               </Suspense>
             </main>
           </InstantReveal.Provider>
-          <Footer />
+          {/* its own boundary: the browser takes it over separately from the page above (see pages/Home.tsx) */}
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
           <FloatingEnquiry key={entry.path} />
         </div>
       </MorphProvider>

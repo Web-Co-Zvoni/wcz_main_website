@@ -19,7 +19,12 @@ process.env.NODE_ENV = "production";
 
 const { ready, render, pages, notFound } = await import(pathToFileURL(join(server, "entry-server.js")).href);
 await ready();
-const template = readFileSync(join(dist, "index.html"), "utf8");
+// the stylesheet goes into the page itself: one round trip less before the first paint (~19 kB compressed)
+const template = readFileSync(join(dist, "index.html"), "utf8").replace(
+  /<link rel="stylesheet" crossorigin href="(\/assets\/[^"]+\.css)">/,
+  (_, href) => `<style>${readFileSync(join(dist, href), "utf8").replace(/<\/style/gi, "<\\/style")}</style>`
+);
+if (template.includes('rel="stylesheet"')) throw new Error("index.html: stylesheet link not inlined");
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 

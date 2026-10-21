@@ -107,6 +107,75 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* phones skip the blur of the scroll reveals (components/ui.tsx) — animating a filter is what makes scrolling stutter there */
+@media (max-width: 47.99rem) {
+  [data-reveal] {
+    filter: none !important;
+  }
+}
+
+/* ---------- first paint: header and hero ----------
+   They come in by CSS, so they move from the very first frame of the prerendered page instead of
+   waiting for the scripts. Same moves and timing as the scroll reveals (ui.tsx Reveal, EASE). */
+
+@keyframes enter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--enter-y, 28px));
+    filter: blur(var(--enter-blur, 8px));
+  }
+}
+@keyframes enter-line {
+  from {
+    transform: translateY(110%);
+  }
+}
+@keyframes enter-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-80px);
+  }
+}
+/* rise + un-blur; --enter-delay (phones) / --enter-delay-md (wide) / --enter-dur / --enter-y / --enter-blur tune it per element */
+.enter-rise {
+  animation: enter-rise var(--enter-dur, 0.9s) cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0s) both;
+}
+@media (max-width: 47.99rem) {
+  .enter-rise {
+    --enter-blur: 0px;
+  }
+}
+@media (min-width: 48rem) {
+  /* the headline lines rise out of their masks — wide screens only, phones show the headline from the first paint */
+  .enter-line {
+    animation: enter-line 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .enter-rise,
+  .enter-line {
+    animation-delay: var(--enter-delay-md, var(--enter-delay, 0s));
+  }
+}
+.enter-drop {
+  animation: enter-drop 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+/* opacity only — for layers that start later (the hero's live effects) and may blend with what's under them */
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+}
+.enter-fade {
+  animation: enter-fade 1.2s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .enter-rise,
+  .enter-line,
+  .enter-drop,
+  .enter-fade {
+    animation: none;
+  }
+}
+
 /* rotating conic border — used once, on the featured price */
 @property --spin {
   syntax: "<angle>";

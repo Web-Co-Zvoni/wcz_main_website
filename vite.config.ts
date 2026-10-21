@@ -10,6 +10,9 @@ const __dirname = path.dirname(__filename);
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  define: {
+    __BUILD_TIME__: JSON.stringify(Date.now()),
+  },
   server: {
     watch: {
       ignored: ["**/dist/**", "**/.astro/**", "**/.vite/**"],

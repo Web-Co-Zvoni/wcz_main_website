@@ -1,29 +1,28 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, lazy, useContext, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { HERO, PORTFOLIO } from "../content";
-import { isWide, useWide } from "../lib/useWide";
-import { afterLoadIdle } from "../utils/idle";
+import { useWide } from "../lib/useWide";
+import { onFirstInteraction } from "../utils/idle";
 import { remScale } from "../utils/remScale";
 import { cz } from "../utils/typo";
 import { PrimaryCta, SecondaryCta } from "./HeroCtas";
 import BeamParticles from "./fx/BeamParticles";
 import logoWcz from "../assets/brand/logo-wcz.svg";
-import { EASE, Kicker, Reveal } from "./ui";
+import { EASE, InstantReveal, Kicker, Reveal } from "./ui";
 
-// three.js is heavy — let the page paint first, the beam fades in on its own
+// The WebGL layers are their own chunks and start only once the page has loaded and gone quiet:
+// the copy and the CSS beam are already there, these fade in on top. Phones never fetch the desktop ones.
+// three.js is heavy — the beam fades in on its own
 const LaserFlow = lazy(() => import("./fx/LaserFlow"));
 // phones: no laser at all — a slowly turning pillar of light behind the centred copy instead
 const LightPillar = lazy(() => import("./fx/LightPillar"));
-// the clouds and the charged logo (ogl) are desktop-only: their own chunk, which phones never fetch
-// and wide screens start fetching as soon as this module runs, alongside the first render
-const loadClouds = () => import("./fx/CloudLayer");
-const loadLogo = () => import("./ChargedLogo");
-if (isWide()) {
-  void loadClouds();
-  void loadLogo();
-}
-const CloudLayer = lazy(loadClouds);
-const ChargedLogo = lazy(loadLogo);
+// the clouds and the charged logo (ogl) are desktop-only
+const CloudLayer = lazy(() => import("./fx/CloudLayer"));
+const ChargedLogo = lazy(() => import("./ChargedLogo"));
+
+/** CSS entrance (index.css .enter-*), started by the first paint of the prerendered page; `d`/`dm` = delay on wide screens / phones, s */
+const enter = (d: number, dm = d, more?: Record<string, string>) =>
+  ({ "--enter-delay": `${dm}s`, "--enter-delay-md": `${d}s`, ...more }) as CSSProperties;
 
 /** night sky above the card; the card itself is the page colour, so it flows on */
 const SKY = "#0f0d10";
@@ -207,9 +206,13 @@ export default function Hero() {
   const copyRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const wide = useWide();
-  // phones: the pillar starts once the page has loaded and gone quiet, so its GPU setup stays out of the first paint
-  const [pillar, setPillar] = useState(false);
-  useEffect(() => (wide ? undefined : afterLoadIdle(() => setPillar(true))), [wide]);
+  // the live layers (WebGL, sparks) start at the visitor's first move or once the loaded page has sat quiet,
+  // so their download, shader compiling and frame loops stay out of the way while the page becomes usable
+  const [fx, setFx] = useState(false);
+  useEffect(() => onFirstInteraction(() => setFx(true)), []);
+  // brought back with Back: the copy is already in place
+  const instant = useContext(InstantReveal);
+  const rise = instant ? "" : "enter-rise";
   const [layout, setLayout] = useState<Layout>({ beamX: 0.62, beamY: -0.25, arch: 64, hitPx: 0, logoX: 0.81, logoY: 0, logoR: 0 });
 
   useLayoutEffect(() => {
@@ -309,7 +312,7 @@ export default function Hero() {
         />
 
         {/* phones never load three.js — no laser at all, a pillar of light in the site's reds instead */}
-        {!wide && pillar && (
+        {!wide && fx && (
           <Suspense fallback={null}>
             <LightPillar
               topColor="#FF3B47"
@@ -330,7 +333,7 @@ export default function Hero() {
             />
           </Suspense>
         )}
-        {wide && (
+        {wide && fx && (
           <Suspense fallback={null}>
             <LaserFlow
               color="#FF3B47"
@@ -374,11 +377,11 @@ export default function Hero() {
         />
 
         {/* logo sits behind the clouds: it glows faintly through and shows in full where the cursor parts them */}
-        {wide && (
+        {wide && fx && (
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.4, delay: 0.9, ease: EASE }}
+            transition={{ duration: 1.4, delay: 0.3, ease: EASE }}
             className="pointer-events-auto absolute hidden w-[clamp(18.75rem,30vw,32.5rem)] -translate-x-1/2 -translate-y-1/2 md:block"
             // the mark sits high in its box — drop the box so the mark itself is level with the copy
             style={{ left: bellPct, top: layout.logoY ? `calc(${layout.logoY}px + clamp(1.75rem,2.8vw,3rem))` : "50%" }}
@@ -390,13 +393,14 @@ export default function Hero() {
         )}
 
         {/* clouds drifting round the beam; the cursor parts them to show the grid, beam and logo behind */}
-        {wide && (
+        {wide && fx && (
           <Suspense fallback={null}>
+            {/* fades in over the sky once its chunk is there */}
             <CloudLayer
               beamX={layout.beamX}
               floorPx={layout.hitPx}
               logo={layout.logoR > 0 ? { x: layout.logoX, y: layout.logoY, r: layout.logoR } : undefined}
-              className="absolute inset-0"
+              className="enter-fade absolute inset-0"
             />
           </Suspense>
         )}
@@ -404,62 +408,58 @@ export default function Hero() {
         {/* layered beam in front of the clouds: crimson haze → red glow → pink halo → white core, plus a flared skirt */}
         {wide && layout.hitPx > 0 && <BeamLayers left={beamPct} height={layout.hitPx} />}
         {/* sparks riding the beam down into the card */}
-        {wide && layout.hitPx > 0 && <BeamParticles left={beamPct} height={layout.hitPx} />}
+        {wide && fx && layout.hitPx > 0 && <BeamParticles left={beamPct} height={layout.hitPx} className="enter-fade" />}
       </motion.div>
 
       {/* stage: copy left of the beam (the bell lives behind the clouds) — lets the cursor through to the logo */}
       <div className="pointer-events-none relative z-10">
         <div className="mx-auto flex min-h-[clamp(40rem,82svh,57.5rem)] max-w-[88rem] flex-col justify-center px-4 pb-28 pt-[8.75rem] [@media(max-width:400px)_and_(max-height:650px)]:pt-[6.25rem] md:min-h-[max(30rem,calc(100svh-16.625rem))] md:px-8 md:pb-[clamp(1.5rem,4vh,3.5rem)] min-[1224px]:pb-[clamp(1.25rem,3.4vh,3.5rem)] md:pt-[clamp(6.25rem,13vh,7.75rem)] min-[1224px]:pt-[clamp(7.625rem,13vh,8.25rem)]">
           <div ref={copyRef} className="pointer-events-auto max-w-[80%] md:max-w-[min(48rem,52vw)] max-md:mx-auto max-md:max-w-full max-md:text-center">
-            <Reveal delay={wide ? 0.45 : 0}>
+            <div className={rise} style={enter(0.45, 0)}>
               <Kicker className="xl:text-[clamp(0.9375rem,2vh,1.0938rem)]">{HERO.kicker}</Kicker>
-            </Reveal>
+            </div>
 
             <h1 className="display mt-6 text-[clamp(3rem,min(5.8vw,10.4vh),6.5rem)] xl:text-[clamp(3rem,max(min(5.8vw,10.4vh),min(7.4vw,calc(17vh-3.25rem))),8.5rem)] max-md:text-[clamp(2.5rem,11vw,3.8rem)]">
               {HERO.titleLines.map((line, i) => (
                 // descenders (the y, the comma) hang below the tight line box: the mask and the text fill reach
                 // down to cover them, and a negative margin keeps the lines exactly where they were
                 <span key={line} className="-mb-[0.18em] block overflow-hidden pb-[0.24em]">
-                  <motion.span
-                    // phones: the headline is there from the first paint — it's what Lighthouse times as LCP
-                    initial={wide ? { y: "110%" } : false}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 1.1, delay: 0.45 + i * 0.12, ease: EASE }}
+                  <span
+                    // phones: the headline is there from the first paint (.enter-line moves on wide screens only)
+                    style={enter(0.45 + i * 0.12)}
                     // white on top shading to grey at the foot of the letters, for a little depth
-                    className="-mb-[0.24em] block bg-[linear-gradient(180deg,#ffffff_8%,#f6f2f0_30%,#c4bdbf_50%,#8f878b_64%,#7d7579_84%)] bg-clip-text pb-[0.24em] text-transparent"
+                    className={`${instant ? "" : "enter-line "}-mb-[0.24em] block bg-[linear-gradient(180deg,#ffffff_8%,#f6f2f0_30%,#c4bdbf_50%,#8f878b_64%,#7d7579_84%)] bg-clip-text pb-[0.24em] text-transparent`}
                   >
                     {line}
-                  </motion.span>
+                  </span>
                 </span>
               ))}
             </h1>
 
-            <Reveal delay={wide ? 0.75 : 0.05}>
+            <div className={rise} style={enter(0.75, 0.05)}>
               <p className="mt-6 max-w-[40rem] text-[1.0625rem] max-md:mx-auto max-md:max-w-[22rem] leading-relaxed text-paper/70 md:text-[1.3125rem] xl:max-w-[44rem] xl:text-[clamp(1.3125rem,2.9vh,1.625rem)]">
                 {cz(HERO.description)}
               </p>
-            </Reveal>
+            </div>
 
-            <Reveal delay={wide ? 0.85 : 0.1}>
+            <div className={rise} style={enter(0.85, 0.1)}>
               <div className="mt-10 flex flex-wrap items-center gap-3 max-md:justify-center">
                 <PrimaryCta href="#kontakt">{HERO.primaryCta}</PrimaryCta>
                 <SecondaryCta href="#koncepty" photo={CTA_PHOTO}>
                   {HERO.secondaryCta}
                 </SecondaryCta>
               </div>
-            </Reveal>
+            </div>
           </div>
         </div>
       </div>
 
       {/* the card the beam lands on — edge to edge, arched so it melts into the sides */}
-      <motion.div
+      <div
         ref={cardRef}
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, delay: 0.25, ease: EASE }}
-        className="relative z-10 shadow-[0_-30px_120px_-50px_rgba(255,59,71,0.65)]"
+        className={`${rise} relative z-10 shadow-[0_-30px_120px_-50px_rgba(255,59,71,0.65)]`}
         style={{
+          ...enter(0.25, 0.25, { "--enter-y": "50px", "--enter-blur": "0px", "--enter-dur": "1.2s" }),
           borderTopLeftRadius: `50% ${layout.arch}px`,
           borderTopRightRadius: `50% ${layout.arch}px`,
         }}
@@ -495,7 +495,7 @@ export default function Hero() {
             ))}
           </dl>
         </Reveal>
-      </motion.div>
+      </div>
     </section>
   );
 }

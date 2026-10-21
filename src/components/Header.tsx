@@ -58,12 +58,10 @@ export default function Header() {
 
   return (
     <>
-      <motion.header
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.9, ease: EASE, delay: 0.2 }}
+      {/* .enter-drop (index.css): slides in from the first paint of the prerendered page, no script needed */}
+      <header
         className={cn(
-          "fixed inset-x-0 top-0 z-50 border-b pt-[env(safe-area-inset-top)] transition-[background-color,border-color,backdrop-filter] duration-500",
+          "enter-drop fixed inset-x-0 top-0 z-50 border-b pt-[env(safe-area-inset-top)] transition-[background-color,border-color,backdrop-filter] duration-500",
           scrolled ? "hairline bg-ink/80 backdrop-blur-xl max-md:bg-ink/95 max-md:backdrop-blur-none" : "border-transparent bg-transparent"
         )}
       >
@@ -101,7 +99,7 @@ export default function Header() {
             </button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       <AnimatePresence>
         {open && (

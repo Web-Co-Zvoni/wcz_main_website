@@ -60,11 +60,13 @@ export default function BeamParticles({
   height,
   count = 520,
   embers = 170,
+  className,
 }: {
   left: string;
   height: number;
   count?: number;
   embers?: number;
+  className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const heightRef = useRef(height);
@@ -227,7 +229,7 @@ export default function BeamParticles({
     <canvas
       ref={canvasRef}
       aria-hidden
-      className="pointer-events-none absolute top-0 -translate-x-1/2 mix-blend-screen"
+      className={`pointer-events-none absolute top-0 -translate-x-1/2 mix-blend-screen ${className ?? ""}`}
       style={{ left, width: WIDTH, height }}
     />
   );

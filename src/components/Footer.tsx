@@ -1,9 +1,12 @@
 import { ArrowUp } from "lucide-react";
 import { FOOTER, NAV_LINKS, SITE } from "../content";
+import { useHydrated } from "../lib/useHydrated";
 import { Logo } from "./Header";
 import { cz } from "../utils/typo";
 
 export default function Footer() {
+  // build year in the prerendered HTML, this year once the browser has taken the page over
+  const year = (useHydrated() ? new Date() : new Date(__BUILD_TIME__)).getFullYear();
   const legalDetails = [SITE.legalName, `IČO ${SITE.ico}`, SITE.legalAddress, SITE.legalNote, SITE.legalRegistry];
 
   return (
@@ -69,7 +72,7 @@ export default function Footer() {
           </a>
           <div className="mt-2 flex flex-col items-center gap-4 sm:flex-row sm:gap-8">
             <p>
-              © {new Date().getFullYear()} {SITE.domain} — {SITE.footerSignoff}
+              © {year} {SITE.domain} — {SITE.footerSignoff}
             </p>
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
