@@ -298,31 +298,53 @@ export const FAQ = {
 
 export const CONTACT = {
   title: "Chcete web, co zvoní?",
-  description: "Formulář zabere dvě minuty. Ozveme se do 24 hodin — většinou dřív.",
+  description: "Vyplníte pár údajů a vyberete si čas na krátký videohovor. Nezávazně probereme, co váš web potřebuje.",
   emailLead: "Nebo napište rovnou na e-mail",
   availability: "Volná kapacita od",
   monthsGenitive: [
     "ledna", "února", "března", "dubna", "května", "června",
     "července", "srpna", "září", "října", "listopadu", "prosince",
   ],
-  successTitle: "Díky, je to u nás.",
-  successStart: "Ozveme se do 24 hodin. Když to spěchá, napište nám na",
-  formTitle: "Nezávazná poptávka",
-  progress: (done: number, total: number) => (done === total ? "Hotovo, můžete odeslat" : `Vyplněno ${done} z ${total}`),
+  successTitle: "Termín máme poznamenaný.",
+  successText: "Brzy vám schůzku potvrdíme e-mailem i s odkazem na videohovor. Kdyby se něco změnilo, napište nám na",
+  // when the calendar can't be reached, the answers come to us by e-mail instead
+  fallbackTitle: "Díky, je to u nás.",
+  fallbackText: "Ozveme se do 24 hodin a termín domluvíme spolu. Když to spěchá, napište nám na",
+  formTitle: "Nezávazná schůzka",
+  /** the form's three steps: who you are, what you want, when */
+  steps: ["Kontakt", "Váš web", "Termín"],
+  stepLabel: (n: number, total: number, name: string) => `Krok ${n} ze ${total} · ${name}`,
   fields: {
     name: "Jméno a příjmení *",
     phone: "Telefon *",
-    email: "E-mail",
+    email: "E-mail *",
     trade: "Čím se živíte? *",
-    message: "Co potřebujete? *",
+    need: "Co od webu chcete? *",
+    note: "Chcete nám něco napsat předem?",
     privacyNote: "Odesláním berete na vědomí, jak nakládáme s vašimi údaji. Nikomu je nepředáváme.",
-    submit: "Odeslat poptávku",
-    sending: "Odesíláme…",
-    error: "Odeslání se nepovedlo. Zkuste to znovu, nebo zavolejte.",
+    next: "Pokračovat",
+    back: "Zpět",
+    submit: "Rezervovat schůzku",
+    sending: "Rezervujeme…",
+    pickFirst: "Vyberte den a čas",
+    error: "Rezervace se nepovedla. Zkuste to znovu, nebo nám napište.",
+    fallbackError: "Odeslání se nepovedlo. Zkuste to znovu, nebo nám napište.",
     namePlaceholder: "Jan Novák",
     phonePlaceholder: "777 123 456",
     emailPlaceholder: "jan@firma.cz",
-    messagePlaceholder: "Např.: Mám starý web a potřebuju nový, aby mě lidi našli v Plzni…",
+    notePlaceholder: "Nepovinné. Třeba odkaz na váš současný web…",
+  },
+  needs: ["Úplně nový web", "Předělat starý web", "Web s rezervacemi nebo objednávkami", "Zatím nevím, poraďte mi"],
+  /** step 3: days and times straight from our booking system */
+  calendar: {
+    day: "Den",
+    time: "Čas",
+    loading: "Načítáme volné termíny…",
+    dayFull: "Tento den už je obsazený, zkuste jiný.",
+    noDates: "Teď nemáme volný termín. Pošlete nám údaje bez něj, ozveme se a domluvíme ho spolu.",
+    loadError: "Volné termíny se nepodařilo načíst.",
+    retry: "Zkusit znovu",
+    sendWithout: "Odeslat bez termínu",
   },
   trades: [
     "Instalatérství · voda · topení",
@@ -338,19 +360,6 @@ export const CONTACT = {
   ],
 };
 
-/**
- * Booking a consultation — the form comes from our own booking system (rezervacni-system),
- * shown in an iframe. Its address comes from VITE_REZERVACE_URL (.env.production).
- */
-export const BOOKING = {
-  /** the business in the booking system (its slug, set in /admin → Klienti) */
-  tenant: "webcozvoni",
-  kicker: "Konzultace",
-  title: "Radši to probereme?",
-  description: "Vyberte si volný termín. Potvrdíme vám ho e-mailem.",
-  frameTitle: "Rezervace konzultace",
-};
-
 export const FOOTER = {
   backToTop: "Zpět nahoru",
   privacy: "Zásady zpracování osobních údajů",
@@ -364,7 +373,7 @@ export const FOOTER = {
 export const NICHE_PAGE = {
   back: "Zpět",
   heroCta: "Ukázat koncepty",
-  heroCtaSecondary: "Nezávazná poptávka",
+  heroCtaSecondary: "Nezávazná schůzka",
   featuresKicker: "Co pro vás uděláme",
   featuresTitle: "Web, který zná vaše řemeslo",
   featuresLead: "Žádná šablona pro všechny. Každý obor má jiné zákazníky a jiné otázky — web na ně odpoví dřív, než zavolají.",
