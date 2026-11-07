@@ -5,11 +5,36 @@ import { cn } from "../utils/cn";
 import { Button, Reveal, SectionHead } from "./ui";
 import { cz } from "../utils/typo";
 
+/** the monthly care under a plan's one-off price — shared with the concept pages' price card */
+export function CarePrice({ care, featured, className }: { care: string; featured: boolean; className?: string }) {
+  return (
+    <div className={cn("flex items-baseline justify-center gap-2 rounded-full border px-5 py-2.5", featured ? "border-accent/35 bg-accent/[0.08]" : "border-paper/12 bg-paper/[0.03]", className)}>
+      <span className={cn("display whitespace-nowrap text-[1.375rem] leading-none xl:text-[1.5rem]", featured && "text-accent")}>{care}</span>
+      <span className="text-[0.875rem] text-mute xl:text-[0.9375rem]">{PRICING.carePer}</span>
+    </div>
+  );
+}
+
 export default function Pricing() {
   return (
     <section id="cenik" className="relative py-24 md:py-28">
       <div className="mx-auto max-w-[88rem] px-4 md:px-8">
         <SectionHead kicker={PRICING.kicker} title={PRICING.title} desc={PRICING.description} size="lg" />
+
+        {/* what the monthly care always covers — the same in every plan */}
+        <Reveal delay={0.1}>
+          <div className="mt-12 flex flex-col items-center gap-3 text-center">
+            <p className="text-[0.875rem] font-medium text-paper/60 xl:text-[0.9375rem]">{PRICING.careLabel}</p>
+            <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[0.9375rem] text-paper/80 xl:text-[1rem]">
+              {PRICING.careIncluded.map((f) => (
+                <li key={f} className="flex items-center gap-2">
+                  <Check className="size-4 shrink-0 text-accent" strokeWidth={2.75} />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
 
         <div className="mt-20 grid items-center gap-6 lg:grid-cols-3 lg:gap-8">
           {PRICING.plans.map((p, i) => (
@@ -37,6 +62,7 @@ export default function Pricing() {
                 <h3 className={cn("text-[1.0625rem] font-semibold xl:text-[1.1875rem]", p.featured ? "text-accent" : "text-mute")}>{p.name}</h3>
                 <p className="display mt-5 text-[clamp(2.6rem,4.2vw,4.4rem)] leading-none">{p.price}</p>
                 <p className="mt-2.5 text-[0.875rem] text-mute xl:text-[0.9688rem]">{p.per}</p>
+                <CarePrice care={p.care} featured={p.featured} className="mt-5" />
                 <p className="mt-6 max-w-[32ch] text-[1.0312rem] leading-relaxed text-paper/80 xl:text-[1.125rem]">{cz(p.desc)}</p>
 
                 <ul className="mt-8 flex w-full flex-col gap-4 border-t border-paper/10 pt-8">
@@ -56,30 +82,6 @@ export default function Pricing() {
               </motion.div>
             </Reveal>
           ))}
-        </div>
-
-        {/* monthly care after launch: quieter than the plans, two to a row */}
-        <div className="mx-auto mt-20 max-w-5xl">
-          <Reveal>
-            <h3 className="text-center text-[1.0625rem] font-semibold text-paper xl:text-[1.1875rem]">{cz(PRICING.retainers.title)}</h3>
-            <p className="mt-2 text-center text-[0.9375rem] text-mute xl:text-[1.0312rem]">{cz(PRICING.retainers.note)}</p>
-          </Reveal>
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:gap-6">
-            {PRICING.retainers.items.map((r, i) => (
-              <Reveal key={r.name} delay={i * 0.1} className="h-full">
-                <div className="flex h-full items-center justify-between gap-6 rounded-[1.25rem] border border-paper/10 bg-[#0b0a0c]/80 px-6 py-6 xl:px-8 xl:py-7">
-                  <div className="min-w-0">
-                    <h4 className="text-[1.0625rem] font-semibold text-paper xl:text-[1.1875rem]">{r.name}</h4>
-                    <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-mute xl:text-[1.0312rem]">{cz(r.desc)}</p>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <p className="display whitespace-nowrap text-[clamp(1.6rem,2.4vw,2.2rem)] leading-none">{r.price}</p>
-                    <p className="mt-1.5 text-[0.8125rem] text-mute xl:text-[0.9062rem]">{r.per}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
         </div>
 
         <Reveal delay={0.15}>
