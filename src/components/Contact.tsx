@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, ArrowUpRight, AtSign, CalendarCheck, Check, CheckCircle2, Loader2, Mail, MessageSquareText, Phone, Send, UserRound, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, AtSign, Building2, CalendarCheck, Check, CheckCircle2, Globe, Loader2, Mail, MessageSquareText, Phone, Send, UserRound, type LucideIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { CONTACT, SETTINGS, SITE } from "../content";
@@ -113,7 +113,10 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
   const [step, setStep] = useState(0);
   const [trade, setTrade] = useState(knownTrade ?? "");
   const [need, setNeed] = useState("");
-  const [filled, setFilled] = useState({ jmeno: false, telefon: false, email: false });
+  const [filled, setFilled] = useState({ jmeno: false, firma: false, telefon: false, email: false });
+  // the link to the website to be redone: kept here, so it survives switching the chip away and back
+  const [oldWeb, setOldWeb] = useState("");
+  const redo = need === CONTACT.redoNeed;
   const [pick, setPick] = useState<Pick | null>(null);
   // the last day a time was picked on, so a reload of the picker stays there
   const [day, setDay] = useState<string | null>(null);
@@ -124,7 +127,7 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
   // one per filled-in form, so a double click doesn't book twice
   const [idempotencyKey] = useState(() => crypto.randomUUID());
   // whether what this step asks for is there — lights up the button
-  const ready = [filled.jmeno && filled.telefon && filled.email, trade !== "" && need !== "", pick !== null][step];
+  const ready = [filled.jmeno && filled.telefon && filled.email, trade !== "" && need !== "" && (!redo || oldWeb.trim() !== ""), pick !== null][step];
   // the prerendered HTML carries the build date; the browser swaps in today once it has taken the page over
   const today = useHydrated() ? new Date() : new Date(__BUILD_TIME__);
   const nextMonth = CONTACT.monthsGenitive[(today.getMonth() + 1) % 12];
@@ -206,7 +209,15 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
         email: data.email ?? "",
         phone: data.telefon ?? "",
         vehicle: data.obor ?? "",
-        note: [`Chce: ${data.potreba ?? ""}`, data.poznamka?.trim()].filter(Boolean).join("\n"),
+        // the booking has no field for the company or the old website: they go into the note
+        note: [
+          `Chce: ${data.potreba ?? ""}`,
+          data.firma?.trim() && `Firma: ${data.firma.trim()}`,
+          data.web?.trim() && `Současný web: ${data.web.trim()}`,
+          data.poznamka?.trim(),
+        ]
+          .filter(Boolean)
+          .join("\n"),
         idempotencyKey,
       });
       setState("booked");
@@ -310,7 +321,7 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
                   onInput={(e) => {
                     const fd = new FormData(e.currentTarget);
                     const has = (n: string) => String(fd.get(n) ?? "").trim() !== "";
-                    setFilled({ jmeno: has("jmeno"), telefon: has("telefon"), email: has("email") });
+                    setFilled({ jmeno: has("jmeno"), firma: has("firma"), telefon: has("telefon"), email: has("email") });
                   }}
                   className="relative flex flex-col gap-6 text-left"
                 >
@@ -342,9 +353,14 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
 
                   {/* earlier steps only hide, so "back" finds them filled in and they still go with the request */}
                   <div data-step={0} className={cn("flex flex-col gap-6", step !== 0 && "hidden")}>
-                    <Field label={CONTACT.fields.name} icon={UserRound} done={filled.jmeno}>
-                      <input required name="jmeno" autoComplete="name" placeholder={CONTACT.fields.namePlaceholder} className={inputCls} />
-                    </Field>
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <Field label={CONTACT.fields.name} icon={UserRound} done={filled.jmeno}>
+                        <input required name="jmeno" autoComplete="name" placeholder={CONTACT.fields.namePlaceholder} className={inputCls} />
+                      </Field>
+                      <Field label={CONTACT.fields.company} icon={Building2} done={filled.firma}>
+                        <input name="firma" autoComplete="organization" maxLength={100} placeholder={CONTACT.fields.companyPlaceholder} className={inputCls} />
+                      </Field>
+                    </div>
                     <div className="grid gap-5 sm:grid-cols-2">
                       <Field label={CONTACT.fields.phone} icon={Phone} done={filled.telefon}>
                         <input
@@ -366,8 +382,36 @@ export default function Contact({ trade: knownTrade, pinned = true }: { trade?: 
                   <div data-step={1} className={cn("flex flex-col gap-6", step !== 1 && "hidden")}>
                     <Chips legend={CONTACT.fields.trade} name="obor" options={CONTACT.trades} value={trade} onChange={setTrade} />
                     <Chips legend={CONTACT.fields.need} name="potreba" options={CONTACT.needs} value={need} onChange={setNeed} />
+                    {/* redoing a website: we need to see the current one. -m-1 p-1 leaves room for the focus ring the overflow would clip */}
+                    <AnimatePresence initial={false}>
+                      {redo && (
+                        <motion.div
+                          key="old-web"
+                          initial={{ height: 0, opacity: 0, marginTop: "-1.75rem" }}
+                          animate={{ height: "auto", opacity: 1, marginTop: "-0.25rem" }}
+                          exit={{ height: 0, opacity: 0, marginTop: "-1.75rem" }}
+                          transition={{ duration: 0.35, ease: EASE }}
+                          className="-m-1 overflow-hidden p-1"
+                        >
+                          <Field label={CONTACT.fields.oldWeb} icon={Globe} done={oldWeb.trim() !== ""}>
+                            <input
+                              required
+                              autoFocus
+                              name="web"
+                              inputMode="url"
+                              autoComplete="url"
+                              maxLength={200}
+                              value={oldWeb}
+                              onChange={(e) => setOldWeb(e.target.value)}
+                              placeholder={CONTACT.fields.oldWebPlaceholder}
+                              className={inputCls}
+                            />
+                          </Field>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                     <Field label={CONTACT.fields.note} icon={MessageSquareText} done={false}>
-                      <textarea name="poznamka" rows={3} maxLength={800} placeholder={CONTACT.fields.notePlaceholder} className={`${inputCls} block resize-none`} />
+                      <textarea name="poznamka" rows={3} maxLength={600} placeholder={CONTACT.fields.notePlaceholder} className={`${inputCls} block resize-none`} />
                     </Field>
                   </div>
 

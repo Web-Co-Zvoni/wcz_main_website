@@ -316,10 +316,12 @@ export const CONTACT = {
   stepLabel: (n: number, total: number, name: string) => `Krok ${n} ze ${total} · ${name}`,
   fields: {
     name: "Jméno a příjmení *",
+    company: "Název firmy (nepovinné)",
     phone: "Telefon *",
     email: "E-mail *",
     trade: "Čím se živíte? *",
     need: "Co od webu chcete? *",
+    oldWeb: "Odkaz na váš současný web *",
     note: "Chcete nám něco napsat předem?",
     privacyNote: "Odesláním berete na vědomí, jak nakládáme s vašimi údaji. Nikomu je nepředáváme.",
     next: "Pokračovat",
@@ -332,8 +334,12 @@ export const CONTACT = {
     namePlaceholder: "Jan Novák",
     phonePlaceholder: "777 123 456",
     emailPlaceholder: "jan@firma.cz",
-    notePlaceholder: "Nepovinné. Třeba odkaz na váš současný web…",
+    companyPlaceholder: "Novák Instalace",
+    oldWebPlaceholder: "www.vasefirma.cz",
+    notePlaceholder: "Nepovinné. Třeba co by měl web umět…",
   },
+  /** the "need" that asks for a link to the current website */
+  redoNeed: "Předělat starý web",
   needs: ["Úplně nový web", "Předělat starý web", "Web s rezervacemi nebo objednávkami", "Zatím nevím, poraďte mi"],
   /** step 3: days and times straight from our booking system */
   calendar: {
