@@ -1,11 +1,10 @@
 import { motion, useInView } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Check, Lock, Quote, Star, UserRound } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Lock, Plus, Quote, Star, UserRound } from "lucide-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import Contact from "../components/Contact";
 import CurvedSteps from "../components/CurvedSteps";
-import { CarePrice } from "../components/Pricing";
 import { Button, InstantReveal, Kicker, Reveal, SectionHead } from "../components/ui";
-import { CONCEPT_DETAILS, CONCEPT_PAGE, cardPhoto, conceptPhoto, PORTFOLIO, PRICING, PROCESS, SITE } from "../content";
+import { CONCEPT_DETAILS, CONCEPT_PAGE, cardPhoto, conceptPhoto, planPrice, PORTFOLIO, PRICING, PROCESS, SITE } from "../content";
 import { Landed, MorphImage, MorphLayer, useFromPrerender, useMorph } from "../lib/morph";
 import { cn } from "../utils/cn";
 import { cz } from "../utils/typo";
@@ -129,7 +128,7 @@ function Hero({ p, d, n, plan, launch }: { p: Item; d: Detail; n: number; plan: 
           <Facts
             items={[
               { label: CONCEPT_PAGE.facts.plan, value: plan.name },
-              { label: CONCEPT_PAGE.facts.price, value: plan.price, sub: `${plan.care} ${PRICING.carePer}` },
+              { label: CONCEPT_PAGE.facts.price, value: planPrice(plan), sub: plan.price === null ? plan.per : `${plan.per} · ${PRICING.careFrom}` },
               { label: CONCEPT_PAGE.facts.launch, value: launch },
               { label: CONCEPT_PAGE.facts.scope, value: CONCEPT_PAGE.scope(plan.name, d.pages.length), ...d.scope },
             ]}
@@ -156,9 +155,12 @@ function PlanCard({ plan }: { plan: Plan }) {
         </span>
       )}
       <h3 className="text-[1.1875rem] font-semibold text-accent xl:text-[1.3125rem]">{plan.name}</h3>
-      <p className="display mt-5 text-[clamp(2.8rem,4.4vw,4.6rem)] leading-none">{plan.price}</p>
+      <p className="display mt-5 text-[clamp(2.8rem,4.4vw,4.6rem)] leading-none">{planPrice(plan)}</p>
       <p className="mt-2.5 text-[0.9688rem] text-mute xl:text-[1.0625rem]">{plan.per}</p>
-      <CarePrice care={plan.care} featured className="mt-5" />
+      <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-accent/35 bg-accent/[0.08] px-4 py-2 text-[0.9375rem] font-medium text-paper/85">
+        <Plus className="size-4 text-accent" strokeWidth={2.75} />
+        {PRICING.careFrom}
+      </p>
       <p className="mt-6 max-w-[32ch] text-[1.125rem] leading-relaxed text-paper/80 xl:text-[1.1875rem]">{cz(plan.desc)}</p>
       <ul className="mt-8 flex w-full flex-col gap-4 border-t border-paper/10 pt-8">
         {plan.features.map((f) => (

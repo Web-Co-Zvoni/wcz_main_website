@@ -40,7 +40,7 @@ export const META = {
   homeDescription:
     "Stavíme poctivé weby pro živnostníky a malé firmy z Plzně a okolí. Návrh do 72 hodin zdarma, spuštění do 14 dnů. Web, díky kterému vám zákazníci volají.",
   nicheDescription: (title: string) =>
-    `${title} z Plzně a okolí. Návrh do 72 hodin zdarma, spuštění do 14 dnů. Pevná cena předem, správa od 900 Kč měsíčně.`,
+    `${title} z Plzně a okolí. Návrh do 72 hodin zdarma, spuštění do 14 dnů. Pevná cena předem, správa od 499 Kč měsíčně.`,
   notFoundTitle: "Stránka nenalezena — webcozvoni.cz",
 };
 
@@ -175,7 +175,7 @@ export const PROCESS = {
     { title: "Zavoláme si", text: "15 minut, zdarma a bez závazků.", meta: "Den 1" },
     { title: "Návrh do 72 hodin", text: "Uvidíte web dřív, než cokoliv zaplatíte.", meta: "Den 3" },
     { title: "Spuštění do 14 dnů", text: "Texty, fotky, SEO. Doména i web jsou vaše.", meta: "Den 14" },
-    { title: "Začne to zvonit", text: "Web hlídáme a upravujeme. Vy řešíte zakázky.", meta: "Pořád" },
+    { title: "Začne to zvonit", text: "Se správou web hlídáme a upravujeme. Vy řešíte zakázky.", meta: "Pořád" },
   ],
   guarantee: "Zpozdíme se z naší viny? Máte slevu 10 %.",
   guaranteeCta: "Chci termín návrhu",
@@ -218,54 +218,113 @@ export const PORTFOLIO = {
   ],
 };
 
+/** a price as the page shows it: 16 899 Kč */
+export const kc = (n: number) => `${new Intl.NumberFormat("cs-CZ").format(n)} Kč`;
+
 /**
- * Every plan is two payments: the web, once, and its care, monthly — hosting, watching, backups
- * and small changes. The care is what keeps the one-off price this low.
+ * Two separate choices that combine freely: the web, paid once, and its care, monthly — or none.
+ * A one-page web with full care is as fine as an eight-page one with hosting only.
+ * Prices are numbers so the page can count them up; null means "priced per brief".
  */
 export const PRICING = {
   kicker: "Ceník",
   title: "Cena na stole. Hned a celá.",
-  description: "Web zaplatíte jednou. Potom měsíčně správa — hlídáme ho, zálohujeme a upravujeme za vás.",
+  description: "Web zaplatíte jednou. Správu si k němu vyberete zvlášť — jakoukoli, nebo žádnou.",
   featuredLabel: "Nejčastější volba",
-  /** what the monthly care always covers, above the cards */
-  careIncluded: ["Hosting, doména a SSL", "Hlídání webu nonstop", "Zálohy a aktualizace", "Úpravy na zavolání"],
-  careLabel: "V měsíční správě je vždycky",
-  /** the monthly line under the one-off price */
-  carePer: "měsíčně za správu",
-  note: "Návrh zdarma, výrobu platíte až po schválení a správu až od spuštění. Web i doména jsou vaše od prvního dne. Správa běží prvních 12 měsíců, potom ji můžete kdykoli zrušit s měsíční výpovědí.",
+  custom: "Dohodou",
+  build: {
+    step: "Krok 1 · Výroba webu",
+    title: "Web, který je váš",
+    lead: "Platíte jednou. Web i doména patří vám od prvního dne.",
+  },
+  care: {
+    step: "Krok 2 · Měsíční správa",
+    title: "Kdo se o web bude starat?",
+    lead: "Ke kterémukoli webu. Klidně jednostránka s kompletní péčí — nebo vůbec nic.",
+    per: "měsíčně",
+    sample: "ukázka",
+    /** the visuals in the care tiles: illustrations, not a client's numbers */
+    visuals: {
+      domain: "vasefirma.cz",
+      secure: "Zabezpečeno",
+      up: "Web běží",
+      backup: "Záloha hotová",
+      fixed: "Chyba opravena",
+      report: "Report za měsíc",
+    },
+    /** no care at all: the web is theirs, so it can live anywhere */
+    none: {
+      name: "Bez správy",
+      price: 0,
+      desc: "Web i doména jsou vaše. Postaráte se o ně sami, nebo je dáte, kam chcete.",
+      features: ["Žádný měsíční poplatek", "Hosting si zařídíte kdekoli", "Úpravy vám naceníme předem"],
+    },
+    plans: [
+      {
+        name: "Hosting",
+        icon: "server",
+        price: 499,
+        desc: "Web online, rychlý a bezpečný.",
+        features: ["Rychlý a bezpečný hosting", "SSL certifikát (HTTPS)", "Doména a nastavení DNS"],
+        featured: false,
+      },
+      {
+        name: "Údržba",
+        icon: "shield",
+        price: 1199,
+        desc: "Hlídáme, aby web běžel, a opravíme, co se rozbije.",
+        features: ["Všechno z Hostingu", "Hlídání dostupnosti a chyb", "Opravy chyb", "Aktualizace a zálohy"],
+        featured: false,
+      },
+      {
+        name: "Kompletní péče",
+        icon: "sparkles",
+        price: 1999,
+        desc: "Web, o který se vůbec nemusíte starat.",
+        features: ["Všechno z Údržby", "Měsíční report webu", "Hlídání pozic na Googlu", "Drobné úpravy designu a obsahu"],
+        featured: true,
+      },
+    ],
+  },
+  /** the line under a web's price on a concept page */
+  careFrom: "správa od 499 Kč měsíčně",
+  note: "Návrh zdarma, výrobu platíte až po schválení. Správa je nepovinná, platí se od spuštění a zrušit jde kdykoli s měsíční výpovědí.",
   plans: [
     {
       name: "Start",
-      price: "7 900 Kč",
+      icon: "page",
+      price: 7899 as number | null,
       per: "jednorázově",
-      care: "+ 900 Kč",
       desc: "Pro živnostníka, co potřebuje být konečně vidět.",
-      features: ["Jednostránkový web na míru", "Poptávkový formulář a mapa", "Základy SEO a profil na Googlu", "Úpravy do 30 minut měsíčně", "Spuštění do 10 dnů"],
+      features: ["Jednostránkový web na míru", "Poptávkový formulář a mapa", "Základy SEO a profil na Googlu", "Spuštění do 10 dnů"],
       cta: "Chci Start",
       featured: false,
     },
     {
       name: "Poctivý web",
-      price: "16 900 Kč",
+      icon: "layers",
+      price: 16899 as number | null,
       per: "jednorázově",
-      care: "+ 1 600 Kč",
       desc: "Pro dílny, salony a malé firmy.",
-      features: ["Do 8 podstránek a reference", "Rezervace nebo objednávky", "Lokální SEO pro Plzeň a okolí", "Úpravy do 2 hodin měsíčně", "Měsíční report návštěv a poptávek", "Spuštění do 14 dnů"],
+      features: ["Do 8 podstránek a reference", "Rezervace nebo objednávky", "Lokální SEO pro Plzeň a okolí", "Školení — úpravy zvládnete sami", "Spuštění do 14 dnů"],
       cta: "Chci Poctivý web",
       featured: true,
     },
     {
       name: "Na míru",
-      price: "Dohodou",
+      icon: "boxes",
+      price: null as number | null,
       per: "vždy pevná cena předem",
-      care: "+ od 2 900 Kč",
       desc: "E-shop, katalog nebo cokoliv většího.",
-      features: ["E-shop nebo katalog", "Napojení na vaše systémy", "Vícejazyčné weby", "Úpravy do 5 hodin měsíčně", "Nabídka do 48 hodin"],
+      features: ["E-shop nebo katalog", "Napojení na vaše systémy", "Vícejazyčné weby", "Nabídka do 48 hodin"],
       cta: "Popsat zadání",
       featured: false,
     },
   ],
 };
+
+/** a web's price, or "Dohodou" */
+export const planPrice = (p: { price: number | null }) => (p.price === null ? PRICING.custom : kc(p.price));
 
 export const FAQ = {
   title: "Na rovinu odpovězeno",
@@ -280,19 +339,19 @@ export const FAQ = {
     },
     {
       question: "Kolik mě web stojí?",
-      answer: "Výrobu zaplatíte jednou a cenu víte předem. Potom měsíčně správa podle balíčku — 900 Kč, 1 600 Kč, u větších webů od 2 900 Kč. Hosting, doména, hlídání, zálohy i úpravy jsou v ní. Nic dalšího.",
+      answer: "Výrobu zaplatíte jednou a cenu víte předem. Správu si vyberete zvlášť: Hosting za 499 Kč, Údržbu s hlídáním a opravami za 1 199 Kč, nebo Kompletní péči s reportem a úpravami za 1 999 Kč měsíčně. Kombinovat jde cokoliv s čímkoliv — a bez správy platíte měsíčně 0 Kč.",
     },
     {
-      question: "Co pro mě správa každý měsíc dělá?",
-      answer: "Hlídáme, že web běží a formuláře doručují poptávky. Zálohujeme, aktualizujeme a děláme úpravy, které pošlete — nové ceny, fotky, akce, otevírací dobu. Stačí SMS nebo e-mail.",
+      question: "Potřebuju správu?",
+      answer: "Ne, je nepovinná. Je pro ty, kdo na web nechtějí myslet: s Údržbou hlídáme, že běží, a opravujeme chyby. S Kompletní péčí za vás navíc měníme ceny, fotky, akce i otevírací dobu — stačí SMS nebo e-mail.",
     },
     {
       question: "Co když budu chtít větší změnu?",
-      answer: "Co se nevejde do hodin ve vašem balíčku, naceníme předem a uděláme až po vašem souhlasu.",
+      answer: "Co je víc než drobná úprava, naceníme předem a uděláme až po vašem souhlasu.",
     },
     {
       question: "Můžu správu zrušit?",
-      answer: "Správa běží prvních 12 měsíců, potom ji můžete kdykoli zrušit s měsíční výpovědí. Web i doména jsou vaše od začátku, takže si je vezmete s sebou.",
+      answer: "Kdykoli, s měsíční výpovědí. Web i doména jsou vaše od začátku, takže si je vezmete s sebou.",
     },
     {
       question: "Co když se mi návrh nebude líbit?",
@@ -300,7 +359,7 @@ export const FAQ = {
     },
     {
       question: "Zvládnu si web upravovat sám?",
-      answer: "Můžete, ale nemusíte. Úpravy jsou ve správě — napíšete nám a uděláme to za vás. Když chcete, za 45 minut vás naučíme měnit texty, ceny i fotky.",
+      answer: "Ano. Za 45 minut vás naučíme měnit texty, ceny i fotky. S Kompletní péčí ale nemusíte — napíšete nám a uděláme to za vás.",
     },
     {
       question: "Pomůžete i s Googlem a e-mailem?",
