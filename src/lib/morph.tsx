@@ -277,14 +277,14 @@ export function MorphProvider({ children }: { children: ReactNode }) {
  * once and the large one over it when loaded — the same pair the flight crossfaded. Shading or
  * labels over it go in a <MorphLayer>, so they lie over the photo while it is still flying.
  */
-/** the width parameter of a Pexels photo URL (content.ts heroPhoto) */
-const PEXELS_W = /(?<=images\.pexels\.com\/.*[?&])w=\d+/;
+/** the width in a photo's file name, /foto/<id>-w1920.webp (content.ts heroPhoto) */
+const PHOTO_W = /(?<=\/foto\/\d+-w)\d+(?=\.webp$)/;
 
 export function MorphImage({ small, large, alt, className }: { small: string; large: string; alt: string; className?: string }) {
   const { flying } = useMorph();
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
-  const sized = useFromPrerender() && PEXELS_W.test(large);
+  const sized = useFromPrerender() && PHOTO_W.test(large);
 
   useEffect(() => {
     if (imgRef.current?.complete && imgRef.current.naturalWidth) setLoaded(true);
@@ -297,9 +297,9 @@ export function MorphImage({ small, large, alt, className }: { small: string; la
       <img
         ref={imgRef}
         src={large}
-        // opened directly, phones take a narrower file than the 1920 px desktop one (Pexels scales on request);
+        // opened directly, phones take a narrower file than the 1920 px desktop one (scripts/fetch-photos.mjs has all three);
         // after a morph it stays on `large` — the very file the flying photo has already loaded
-        srcSet={sized ? [800, 1280, 1920].map((w) => `${large.replace(PEXELS_W, `w=${w}`)} ${w}w`).join(", ") : undefined}
+        srcSet={sized ? [800, 1280, 1920].map((w) => `${large.replace(PHOTO_W, String(w))} ${w}w`).join(", ") : undefined}
         sizes={sized ? "100vw" : undefined}
         fetchPriority="low"
         alt={alt}

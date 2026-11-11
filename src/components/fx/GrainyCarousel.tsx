@@ -12,7 +12,7 @@
  * step every frame. A card in the clear middle opens its `href` on click — or hands itself to
  * `onOpen` with its on-screen box, for the page morph. The row keeps its place across remounts
  * and holds still while a photo is flying, so Back lands the photo on the same card.
- * Images need CORS (Pexels sends it); without WebGL the row is a static strip.
+ * Images need CORS (ours come from /foto/, same origin); without WebGL the row is a static strip.
  * With `blur` (phones) the ends just go soft and fade instead of crumbling, and there is no dust.
  */
 import { useReducedMotion } from "framer-motion";

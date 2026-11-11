@@ -7,7 +7,7 @@
  * Adapted for this site from the "morph-gallery" component (raw WebGL, no deps): controlled
  * index (the parent renders the caption), Czech labels, autoplay that also rests while the
  * gallery is off screen, and a canvas that only redraws while something changes instead of
- * every frame. Images need CORS (Pexels sends it); without WebGL or CORS it falls back to a
+ * every frame. Images need CORS (ours come from /foto/, same origin); without WebGL or CORS it falls back to a
  * plain cross-fade.
  */
 import { ChevronLeft, ChevronRight } from "lucide-react";

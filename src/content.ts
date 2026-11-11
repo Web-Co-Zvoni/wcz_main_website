@@ -74,13 +74,18 @@ export const HERO = {
   ],
 };
 
-/** the same Pexels photo, large and uncropped, for the top of a detail page */
-export const heroPhoto = (src: string) => src.replace(/\?.*$/, "?auto=compress&cs=tinysrgb&w=1920");
+/*
+ * Photos are from Pexels, but served from our own /foto/ — a visitor's browser never contacts Pexels,
+ * so there are no third-party cookies and no cookie banner is needed. A new photo id here means
+ * running `node scripts/fetch-photos.mjs`, which downloads every size used below.
+ * Names: /foto/<id>-<w>x<h>.webp is a crop, /foto/<id>-w<w>.webp the uncropped photo at that width.
+ */
+/** the same photo, large and uncropped, for the top of a detail page */
+export const heroPhoto = (src: string) => src.replace(/-\d+x\d+\.webp$/, "-w1920.webp");
 /** a concept photo as the cover-flow cards show it */
-export const cardPhoto = (src: string) => src.replace("h=1000&w=800", "h=1120&w=740");
+export const cardPhoto = (src: string) => src.replace("-800x1000.webp", "-740x1120.webp");
 
-const nichePhoto = (id: number) =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600`;
+const nichePhoto = (id: number) => `/foto/${id}-600x600.webp`;
 
 /** The trades we build for, in the grainy carousel under the hero. Photos are illustrative (Pexels). */
 export const NICHES = {
@@ -186,8 +191,7 @@ export const PROCESS = {
   discount: 10,
 };
 
-const pexels = (id: number) =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1000&w=800`;
+const pexels = (id: number) => `/foto/${id}-800x1000.webp`;
 
 export const PORTFOLIO = {
   kicker: "Oborové koncepty",
