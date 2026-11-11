@@ -67,9 +67,14 @@ export default function Footer() {
               <span key={detail}>{detail}</span>
             ))}
           </p>
-          <a href="/ochrana-osobnich-udaju.html" className="transition-colors hover:text-accent">
-            {FOOTER.privacy}
-          </a>
+          <p className="flex flex-wrap justify-center gap-x-6 gap-y-1">
+            <a href="/obchodni-podminky.html" className="transition-colors hover:text-accent">
+              {FOOTER.terms}
+            </a>
+            <a href="/ochrana-osobnich-udaju.html" className="transition-colors hover:text-accent">
+              {FOOTER.privacy}
+            </a>
+          </p>
           <div className="mt-2 flex flex-col items-center gap-4 sm:flex-row sm:gap-8">
             <p>
               © {year} {SITE.domain} — {SITE.footerSignoff}

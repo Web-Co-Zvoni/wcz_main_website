@@ -292,7 +292,7 @@ export const PRICING = {
   },
   /** the line under a web's price on a concept page */
   careFrom: "správa od 499 Kč měsíčně",
-  note: "Návrh zdarma, výrobu platíte až po schválení. Správa je nepovinná, platí se od spuštění a zrušit jde kdykoli s měsíční výpovědí.",
+  note: "Návrh zdarma, výrobu platíte až po schválení. Správa je nepovinná, platí se od spuštění a zrušit jde kdykoli s měsíční výpovědí. Nejsme plátci DPH, ceny jsou konečné.",
   plans: [
     {
       name: "Start",
@@ -401,7 +401,9 @@ export const CONTACT = {
     need: "Co od webu chcete? *",
     oldWeb: "Odkaz na váš současný web *",
     note: "Chcete nám něco napsat předem?",
-    privacyNote: "Odesláním berete na vědomí, jak nakládáme s vašimi údaji. Nikomu je nepředáváme.",
+    // "jak nakládáme s vašimi údaji" becomes the link (Contact.tsx splits on it). Not "we pass them to
+    // nobody": the booking system, e-mail and hosting providers do get them (see the privacy page)
+    privacyNote: "Odesláním berete na vědomí, jak nakládáme s vašimi údaji. Nikomu je neprodáváme.",
     next: "Pokračovat",
     back: "Zpět",
     submit: "Rezervovat schůzku",
@@ -447,6 +449,7 @@ export const CONTACT = {
 export const FOOTER = {
   backToTop: "Zpět nahoru",
   privacy: "Zásady zpracování osobních údajů",
+  terms: "Obchodní podmínky",
 };
 
 /* ------------------------------------------------------------------ */

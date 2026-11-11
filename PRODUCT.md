@@ -31,6 +31,7 @@ Visitors arrive on mobile and desktop; the primary action is the enquiry form (s
 - Contact form posts to Web3Forms (access key in src/components/Contact.tsx, honeypot `botcheck`, fields jmeno, telefon, email, obor, zprava).
 - All copy lives in `src/content.ts`; Czech typography helper `cz()` in `src/utils/typo.ts`.
 - Legal details (IČO, address) are verified against ARES — do not edit without checking.
+- Legal pages: `public/ochrana-osobnich-udaju.html` (GDPR) and `public/obchodni-podminky.html` (terms), both linked from the footer. The privacy page promises **no cookies and no third-party requests while browsing** — that is why there is no cookie banner. Pexels photos are therefore self-hosted in `public/foto/` (`node scripts/fetch-photos.mjs` after adding one). Any new outside service (analytics, maps, embeds, fonts from a CDN) needs a cookie check, a line in the privacy page's processor table, and possibly a consent banner.
 - Being built desktop-first; mobile pass comes after the full desktop version.
 
 ## Brand Commitments
